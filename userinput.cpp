@@ -49,7 +49,7 @@ UserInput::UserInput()
   m_testImage.load("../trafel/out.jpg");
   QTimer* timer = new QTimer(this);
   connect(timer, SIGNAL(timeout()), this, SLOT(slotCheck()));
-  timer->start(1500);
+  timer->start(200);
 }
 
 UserInput::~UserInput()
@@ -129,7 +129,7 @@ void UserInput::slotCheck()
   QImage image = getImage();
 
   static int counter = 0;
-  image.save( QString( "grab_" + QString::number(counter++) + ".jpg" ) );
+//  image.save( QString( "grab_" + QString::number(counter++) + ".jpg" ) );
 
   std::experimental::optional<QPoint> p = getPointer(image);
   if ( p )

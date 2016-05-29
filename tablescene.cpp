@@ -37,7 +37,6 @@ TableScene::TableScene()
 
   std::random_device rd;
   m_rng.seed(rd());
-  setBackgroundBrush(Qt::black);
 
   for ( unsigned int x = 0; x != ms_gridSize; ++x )
   {

@@ -5,6 +5,8 @@
 #include <QPoint>
 #include <vector>
 
+class QGraphicsTextItem;
+
 class TransformScene : public QGraphicsScene
 {
   Q_OBJECT
@@ -18,7 +20,7 @@ public slots:
   void slotMouseClick( QPoint p );
 
 protected:
-  static QRectF squareAt( QPoint p, double size );
+  static QRectF squareAt(QPointF p, double size );
   static QRectF squareAt( double x, double y, double size );
 
 private:
@@ -26,6 +28,7 @@ private:
   std::vector<QPoint> m_calibrationMouseClicks;
   QGraphicsEllipseItem* m_circle;
   QTransform m_transform;
+  QGraphicsTextItem* m_text;
 };
 
 #endif // TRANSFORMSCENE_H

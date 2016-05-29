@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QGraphicsEllipseItem>
 
-const std::array<QPoint,4> TransformScene::ms_calibrationCoordinates = {QPoint{300,300},QPoint{300,600},QPoint{600,600},QPoint{600,300}};
+const std::array<QPoint,4> TransformScene::ms_calibrationCoordinates = {QPoint{300,300},QPoint{400,300},QPoint{400,400},QPoint{300,400}};
 
 namespace
 {
@@ -23,7 +23,11 @@ TransformScene::TransformScene()
  : m_calibrationMouseClicks(),
    m_circle(0)
 {
-
+  setBackgroundBrush(Qt::black);
+  m_text = new QGraphicsTextItem();
+  addItem(m_text);
+  m_text->setPos(350,350);
+  m_text->setHtml(QString("<div style='background-color: #ffff00;'>") + "(-,-)" + "</div>");
 }
 
 TransformScene::~TransformScene()
@@ -39,7 +43,7 @@ void TransformScene::calibrate()
 
 }
 
-QRectF TransformScene::squareAt(QPoint p, double size)
+QRectF TransformScene::squareAt(QPointF p, double size)
 {
   return QRectF(p.x()-0.5*size, p.y()-0.5*size, size, size);
 }
@@ -52,11 +56,16 @@ QRectF TransformScene::squareAt(double x, double y, double size)
 void TransformScene::slotMouseClick(QPoint p)
 {
   qDebug() << "MOUSE CLICK AT " << p;
+  QString text = "("+QString::number(p.x())+","+QString::number(p.y())+")";
+  m_text->setHtml(QString("<div style='background-color: #ffff00;'>") + text + "</div>");
+
   // calibrate
   if ( m_calibrationMouseClicks.size() >= ms_calibrationCoordinates.size() )
   {
-    QPoint sceneP = 300*m_transform.map(p)+QPoint(300,300);
+    QPointF sceneP = 100.*m_transform.map(QPointF(p))+QPointF(300,300);
+    qDebug() << p << " -> " << sceneP;
     m_circle->setRect(squareAt(sceneP,20));
+    m_circle->show();
     qDebug() << "circle at " << m_circle->boundingRect();
     return;
   }
@@ -75,7 +84,7 @@ void TransformScene::slotMouseClick(QPoint p)
   }
   else
   {
-    QPolygon poly;
+    QPolygonF poly;
     for ( auto p : m_calibrationMouseClicks )
     {
       poly << p;
@@ -87,8 +96,11 @@ void TransformScene::slotMouseClick(QPoint p)
     for (unsigned int i = 0; i < m_calibrationMouseClicks.size(); ++i)
     {
       QPoint p = m_calibrationMouseClicks[i];
-      qDebug() << p << " -> " << 300*m_transform.map(p)+QPoint(300,300);
+      m_transform.map(QPointF(p));
+      QPointF tp = 100.*m_transform.map(QPointF(p))+QPointF(300.,300.);
+      qDebug() << p << " -> " << tp;
     }
+    m_circle->hide();
   }
 
 }
