@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 
-#define USE_CAMERA 0
+#define USE_CAMERA 1
 
 #if USE_CAMERA
 #include <raspicam/raspicam.h>
