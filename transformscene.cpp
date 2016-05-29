@@ -51,7 +51,7 @@ QRectF TransformScene::squareAt(double x, double y, double size)
 
 void TransformScene::slotMouseClick(QPoint p)
 {
-  qDebug() << "mouse click at " << p;
+  qDebug() << "MOUSE CLICK AT " << p;
   // calibrate
   if ( m_calibrationMouseClicks.size() >= ms_calibrationCoordinates.size() )
   {
@@ -59,7 +59,7 @@ void TransformScene::slotMouseClick(QPoint p)
   }
   for ( auto c : m_calibrationMouseClicks )
   {
-    if ( dist(p,c) < 20 )
+    if ( dist(p,c) < 10 )
     {
       return;
     }

@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 
-#define USE_CAMERA 0
+#define USE_CAMERA 1
 
 #if USE_CAMERA
 #include <raspicam/raspicam.h>
@@ -18,15 +18,14 @@ namespace
 raspicam::RaspiCam& getCam()
 {
   static raspicam::RaspiCam camera;
-  static intitialised = false;
+  static bool initialised = false;
   if ( !initialised )
   {
     initialised = true;
     qDebug() << "Opening camera..." << endl;
     if ( !camera.open() )
     {
-        cerr << "Error opening camera" << endl;
-        return -1;
+      exit(1);
     }
     //wait a while until camera stabilizes
     usleep(3000000);
@@ -45,6 +44,7 @@ raspicam::RaspiCam& getCam()
 
 
 UserInput::UserInput()
+  : m_imageData(0)
 {
   m_testImage.load("../trafel/out.jpg");
   QTimer* timer = new QTimer(this);
@@ -56,7 +56,7 @@ UserInput::~UserInput()
 {
 }
 
-const QImage& UserInput::getImage() const
+QImage UserInput::getImage()
 {
 #if USE_CAMERA
 
@@ -64,13 +64,11 @@ const QImage& UserInput::getImage() const
   camera.grab();
 
   //allocate memory
-  std::cout << "allocate memory" << std::endl;
-  unsigned char *data = new unsigned char[  camera.getImageTypeSize( raspicam::RASPICAM_FORMAT_RGB )];
+  delete[] m_imageData;
+  m_imageData = new unsigned char[ camera.getImageTypeSize( raspicam::RASPICAM_FORMAT_RGB )];
   //extract the image in rgb format
-  camera.retrieve( data, raspicam::RASPICAM_FORMAT_RGB );
-
-  QImage image(data, camera.getWidth(), camera.getHeight(), QImage::Format_RGB888);
-  delete[] data;
+  camera.retrieve( m_imageData, raspicam::RASPICAM_FORMAT_RGB );
+  QImage image(m_imageData, camera.getWidth(), camera.getHeight(), QImage::Format_RGB888);
   return image;
 #endif
 

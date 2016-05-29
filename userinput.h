@@ -12,7 +12,7 @@ class UserInput : public QObject
 public:
   UserInput();
   virtual ~UserInput();
-  const QImage& getImage() const;
+  QImage getImage();
 signals:
   void signalMouseClick(QPoint);
 private slots:
@@ -20,6 +20,7 @@ private slots:
 private:
   static std::experimental::optional<QPoint> getPointer(const QImage& image);
   QImage m_testImage;
+  unsigned char* m_imageData;
 };
 
 #endif // USERINPUT_H

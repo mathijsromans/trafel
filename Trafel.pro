@@ -11,6 +11,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = Trafel
 TEMPLATE = app
 
+LIBS += -lraspicam
+
 QMAKE_CXXFLAGS += -std=c++1y -Wall
 CONFIG += console
 
