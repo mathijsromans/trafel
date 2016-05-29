@@ -21,7 +21,6 @@ MainWindow::MainWindow(QWidget *parent) :
   m_scene->calibrate();
   v = new QGraphicsView();
   v->setScene(m_scene);
-  v->fitInView(QRectF(0,0,1000,800));
   setCentralWidget(v);
   resize(1200, 1000);
 }
@@ -66,15 +65,15 @@ MainWindow::~MainWindow()
 {
 }
 
-//void MainWindow::showEvent(QShowEvent* /*event*/)
-//{
-//  fitInView();
-//}
+void MainWindow::showEvent(QShowEvent* /*event*/)
+{
+  fitInView();
+}
 
-//void MainWindow::resizeEvent(QResizeEvent* /*event*/)
-//{
-//  fitInView();
-//}
+void MainWindow::resizeEvent(QResizeEvent* /*event*/)
+{
+  fitInView();
+}
 
 void MainWindow::slotMoneyChanged()
 {
@@ -87,7 +86,9 @@ void MainWindow::slotMouseClick(QPoint p)
   qDebug() << p;
 }
 
-//void MainWindow::fitInView() const
-//{
+void MainWindow::fitInView() const
+{
+  v->setSceneRect(QRectF(0,0,1000,800));
+  qDebug() << "sceneRect " << v->sceneRect();
 //  v->fitInView(t->itemsBoundingRect(), Qt::KeepAspectRatio);
-//}
+}

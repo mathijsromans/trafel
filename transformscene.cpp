@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QGraphicsEllipseItem>
 
-const std::array<QPoint,3> TransformScene::ms_calibrationCoordinates = {QPoint{50,50},QPoint{50,100},QPoint{100,100}};
+const std::array<QPoint,3> TransformScene::ms_calibrationCoordinates = {QPoint{300,300},QPoint{300,600},QPoint{600,600}};
 
 namespace
 {

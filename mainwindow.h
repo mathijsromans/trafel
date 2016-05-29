@@ -16,16 +16,16 @@ public:
   explicit MainWindow(QWidget *parent = 0);
   ~MainWindow();
 
-//protected:
-//  virtual void showEvent(QShowEvent* event) override;
-//  virtual void resizeEvent(QResizeEvent* event) override;
+protected:
+  virtual void showEvent(QShowEvent* event) override;
+  virtual void resizeEvent(QResizeEvent* event) override;
 
 private slots:
   void slotMoneyChanged();
   void slotMouseClick(QPoint p);
 
-//private:
-//  void fitInView() const;
+private:
+  void fitInView() const;
 
 private:
   QGraphicsView* v;

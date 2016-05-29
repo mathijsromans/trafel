@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 
-#define USE_CAMERA 1
+#define USE_CAMERA 0
 
 #if USE_CAMERA
 #include <raspicam/raspicam.h>
@@ -49,7 +49,7 @@ UserInput::UserInput()
   m_testImage.load("../trafel/out.jpg");
   QTimer* timer = new QTimer(this);
   connect(timer, SIGNAL(timeout()), this, SLOT(slotCheck()));
-  timer->start(50);
+  timer->start(1500);
 }
 
 UserInput::~UserInput()
@@ -79,49 +79,55 @@ QImage UserInput::getImage()
 
 std::experimental::optional<QPoint> UserInput::getPointer(const QImage& image)
 {
-//  if ( qrand() % 2 )
-//  {
-//    return QPoint(qrand() % image.width(),
-//                  qrand() % image.height() );
-//  }
+#if !USE_CAMERA
+  if ( qrand() % 2 )
+  {
+    usleep(1000000);
+    return QPoint(qrand() % image.width(),
+                  qrand() % image.height() );
+  }
+#endif
 
   // find 3x3 pixels which are very white and slightly reddish
+  QTime time;
+  time.start();
+
   const int ds = 3;
   int bestScore = -1;
   std::experimental::optional<QPoint> result;
-  for ( int x = ds/2; x < image.width()-ds/2; ++x )
+
+  for ( int y = ds/2; y < image.height()-ds/2; ++y )
   {
-    for ( int y = ds/2; y < image.height()-ds/2; ++y )
+    const QRgb* line = (QRgb *)image.constScanLine(y);
+    for ( int x = ds/2; x < image.width()-ds/2; ++x )
     {
+      int scoreA = 0;
+      int scoreB = 0;
+      int scoreC = 0;
       for ( int dx = x - ds/2; dx <= x + ds/2; ++dx)
       {
-        for ( int dy = y - ds/2; dy <= y + ds/2; ++dy)
-        {
-          QPoint p(dx, dy);
-          QRgb c = image.pixel(p);
-          int scoreA = qRed(c) - 250;
-          int scoreB = qRed(c) - std::min(255, qGreen(c)+1);
-          int scoreC = qRed(c) - std::min(255, qBlue(c)+1);
-          int sum = scoreA + scoreB + scoreC;
-          if ( scoreA >= 0 &&
-               scoreB >= 0 &&
-               scoreC >= 0 &&
-               sum > bestScore )
-          {
-            bestScore = sum;
-            result = p;
-          }
-        }
+        QRgb c = line[dx];
+        scoreA += qRed(c) - 250;
+        scoreB += qRed(c) - std::min(255, qGreen(c)+1);
+        scoreC += qRed(c) - std::min(255, qBlue(c)+1);
+      }
+      int sum = scoreA + scoreB + scoreC;
+      if ( scoreA >= 0 &&
+           scoreB >= 0 &&
+           scoreC >= 0 &&
+           sum > bestScore )
+      {
+        bestScore = sum;
+        result = QPoint(x, y);
       }
     }
   }
+//  qDebug() << "SCANNING TOOK " << time.elapsed();
   return result;
 }
 
 void UserInput::slotCheck()
 {
-  QTime time;
-  time.start();
   QImage image = getImage();
 
   static int counter = 0;
@@ -132,7 +138,6 @@ void UserInput::slotCheck()
   {
     signalMouseClick(*p);
   }
-//  qDebug() << time.elapsed();
 }
 
 
