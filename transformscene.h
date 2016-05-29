@@ -22,9 +22,10 @@ protected:
   static QRectF squareAt( double x, double y, double size );
 
 private:
-  static const std::array<QPoint,3> ms_calibrationCoordinates;
+  static const std::array<QPoint,4> ms_calibrationCoordinates;
   std::vector<QPoint> m_calibrationMouseClicks;
   QGraphicsEllipseItem* m_circle;
+  QTransform m_transform;
 };
 
 #endif // TRANSFORMSCENE_H

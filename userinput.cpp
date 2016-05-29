@@ -72,9 +72,7 @@ QImage UserInput::getImage()
   return image;
 #endif
 
-
   return m_testImage;
-
 }
 
 std::experimental::optional<QPoint> UserInput::getPointer(const QImage& image)

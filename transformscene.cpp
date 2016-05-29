@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QGraphicsEllipseItem>
 
-const std::array<QPoint,3> TransformScene::ms_calibrationCoordinates = {QPoint{300,300},QPoint{300,600},QPoint{600,600}};
+const std::array<QPoint,4> TransformScene::ms_calibrationCoordinates = {QPoint{300,300},QPoint{300,600},QPoint{600,600},QPoint{600,300}};
 
 namespace
 {
@@ -55,6 +55,9 @@ void TransformScene::slotMouseClick(QPoint p)
   // calibrate
   if ( m_calibrationMouseClicks.size() >= ms_calibrationCoordinates.size() )
   {
+    QPoint sceneP = 300*m_transform.map(p)+QPoint(300,300);
+    m_circle->setRect(squareAt(sceneP,20));
+    qDebug() << "circle at " << m_circle->boundingRect();
     return;
   }
   for ( auto c : m_calibrationMouseClicks )
@@ -69,6 +72,23 @@ void TransformScene::slotMouseClick(QPoint p)
   {
     m_circle->setRect(squareAt(ms_calibrationCoordinates[m_calibrationMouseClicks.size()],20));
     qDebug() << "circle at " << m_circle->boundingRect();
+  }
+  else
+  {
+    QPolygon poly;
+    for ( auto p : m_calibrationMouseClicks )
+    {
+      poly << p;
+    }
+    bool success = QTransform::quadToSquare(poly, m_transform);
+    qDebug() << "CREATING TRANSFORM SUCCESS " << success;
+    qDebug() << "TRANSFORM IS " << m_transform;
+
+    for (unsigned int i = 0; i < m_calibrationMouseClicks.size(); ++i)
+    {
+      QPoint p = m_calibrationMouseClicks[i];
+      qDebug() << p << " -> " << 300*m_transform.map(p)+QPoint(300,300);
+    }
   }
 
 }
