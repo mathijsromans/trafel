@@ -2,9 +2,11 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "userinput.h"
 class QGraphicsView;
 class TableScene;
 class QLabel;
+class TransformScene;
 
 class MainWindow : public QMainWindow
 {
@@ -14,21 +16,24 @@ public:
   explicit MainWindow(QWidget *parent = 0);
   ~MainWindow();
 
-protected:
-  virtual void showEvent(QShowEvent* event) override;
-  virtual void resizeEvent(QResizeEvent* event) override;
+//protected:
+//  virtual void showEvent(QShowEvent* event) override;
+//  virtual void resizeEvent(QResizeEvent* event) override;
 
 private slots:
   void slotMoneyChanged();
+  void slotMouseClick(QPoint p);
 
-private:
-  void fitInView() const;
+//private:
+//  void fitInView() const;
 
 private:
   QGraphicsView* v;
-  TableScene* t;
-  QLabel* m_l0;
-  QLabel* m_l1;
+//  TableScene* t;
+  TransformScene* m_scene;
+//  QLabel* m_l0;
+//  QLabel* m_l1;
+  UserInput m_ui;
 };
 
 #endif // MAINWINDOW_H

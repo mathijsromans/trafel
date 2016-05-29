@@ -1,14 +1,14 @@
 #ifndef TABLESCENE_H
 #define TABLESCENE_H
 
-#include <QGraphicsScene>
+#include "earth.h"
+#include "transformscene.h"
 #include <QObject>
 #include <random>
 #include <array>
 #include <vector>
-#include "earth.h"
 
-class TableScene : public QGraphicsScene
+class TableScene : public TransformScene
 {
   Q_OBJECT
 

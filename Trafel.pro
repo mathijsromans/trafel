@@ -11,18 +11,22 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = Trafel
 TEMPLATE = app
 
-QMAKE_CXXFLAGS += -std=c++11 -Wall
-
+QMAKE_CXXFLAGS += -std=c++1y -Wall
+CONFIG += console
 
 SOURCES += main.cpp\
         mainwindow.cpp \
     tablescene.cpp \
     earth.cpp \
-    distributions.cpp
+    distributions.cpp \
+    userinput.cpp \
+    transformscene.cpp
 
 HEADERS  += mainwindow.h \
     tablescene.h \
     earth.h \
-    distributions.h
+    distributions.h \
+    userinput.h \
+    transformscene.h
 
 FORMS    +=

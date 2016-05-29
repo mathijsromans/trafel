@@ -22,11 +22,6 @@ bool has_if( const T1& vec, T2 condition )
   return std::find_if( vec.begin(), vec.end(), condition ) != vec.end();
 }
 
-QRectF squareAt( double x, double y, double size )
-{
-  return QRectF(x-0.5*size, y-0.5*size, size, size);
-}
-
 template <typename T>
 T sqr(T x) { return x*x; }
 
@@ -34,8 +29,7 @@ T sqr(T x) { return x*x; }
 
 
 TableScene::TableScene()
-  : QGraphicsScene(),
-    m_earth(ms_gridSize, ms_gridSize),
+  : m_earth(ms_gridSize, ms_gridSize),
     m_travelState(TravelState::neutral),
     m_clickState(ClickState::neutral),
     m_money{ 35, 45 }
