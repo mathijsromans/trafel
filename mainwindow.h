@@ -22,17 +22,16 @@ protected:
 
 private slots:
   void slotMoneyChanged();
-  void slotMouseClick(QPoint p);
+  void slotLightAt(QPoint p);
 
 private:
   void fitInView() const;
 
 private:
   QGraphicsView* v;
-//  TableScene* t;
-  TransformScene* m_scene;
-//  QLabel* m_l0;
-//  QLabel* m_l1;
+  TableScene* t;
+  QLabel* m_l0;
+  QLabel* m_l1;
   UserInput m_ui;
 };
 

@@ -2,12 +2,13 @@
 #include <QTime>
 #include <QTimer>
 #include <QDebug>
+#include <array>
 #include <cassert>
 #include <ctime>
 #include <unistd.h>
 
 
-#define USE_CAMERA 1
+#define USE_CAMERA 0
 
 #if USE_CAMERA
 #include <raspicam/raspicam.h>
@@ -58,8 +59,12 @@ UserInput::~UserInput()
 
 QImage UserInput::getImage()
 {
-#if USE_CAMERA
+  QTime time;
+  time.start();
 
+  QImage result;
+
+#if USE_CAMERA
   raspicam::RaspiCam& camera = getCam();
   camera.grab();
 
@@ -68,59 +73,120 @@ QImage UserInput::getImage()
   m_imageData = new unsigned char[ camera.getImageTypeSize( raspicam::RASPICAM_FORMAT_RGB )];
   //extract the image in rgb format
   camera.retrieve( m_imageData, raspicam::RASPICAM_FORMAT_RGB );
-  QImage image(m_imageData, camera.getWidth(), camera.getHeight(), QImage::Format_RGB888);
-  return image;
+  result = QImage(m_imageData, camera.getWidth(), camera.getHeight(), QImage::Format_RGB888);
+#else
+  result = m_testImage;
 #endif
 
-  return m_testImage;
+  qDebug() << "getImage() took" << time.elapsed() << "ms";
+  return result;
+}
+
+namespace
+{
+struct ScoreOnePixel
+{
+  ScoreOnePixel() : scoreA(0), scoreB(0), scoreC(0) {}
+  explicit ScoreOnePixel( QRgb c )
+  {
+    scoreA = qRed(c) - 250;
+    scoreB = qRed(c) - std::min(255, qGreen(c)+1);
+    scoreC = qRed(c) - std::min(255, qBlue(c)+1);
+  }
+  int scoreA;
+  int scoreB;
+  int scoreC;
+};
+
+const int ds = 3;
+
+struct Score
+{
+
+  explicit Score() : scores(), scoreA(0), scoreB(0), scoreC(0), sum(0), newScoreIndex(0) {}
+
+  void addPoint( QRgb c )
+  {
+    ScoreOnePixel& sp = scores[newScoreIndex];
+    scoreA -= sp.scoreA;
+    scoreB -= sp.scoreB;
+    scoreC -= sp.scoreC;
+    sum -= sp.scoreA;
+    sum -= sp.scoreB;
+    sum -= sp.scoreC;
+    sp = ScoreOnePixel(c);
+    scoreA += sp.scoreA;
+    scoreB += sp.scoreB;
+    scoreC += sp.scoreC;
+    sum += sp.scoreA;
+    sum += sp.scoreB;
+    sum += sp.scoreC;
+
+    newScoreIndex = (newScoreIndex+1)%ds;
+  }
+
+  int getScore() const
+  {
+    if ( scoreA >= 0 &&
+         scoreB >= 0 &&
+         scoreC >= 0 )
+    {
+      return scoreA + scoreB + scoreC;
+    }
+    return -1;
+  }
+
+  std::array<ScoreOnePixel, ds> scores;
+  int scoreA;
+  int scoreB;
+  int scoreC;
+  int sum;
+  unsigned int newScoreIndex;
+};
 }
 
 std::experimental::optional<QPoint> UserInput::getPointer(const QImage& image)
 {
-#if !USE_CAMERA
-  if ( qrand() % 2 )
-  {
-    usleep(1000000);
-    return QPoint(qrand() % image.width(),
-                  qrand() % image.height() );
-  }
-#endif
+//#if !USE_CAMERA
+//  if ( qrand() % 2 )
+//  {
+//    usleep(1000000);
+//    return QPoint(qrand() % image.width(),
+//                  qrand() % image.height() );
+//  }
+//#endif
 
   // find 3x3 pixels which are very white and slightly reddish
   QTime time;
   time.start();
 
-  const int ds = 3;
+
   int bestScore = -1;
   std::experimental::optional<QPoint> result;
 
-  for ( int y = ds/2; y < image.height()-ds/2; ++y )
+  const int height = image.height();
+  const int width = image.width();
+  if ( height < ds ||
+       width < ds )
+  {
+    return result;
+  }
+
+  Score s;
+  for ( int y = 0; y < height; ++y )
   {
     const QRgb* line = (QRgb *)image.constScanLine(y);
-    for ( int x = ds/2; x < image.width()-ds/2; ++x )
+    for ( int x = 0; x < width; ++x )
     {
-      int scoreA = 0;
-      int scoreB = 0;
-      int scoreC = 0;
-      for ( int dx = x - ds/2; dx <= x + ds/2; ++dx)
+      s.addPoint(line[x]);
+      if ( s.sum > bestScore )
       {
-        QRgb c = line[dx];
-        scoreA += qRed(c) - 250;
-        scoreB += qRed(c) - std::min(255, qGreen(c)+1);
-        scoreC += qRed(c) - std::min(255, qBlue(c)+1);
-      }
-      int sum = scoreA + scoreB + scoreC;
-      if ( scoreA >= 0 &&
-           scoreB >= 0 &&
-           scoreC >= 0 &&
-           sum > bestScore )
-      {
-        bestScore = sum;
-        result = QPoint(x, y);
+        bestScore = s.sum;
+        result = QPoint(x - ds/2, y);
       }
     }
   }
-//  qDebug() << "SCANNING TOOK " << time.elapsed();
+  qDebug() << "getPoint() took" << time.elapsed() << "ms : " << (result ? *result : QPoint(0,0));
   return result;
 }
 
@@ -128,13 +194,13 @@ void UserInput::slotCheck()
 {
   QImage image = getImage();
 
-  static int counter = 0;
+//  static int counter = 0;
 //  image.save( QString( "grab_" + QString::number(counter++) + ".jpg" ) );
 
   std::experimental::optional<QPoint> p = getPointer(image);
   if ( p )
   {
-    signalMouseClick(*p);
+    signalMouseClick(*p, image);
   }
 }
 
