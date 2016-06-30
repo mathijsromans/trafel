@@ -34,8 +34,6 @@ TransformScene::TransformScene()
 
   m_image = new QGraphicsPixmapItem();
   addItem(m_image);
-
-  calibrate();
 }
 
 TransformScene::~TransformScene()
@@ -129,6 +127,7 @@ void TransformScene::newCalibratedPoint(QPoint p)
     }
     m_circle->hide();
     m_calibrated = true;
+    init();
   }
 }
 

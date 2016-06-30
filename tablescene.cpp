@@ -33,8 +33,15 @@ TableScene::TableScene()
     m_travelState(TravelState::neutral),
     m_clickState(ClickState::neutral),
     m_money{ 35, 45 }
-{
+{  
+}
 
+TableScene::~TableScene()
+{  
+}
+
+void TableScene::init()
+{
   std::random_device rd;
   m_rng.seed(rd());
 
@@ -79,10 +86,6 @@ TableScene::TableScene()
       addEllipse(squareAt(x, y, 0.93), QPen(c))->setZValue(-10);
     }
   }
-}
-
-TableScene::~TableScene()
-{  
 }
 
 int TableScene::getMoney(unsigned int player) const

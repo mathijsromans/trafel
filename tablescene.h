@@ -30,6 +30,10 @@ private slots:
   void slotNext();
 
 private:
+
+  virtual void init();
+
+private:
   struct Dot
   {
     unsigned int x,y;

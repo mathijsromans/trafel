@@ -89,21 +89,21 @@ struct ScoreOnePixel
   ScoreOnePixel() : scoreA(0), scoreB(0), scoreC(0) {}
   explicit ScoreOnePixel( QRgb c )
   {
-    scoreA = qRed(c) - 250;
-    scoreB = qRed(c) - std::min(255, qGreen(c)+1);
-    scoreC = qRed(c) - std::min(255, qBlue(c)+1);
+    scoreA = qRed(c)- 220;
+    scoreB = 80 - std::abs(110 - qGreen(c));
+    scoreC = 80 - std::abs(110 - qBlue(c));
   }
   int scoreA;
   int scoreB;
   int scoreC;
 };
 
-const int ds = 3;
+const int ds = 15;
 
 struct Score
 {
 
-  explicit Score() : scores(), scoreA(0), scoreB(0), scoreC(0), sum(0), newScoreIndex(0) {}
+  explicit Score() : scores(), scoreA(0), scoreB(0), scoreC(0), newScoreIndex(0) {}
 
   void addPoint( QRgb c )
   {
@@ -111,16 +111,10 @@ struct Score
     scoreA -= sp.scoreA;
     scoreB -= sp.scoreB;
     scoreC -= sp.scoreC;
-    sum -= sp.scoreA;
-    sum -= sp.scoreB;
-    sum -= sp.scoreC;
     sp = ScoreOnePixel(c);
     scoreA += sp.scoreA;
     scoreB += sp.scoreB;
     scoreC += sp.scoreC;
-    sum += sp.scoreA;
-    sum += sp.scoreB;
-    sum += sp.scoreC;
 
     newScoreIndex = (newScoreIndex+1)%ds;
   }
@@ -140,7 +134,6 @@ struct Score
   int scoreA;
   int scoreB;
   int scoreC;
-  int sum;
   unsigned int newScoreIndex;
 };
 }
@@ -179,10 +172,11 @@ std::experimental::optional<QPoint> UserInput::getPointer(const QImage& image)
     for ( int x = 0; x < width; ++x )
     {
       s.addPoint(line[x]);
-      if ( s.sum > bestScore )
+      if ( s.getScore() > bestScore )
       {
-        bestScore = s.sum;
+        bestScore = s.getScore();
         result = QPoint(x - ds/2, y);
+//        qDebug() << "new best point at " << *result << " with score " << bestScore;
       }
     }
   }
@@ -194,8 +188,10 @@ void UserInput::slotCheck()
 {
   QImage image = getImage();
 
-//  static int counter = 0;
-//  image.save( QString( "grab_" + QString::number(counter++) + ".jpg" ) );
+  static int counter = 0;
+  QString fileName = QString("grab_") + QString::number(counter++) + ".jpg";
+  image.save( fileName );
+  qDebug() << "saved to " << fileName;
 
   std::experimental::optional<QPoint> p = getPointer(image);
   if ( p )

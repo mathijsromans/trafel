@@ -30,6 +30,8 @@ protected:
 
 private:
 
+  virtual void init() = 0;
+
   void newCalibratedPoint(QPoint p);
 
 private:
