@@ -69,9 +69,13 @@ void TransformScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
 }
 
-void TransformScene::slotLightAt(QPoint p, QImage i)
+void TransformScene::slotNewImage(QImage i)
 {
   m_image->setPixmap(QPixmap::fromImage(i));
+}
+
+void TransformScene::slotLightAt(QPoint p)
+{
 
   QString text = "("+QString::number(p.x())+","+QString::number(p.y())+")";
   m_text->setHtml(QString("<div style='background-color: #ffff00;'>") + text + "</div>");

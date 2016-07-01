@@ -14,7 +14,8 @@ public:
   virtual ~UserInput();
   QImage getImage();
 signals:
-  void signalMouseClick(QPoint point, QImage image);
+  void signalNewImage(QImage image);
+  void signalMouseClick(QPoint point);
 private slots:
   void slotCheck();
 private:

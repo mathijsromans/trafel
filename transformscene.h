@@ -18,7 +18,8 @@ public:
   void calibrate();
 
 public slots:
-  void slotLightAt( QPoint p, QImage i );
+  void slotNewImage( QImage i );
+  void slotLightAt( QPoint p );
 
 protected:
   static QRectF squareAt(QPointF p, double size );

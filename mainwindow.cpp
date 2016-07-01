@@ -47,7 +47,8 @@ MainWindow::MainWindow(QWidget *parent) :
 //  connect( b, SIGNAL(pressed()), t, SLOT(slotGo()) );
   connect( t, SIGNAL(signalMoneyChanged()), this, SLOT(slotMoneyChanged()) );
 
-  connect(&m_ui, SIGNAL(signalMouseClick(QPoint, QImage)), t, SLOT(slotLightAt(QPoint, QImage)));
+  connect(&m_ui, SIGNAL(signalNewImage(QImage)), t, SLOT(slotNewImage(QImage)));
+  connect(&m_ui, SIGNAL(signalMouseClick(QPoint)), t, SLOT(slotLightAt(QPoint)));
   t->calibrate();
 
   slotMoneyChanged();

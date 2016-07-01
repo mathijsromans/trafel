@@ -187,6 +187,7 @@ std::experimental::optional<QPoint> UserInput::getPointer(const QImage& image)
 void UserInput::slotCheck()
 {
   QImage image = getImage();
+  signalNewImage(image);
 
   static int counter = 0;
   QString fileName = QString("grab_") + QString::number(counter++) + ".jpg";
@@ -196,7 +197,7 @@ void UserInput::slotCheck()
   std::experimental::optional<QPoint> p = getPointer(image);
   if ( p )
   {
-    signalMouseClick(*p, image);
+    signalMouseClick(*p);
   }
 }
 
