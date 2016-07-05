@@ -8,7 +8,7 @@
 #include <ctime>
 #include <unistd.h>
 
-#define USE_CAMERA 1
+#define USE_CAMERA 0
 
 #if USE_CAMERA
 #include <raspicam/raspicam.h>
