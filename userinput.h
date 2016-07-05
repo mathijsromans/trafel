@@ -30,6 +30,7 @@ private:
   public:
     struct RGB { unsigned char r, g, b; };
     Image() : m_width(0), m_height(0), m_data() {}
+    Image( const QImage& image );
     void setSize( unsigned int width, unsigned int height, unsigned int dataSize );
     QImage toImage() const;
     const RGB* scanLine(unsigned int y) const;
@@ -80,7 +81,7 @@ private:
     unsigned int newScoreIndex;
   };
 
-  QImage m_testImage;
+  Image m_testImage;
   Image m_currentImage;
 };
 

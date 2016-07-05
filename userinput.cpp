@@ -46,9 +46,9 @@ raspicam::RaspiCam& getCam()
 
 
 UserInput::UserInput()
-  : m_currentImage()
+  : m_testImage(QImage("../trafel/test_0.png")),
+    m_currentImage()
 {
-  m_testImage.load("../trafel/out.jpg");
   QTimer* timer = new QTimer(this);
   connect(timer, SIGNAL(timeout()), this, SLOT(slotCheck()));
   timer->start(2000);
@@ -57,8 +57,6 @@ UserInput::UserInput()
 UserInput::~UserInput()
 {
 }
-
-
 
 void UserInput::getImage()
 {
@@ -71,7 +69,7 @@ void UserInput::getImage()
   m_currentImage.setSize( camera.getWidth(), camera.getHeight(), camera.getImageTypeSize( raspicam::RASPICAM_FORMAT_RGB ) );
   camera.retrieve( m_currentImage.getData(), raspicam::RASPICAM_FORMAT_RGB );
 #else
-  result = m_testImage;
+  m_currentImage = m_testImage;
 #endif
 
   qDebug() << "getImage() took" << time.elapsed() << "ms";
@@ -145,6 +143,23 @@ void UserInput::slotCheck()
 }
 
 
+UserInput::Image::Image(const QImage& image)
+  : m_width(image.width()),
+    m_height(image.height()),
+    m_data(m_width*m_height)
+{
+  for ( unsigned int y = 0; y < m_height; ++y )
+  {
+    for ( unsigned int x = 0; x < m_width; ++x )
+    {
+      QRgb c = image.pixel( x, y );
+      m_data[y * m_width + x] = RGB{ static_cast<unsigned char>(qRed(c)),
+                                     static_cast<unsigned char>(qGreen(c)),
+                                     static_cast<unsigned char>(qBlue(c)) };
+    }
+  }
+}
+
 void UserInput::Image::setSize(unsigned int width, unsigned int height, unsigned int dataSize)
 {
   if ( dataSize != sizeof(RGB)*width*height)
@@ -154,12 +169,11 @@ void UserInput::Image::setSize(unsigned int width, unsigned int height, unsigned
   m_width = width;
   m_height = height;
   m_data.resize(m_width*m_height);
-
 }
 
 QImage UserInput::Image::toImage() const
 {
-  return QImage(getConstData(), m_width, m_height, m_width * sizeof(RGB), QImage::Format_RGB888).copy();
+  return QImage(getConstData(), m_width, m_height, QImage::Format_RGB888).copy();
 }
 
 const UserInput::Image::RGB* UserInput::Image::scanLine(unsigned int y) const
