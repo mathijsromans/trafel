@@ -1,12 +1,12 @@
 #include "userinput.h"
+#include "scorekeeper.h"
 #include <QFile>
 #include <QTime>
 #include <QTimer>
 #include <QDebug>
 #include <array>
 #include <cassert>
-#include <ctime>
-#include <unistd.h>
+#include <unordered_set>
 
 #define USE_CAMERA 1
 
@@ -46,19 +46,18 @@ raspicam::RaspiCam& getCam()
 
 
 UserInput::UserInput()
-  : m_currentImage()
+  : m_testImage(QImage("../trafel/test_0.png")),
+    m_currentImage()
 {
-  m_testImage.load("../trafel/out.jpg");
   QTimer* timer = new QTimer(this);
   connect(timer, SIGNAL(timeout()), this, SLOT(slotCheck()));
   timer->start(2000);
+  QTimer::singleShot(0, this, SLOT(slotCheck()));
 }
 
 UserInput::~UserInput()
 {
 }
-
-
 
 void UserInput::getImage()
 {
@@ -71,7 +70,7 @@ void UserInput::getImage()
   m_currentImage.setSize( camera.getWidth(), camera.getHeight(), camera.getImageTypeSize( raspicam::RASPICAM_FORMAT_RGB ) );
   camera.retrieve( m_currentImage.getData(), raspicam::RASPICAM_FORMAT_RGB );
 #else
-  result = m_testImage;
+  m_currentImage = m_testImage;
 #endif
 
   qDebug() << "getImage() took" << time.elapsed() << "ms";
@@ -81,48 +80,68 @@ namespace
 {
 }
 
-std::experimental::optional<QPoint> UserInput::getPointer() const
+bool UserInput::searchLine(int y, std::array<QPoint,3>& result, std::array<int, 3>& bestScore) const
+{
+  bool positiveScore = false;
+  const int width = m_currentImage.getWidth();
+  ScoreKeeper s;
+  const Image::RGB* line = m_currentImage.scanLine(y);
+  for ( int x = 0; x < width; ++x )
+  {
+    s.addPoint(line[x]);
+    for ( unsigned int c = 0; c < 3; ++c )
+    {
+      int score = s.getScore(static_cast<ScoreKeeper::Color>(c));
+      if ( score > 0 )
+      {
+        positiveScore = true;
+      }
+      if ( score > bestScore[c] )
+      {
+        bestScore[c] = score;
+        result[c] = QPoint(x - 3*ScoreKeeper::ds/2, y);
+        //          qDebug() << "new best point for color " << c <<
+        //                      " at " << result[c] <<
+        //                      " with scores: " <<
+        //                      s.scoreBright << "," <<
+        //                      s.scoreColor[0] << "," <<
+        //                      s.scoreColor[1] << "," <<
+        //                      s.scoreColor[2] << ":" <<
+        //                      score;
+      }
+    }
+  }
+  return positiveScore;
+}
+
+std::array<QPoint,3> UserInput::getPointer() const
 {
   QTime time;
   time.start();
 
-  std::experimental::optional<QPoint> result;
+  std::array<QPoint,3> result = {QPoint(0,0), QPoint(0,0), QPoint(0,0)};
 
+  std::array<int, 3> bestScore;
+  bestScore.fill(0);
   const int height = m_currentImage.getHeight();
-  const int width = m_currentImage.getWidth();
-  if ( height < ds ||
-       width < ds )
+  const int stepSize = 4;
+  std::unordered_set<int> moreLinesToBeSearched;
+  for ( int y = 0; y < height; y += stepSize )
   {
-    return result;
-  }
-
-  static int counter = 0;
-  QFile file("check"+QString::number(counter++) + ".txt");
-  if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-         return result;
-  QTextStream out(&file);
-
-  int bestScore = -1;
-  Score s;
-  for ( int y = 0; y < height/10; ++y )
-  {
-    const Image::RGB* line = m_currentImage.scanLine(y);
-    for ( int x = 0; x < width/10; ++x )
+    if( searchLine(y, result, bestScore) )
     {
-      s.addPoint(line[x], QPoint(x,y), out);
-      if ( s.getScore() > bestScore )
+      for ( int i = y-stepSize+1; i < y+stepSize; ++i )
       {
-        bestScore = s.getScore();
-        result = QPoint(x - ds/2, y);
-        qDebug() << "new best point at " << *result << " with score " << s.scoreA << ", " << s.scoreC << " : " << s.getScore();
-        if ( result == QPoint(459,802) )
-        {
-            qDebug() << "hello";
-        }
+        moreLinesToBeSearched.insert(i);
       }
     }
   }
-  qDebug() << "getPoint() took" << time.elapsed() << "ms : " << (result ? *result : QPoint(0,0));
+  for ( int y : moreLinesToBeSearched )
+  {
+    searchLine(y, result, bestScore);
+  }
+
+  qDebug() << "getPoint() took" << time.elapsed() << "ms : " << result[0] << ", " << result[1] << ", " << result[2];
   return result;
 }
 
@@ -137,56 +156,9 @@ void UserInput::slotCheck()
   image.save( fileName );
 //  qDebug() << "saved to " << fileName;
 
-  std::experimental::optional<QPoint> p = getPointer();
-  if ( p )
+  PointerEvent event( getPointer() );
+  if ( event.getAny() != QPoint(0,0) )
   {
-    signalMouseClick(*p);
+    signalMouseClick(event);
   }
-}
-
-
-void UserInput::Image::setSize(unsigned int width, unsigned int height, unsigned int dataSize)
-{
-  if ( dataSize != sizeof(RGB)*width*height)
-  {
-    throw std::logic_error("incorrect image byte size");
-  }
-  m_width = width;
-  m_height = height;
-  m_data.resize(m_width*m_height);
-
-}
-
-QImage UserInput::Image::toImage() const
-{
-  return QImage(getConstData(), m_width, m_height, m_width * sizeof(RGB), QImage::Format_RGB888).copy();
-}
-
-const UserInput::Image::RGB* UserInput::Image::scanLine(unsigned int y) const
-{
-  return &m_data[y * m_width];
-}
-
-UserInput::ScoreOnePixel::ScoreOnePixel(UserInput::Image::RGB c, QPoint p, QTextStream &s)
-  : color(c)
-{
-    scoreA = c.r + c.g + c.b - 3*128;
-    scoreB = 0;
-    scoreC = 2 * c.r - c.g - c.b;
-    s << p.x() << "," << p.y() << ":" <<
-         c.r << "," << c.g << "," << c.b << '\n';
-}
-
-void UserInput::Score::addPoint(UserInput::Image::RGB c, QPoint p, QTextStream &s)
-{
-    ScoreOnePixel& sp = scores[newScoreIndex];
-    scoreA -= sp.scoreA;
-    scoreB -= sp.scoreB;
-    scoreC -= sp.scoreC;
-    sp = ScoreOnePixel(c, p, s);
-    scoreA += sp.scoreA;
-    scoreB += sp.scoreB;
-    scoreC += sp.scoreC;
-
-    newScoreIndex = (newScoreIndex+1)%ds;
 }
