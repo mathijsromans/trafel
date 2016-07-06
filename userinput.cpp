@@ -156,9 +156,9 @@ void UserInput::slotCheck()
   image.save( fileName );
 //  qDebug() << "saved to " << fileName;
 
-  std::array<QPoint,3> p = getPointer();
-  if ( p[0] != QPoint(0,0) )
+  PointerEvent event( getPointer() );
+  if ( event.getAny() != QPoint(0,0) )
   {
-    signalMouseClick(p[0]);
+    signalMouseClick(event);
   }
 }

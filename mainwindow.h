@@ -22,7 +22,7 @@ protected:
 
 private slots:
   void slotMoneyChanged();
-  void slotLightAt(QPoint p);
+  void slotLightAt(PointerEvent e);
 
 private:
   void fitInView() const;

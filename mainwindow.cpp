@@ -48,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
   connect( t, SIGNAL(signalMoneyChanged()), this, SLOT(slotMoneyChanged()) );
 
   connect(&m_ui, SIGNAL(signalNewImage(QImage)), t, SLOT(slotNewImage(QImage)));
-  connect(&m_ui, SIGNAL(signalMouseClick(QPoint)), t, SLOT(slotLightAt(QPoint)));
+  connect(&m_ui, SIGNAL(signalMouseClick(PointerEvent)), t, SLOT(slotLightAt(PointerEvent)));
   t->calibrate();
 
   slotMoneyChanged();
@@ -74,9 +74,9 @@ void MainWindow::slotMoneyChanged()
   m_l1->setText(QString::number(t->getMoney(1)));
 }
 
-void MainWindow::slotLightAt(QPoint p)
+void MainWindow::slotLightAt(PointerEvent e)
 {
-  qDebug() << p;
+  qDebug() << e.getAny();
 }
 
 void MainWindow::fitInView() const

@@ -22,16 +22,11 @@ double dist(QPoint p1, QPoint p2)
 }
 
 TransformScene::TransformScene()
- : m_calibrationMouseClicks(),
+ : m_calibrationLights(),
    m_calibrated(false),
    m_circle(0)
 {
   setBackgroundBrush(Qt::black);
-  m_text = new QGraphicsTextItem();
-  addItem(m_text);
-  m_text->setPos(350,350);
-  m_text->setHtml(QString("<div style='background-color: #ffff00;'>") + "(-,-)" + "</div>");
-
   m_image = new QGraphicsPixmapItem();
   addItem(m_image);
 }
@@ -43,8 +38,8 @@ TransformScene::~TransformScene()
 
 void TransformScene::calibrate()
 {
-  m_calibrationMouseClicks.clear();
-  m_circle = addEllipse(squareAt(ms_calibrationCoordinates[m_calibrationMouseClicks.size()],20), QPen(Qt::green,3));
+  m_calibrationLights.clear();
+  m_circle = addEllipse(squareAt(ms_calibrationCoordinates[m_calibrationLights.size()],20), QPen(Qt::green,3));
   qDebug() << "circle at " << m_circle->boundingRect();
 
 }
@@ -74,61 +69,54 @@ void TransformScene::slotNewImage(QImage i)
   m_image->setPixmap(QPixmap::fromImage(i));
 }
 
-void TransformScene::slotLightAt(QPoint p)
+void TransformScene::slotLightAt(PointerEvent e)
 {
-
-  QString text = "("+QString::number(p.x())+","+QString::number(p.y())+")";
-  m_text->setHtml(QString("<div style='background-color: #ffff00;'>") + text + "</div>");
-
   if ( m_calibrated )
   {
-    QPointF sceneP = 100.*m_transform.map(QPointF(p))+QPointF(300,300);
-    qDebug() << p << " -> " << sceneP;
-    m_circle->setRect(squareAt(sceneP,20));
+    e.transform(m_transform);
+    m_circle->setRect(squareAt(e.getAny(),20));
     m_circle->show();
     qDebug() << "circle at " << m_circle->boundingRect();
-    mouseClick(sceneP);
+    mouseClick(e.getAny());
   }
   else
   {
-    newCalibratedPoint(p);
+    newCalibratedPoint(e.getAny());
   }
 }
 
 void TransformScene::newCalibratedPoint(QPoint p)
 {
   // calibrate
-  for ( auto c : m_calibrationMouseClicks )
+  for ( auto c : m_calibrationLights )
   {
     if ( dist(p,c) < 10 )
     {
       return;
     }
   }
-  m_calibrationMouseClicks.push_back(p);
-  if ( m_calibrationMouseClicks.size() < ms_calibrationCoordinates.size() )
+  m_calibrationLights.push_back(p);
+  if ( m_calibrationLights.size() < ms_calibrationCoordinates.size() )
   {
-    m_circle->setRect(squareAt(ms_calibrationCoordinates[m_calibrationMouseClicks.size()],20));
+    m_circle->setRect(squareAt(ms_calibrationCoordinates[m_calibrationLights.size()],20));
     qDebug() << "circle at " << m_circle->boundingRect();
   }
   else
   {
-    QPolygonF poly;
-    for ( QPoint p : m_calibrationMouseClicks )
+    QPolygonF coords;
+    for ( QPoint p : ms_calibrationCoordinates )
     {
-      poly << p;
+      coords << p;
     }
-    bool success = QTransform::quadToSquare(poly, m_transform);
+    QPolygonF ligths;
+    for ( QPoint p : m_calibrationLights )
+    {
+      ligths << p;
+    }
+    bool success = QTransform::quadToQuad(ligths, coords, m_transform);
     qDebug() << "CREATING TRANSFORM SUCCESS " << success;
     qDebug() << "TRANSFORM IS " << m_transform;
 
-    for (unsigned int i = 0; i < m_calibrationMouseClicks.size(); ++i)
-    {
-      QPoint p = m_calibrationMouseClicks[i];
-      m_transform.map(QPointF(p));
-      QPointF tp = 100.*m_transform.map(QPointF(p))+QPointF(300.,300.);
-      qDebug() << p << " -> " << tp;
-    }
     m_circle->hide();
     m_calibrated = true;
     init();

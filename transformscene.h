@@ -1,11 +1,11 @@
 #ifndef TRANSFORMSCENE_H
 #define TRANSFORMSCENE_H
 
+#include "pointerevent.h"
 #include <QGraphicsScene>
 #include <QPoint>
 #include <vector>
 
-class QGraphicsTextItem;
 class QGraphicsPixmapItem;
 
 class TransformScene : public QGraphicsScene
@@ -19,7 +19,7 @@ public:
 
 public slots:
   void slotNewImage( QImage i );
-  void slotLightAt( QPoint p );
+  void slotLightAt( PointerEvent e );
 
 protected:
   static QRectF squareAt(QPointF p, double size );
@@ -37,11 +37,10 @@ private:
 
 private:
   static const std::array<QPoint,4> ms_calibrationCoordinates;
-  std::vector<QPoint> m_calibrationMouseClicks;
+  std::vector<QPoint> m_calibrationLights;
   bool m_calibrated;
   QGraphicsEllipseItem* m_circle;
   QTransform m_transform;
-  QGraphicsTextItem* m_text;
   QGraphicsPixmapItem* m_image;
 };
 

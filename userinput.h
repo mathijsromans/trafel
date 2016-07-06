@@ -2,6 +2,7 @@
 #define USERINPUT_H
 
 #include "image.h"
+#include "pointerevent.h"
 #include <array>
 #include <QImage>
 #include <QObject>
@@ -18,7 +19,7 @@ public:
   void getImage();
 signals:
   void signalNewImage(QImage image);
-  void signalMouseClick(QPoint point);
+  void signalMouseClick(PointerEvent point);
 private slots:
   void slotCheck();
 private:
