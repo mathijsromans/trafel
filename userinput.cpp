@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <array>
 #include <cassert>
+#include <unistd.h> // for usleep
 #include <unordered_set>
 
 #define USE_CAMERA 0
@@ -31,7 +32,7 @@ raspicam::RaspiCam& getCam()
 
     camera.setExposure(raspicam::RASPICAM_EXPOSURE_AUTO);
     camera.setISO(100); // note: 100 to 800
-    camera.setShutterSpeed(10000);
+    camera.setShutterSpeed(5000);
 
     //wait a while until camera stabilizes
     usleep(3000000);
@@ -51,8 +52,7 @@ UserInput::UserInput()
 {
   QTimer* timer = new QTimer(this);
   connect(timer, SIGNAL(timeout()), this, SLOT(slotCheck()));
-  timer->start(2000);
-  QTimer::singleShot(0, this, SLOT(slotCheck()));
+  timer->start(200);
 }
 
 UserInput::~UserInput()
@@ -147,13 +147,16 @@ std::array<QPoint,3> UserInput::getPointer() const
 
 void UserInput::slotCheck()
 {
+  QTime time;
+  time.start();
+
   getImage();
   QImage image = m_currentImage.toImage();
   signalNewImage(image);
 
-  static int counter = 0;
-  QString fileName = QString("grab_") + QString::number(counter++) + ".png";
-  image.save( fileName );
+//  static int counter = 0;
+//  QString fileName = QString("grab_") + QString::number(counter++) + ".png";
+//  image.save( fileName );
 //  qDebug() << "saved to " << fileName;
 
   PointerEvent event( getPointer() );
@@ -161,4 +164,7 @@ void UserInput::slotCheck()
   {
     signalMouseClick(event);
   }
+
+  qDebug() << "slotCheck() took" << time.elapsed() << "ms";
+
 }

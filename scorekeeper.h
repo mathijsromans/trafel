@@ -16,9 +16,9 @@ private:
   static int brightScore( Image::RGB c ) { return static_cast<int>(c.r) +
                                                   static_cast<int>(c.g) +
                                                   static_cast<int>(c.b) - 3*128; }
-  static int redScore( Image::RGB c ) { return 2 * c.r - c.g - c.b; }
-  static int greScore( Image::RGB c ) { return 2 * c.g - c.r - c.b; }
-  static int bluScore( Image::RGB c ) { return 2 * c.b - c.r - c.g; }
+  static int redScore( Image::RGB c ) { return 2 * c.r - c.g - c.b - brightScore(c); }
+  static int greScore( Image::RGB c ) { return 2 * c.g - c.r - c.b - brightScore(c); }
+  static int bluScore( Image::RGB c ) { return 2 * c.b - c.r - c.g - brightScore(c); }
 private:
   std::array<Image::RGB, 3*ds> pixels;
   int scoreBright;
