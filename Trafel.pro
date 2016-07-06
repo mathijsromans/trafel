@@ -22,13 +22,17 @@ SOURCES += main.cpp\
     earth.cpp \
     distributions.cpp \
     userinput.cpp \
-    transformscene.cpp
+    transformscene.cpp \
+    image.cpp \
+    scorekeeper.cpp
 
 HEADERS  += mainwindow.h \
     tablescene.h \
     earth.h \
     distributions.h \
     userinput.h \
-    transformscene.h
+    transformscene.h \
+    image.h \
+    scorekeeper.h
 
 FORMS    +=

@@ -1,12 +1,11 @@
 #include "userinput.h"
+#include "scorekeeper.h"
 #include <QFile>
 #include <QTime>
 #include <QTimer>
 #include <QDebug>
 #include <array>
 #include <cassert>
-#include <ctime>
-#include <unistd.h>
 #include <unordered_set>
 
 #define USE_CAMERA 0
@@ -85,14 +84,14 @@ bool UserInput::searchLine(int y, std::array<QPoint,3>& result, std::array<int, 
 {
   bool positiveScore = false;
   const int width = m_currentImage.getWidth();
-  Score s;
+  ScoreKeeper s;
   const Image::RGB* line = m_currentImage.scanLine(y);
   for ( int x = 0; x < width; ++x )
   {
     s.addPoint(line[x]);
     for ( unsigned int c = 0; c < 3; ++c )
     {
-      int score = s.getScore(static_cast<Score::Color>(c));
+      int score = s.getScore(static_cast<ScoreKeeper::Color>(c));
       if ( score > 0 )
       {
         positiveScore = true;
@@ -100,7 +99,7 @@ bool UserInput::searchLine(int y, std::array<QPoint,3>& result, std::array<int, 
       if ( score > bestScore[c] )
       {
         bestScore[c] = score;
-        result[c] = QPoint(x - 3*ds/2, y);
+        result[c] = QPoint(x - 3*ScoreKeeper::ds/2, y);
         //          qDebug() << "new best point for color " << c <<
         //                      " at " << result[c] <<
         //                      " with scores: " <<
@@ -162,115 +161,4 @@ void UserInput::slotCheck()
   {
     signalMouseClick(p[0]);
   }
-}
-
-
-UserInput::Image::Image(const QImage& image)
-  : m_width(image.width()),
-    m_height(image.height()),
-    m_data(m_width*m_height)
-{
-  for ( unsigned int y = 0; y < m_height; ++y )
-  {
-    for ( unsigned int x = 0; x < m_width; ++x )
-    {
-      QRgb c = image.pixel( x, y );
-      m_data[y * m_width + x] = RGB{ static_cast<unsigned char>(qRed(c)),
-                                     static_cast<unsigned char>(qGreen(c)),
-                                     static_cast<unsigned char>(qBlue(c)) };
-    }
-  }
-}
-
-void UserInput::Image::setSize(unsigned int width, unsigned int height, unsigned int dataSize)
-{
-  if ( dataSize != sizeof(RGB)*width*height)
-  {
-    throw std::logic_error("incorrect image byte size");
-  }
-  m_width = width;
-  m_height = height;
-  m_data.resize(m_width*m_height);
-}
-
-QImage UserInput::Image::toImage() const
-{
-  return QImage(getConstData(), m_width, m_height, QImage::Format_RGB888).copy();
-}
-
-const UserInput::Image::RGB* UserInput::Image::scanLine(unsigned int y) const
-{
-  return &m_data[y * m_width];
-}
-
-void UserInput::Score::addPoint(UserInput::Image::RGB c)
-{
-  scoreColor[0] -= redScore(pixels[oldestPixel]);
-  scoreColor[1] -= greScore(pixels[oldestPixel]);
-  scoreColor[2] -= bluScore(pixels[oldestPixel]);
-  unsigned int oneThird = oldestPixel + ds;
-  if ( oneThird >= 3*ds ) { oneThird -= 3*ds; }
-  scoreBright -= brightScore(pixels[oneThird]);
-  scoreColor[0] += redScore (pixels[oneThird]);
-  scoreColor[1] += greScore (pixels[oneThird]);
-  scoreColor[2] += bluScore (pixels[oneThird]);
-  unsigned int twoThird = oneThird + ds;
-  if ( twoThird >= 3*ds ) { twoThird -= 3*ds; }
-  scoreBright += brightScore(pixels[twoThird]);
-  scoreColor[0] -= redScore (pixels[twoThird]);
-  scoreColor[1] -= greScore (pixels[twoThird]);
-  scoreColor[2] -= bluScore (pixels[twoThird]);
-  pixels[oldestPixel] = c;
-  scoreColor[0] += redScore(c);
-  scoreColor[1] += greScore(c);
-  scoreColor[2] += bluScore(c);
-  ++oldestPixel;
-  if ( oldestPixel == 3*ds ) { oldestPixel = 0; }
-}
-
-UserInput::Score::Score() : pixels(), scoreBright(0), scoreColor(), oldestPixel(0)
-{
-  Image::RGB zeroPixel{0,0,0};
-  pixels.fill(zeroPixel);
-  scoreColor.fill(0);
-  for ( unsigned int i = 0; i < ds; ++i )
-  {
-    scoreColor[0] += 2*redScore(zeroPixel);
-    scoreColor[1] += 2*greScore(zeroPixel);
-    scoreColor[2] += 2*bluScore(zeroPixel);
-    scoreBright   += brightScore(zeroPixel);
-  }
-}
-
-int UserInput::Score::brightScore(UserInput::Image::RGB c)
-{
-  return static_cast<int>(c.r) +
-      static_cast<int>(c.g) +
-      static_cast<int>(c.b) - 3*128;
-}
-
-int UserInput::Score::redScore(UserInput::Image::RGB c)
-{
-  return 2 * c.r - c.g - c.b;
-}
-
-int UserInput::Score::greScore(UserInput::Image::RGB c)
-{
-  return 2 * c.g - c.r - c.b;
-}
-
-int UserInput::Score::bluScore(UserInput::Image::RGB c)
-{
-  return 2 * c.b - c.r - c.g;
-}
-
-int UserInput::Score::getScore( Color c ) const
-{
-  auto scoreC = scoreColor[static_cast<unsigned int>(c)];
-  if ( scoreBright <= 0 ||
-       scoreC <= 0 )
-  {
-    return 0;
-  }
-  return scoreBright + scoreC;
 }
