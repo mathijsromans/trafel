@@ -22,7 +22,7 @@ signals:
 private slots:
   void slotCheck();
 private:
-  std::experimental::optional<QPoint> getPointer() const;
+  std::array<QPoint, 3> getPointer() const;
 private:
 
   class Image
@@ -44,41 +44,26 @@ private:
     std::vector<RGB> m_data;
   };
 
-  struct ScoreOnePixel
-  {
-    ScoreOnePixel() : scoreA(0), scoreB(0), scoreC(0) {}
-    explicit ScoreOnePixel( UserInput::Image::RGB c, QPoint p, QTextStream& s );
-    UserInput::Image::RGB color;
-    int scoreA;
-    int scoreB;
-    int scoreC;
-  };
-
-  static const int ds = 10;
+  static const int ds = 6;
 
   struct Score
   {
+    enum class Color{ red, green, blue };
+    explicit Score();
 
-    explicit Score() : scores(), scoreA(0), scoreB(0), scoreC(0), newScoreIndex(0) {}
+    void addPoint( UserInput::Image::RGB c );
 
-    void addPoint( UserInput::Image::RGB c, QPoint p, QTextStream& s );
+    static int brightScore( UserInput::Image::RGB c );
+    static int redScore( UserInput::Image::RGB c );
+    static int greScore( UserInput::Image::RGB c );
+    static int bluScore( UserInput::Image::RGB c );
 
-    int getScore() const
-    {
-      if ( scoreA >= 0 &&
-           scoreB >= 0 &&
-           scoreC >= 0 )
-      {
-        return scoreA + scoreB + scoreC;
-      }
-      return -1;
-    }
+    int getScore( Color c ) const;
 
-    std::array<ScoreOnePixel, ds> scores;
-    int scoreA;
-    int scoreB;
-    int scoreC;
-    unsigned int newScoreIndex;
+    std::array<Image::RGB, 3*ds> pixels;
+    int scoreBright;
+    std::array<int, 3> scoreColor;
+    unsigned int oldestPixel;
   };
 
   Image m_testImage;

@@ -52,6 +52,7 @@ UserInput::UserInput()
   QTimer* timer = new QTimer(this);
   connect(timer, SIGNAL(timeout()), this, SLOT(slotCheck()));
   timer->start(2000);
+  QTimer::singleShot(0, this, SLOT(slotCheck()));
 }
 
 UserInput::~UserInput()
@@ -79,48 +80,44 @@ namespace
 {
 }
 
-std::experimental::optional<QPoint> UserInput::getPointer() const
+std::array<QPoint,3> UserInput::getPointer() const
 {
   QTime time;
   time.start();
 
-  std::experimental::optional<QPoint> result;
+  std::array<QPoint,3> result = {QPoint(0,0), QPoint(0,0), QPoint(0,0)};
 
   const int height = m_currentImage.getHeight();
   const int width = m_currentImage.getWidth();
-  if ( height < ds ||
-       width < ds )
+  std::array<int, 3> bestScore;
+  bestScore.fill(0);
+  for ( int y = 0; y < height; ++y )
   {
-    return result;
-  }
-
-  static int counter = 0;
-  QFile file("check"+QString::number(counter++) + ".txt");
-  if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-         return result;
-  QTextStream out(&file);
-
-  int bestScore = -1;
-  Score s;
-  for ( int y = 0; y < height/10; ++y )
-  {
+    Score s;
     const Image::RGB* line = m_currentImage.scanLine(y);
-    for ( int x = 0; x < width/10; ++x )
+    for ( int x = 0; x < width; ++x )
     {
-      s.addPoint(line[x], QPoint(x,y), out);
-      if ( s.getScore() > bestScore )
+      s.addPoint(line[x]);
+      for ( unsigned int c = 0; c < 3; ++c )
       {
-        bestScore = s.getScore();
-        result = QPoint(x - ds/2, y);
-        qDebug() << "new best point at " << *result << " with score " << s.scoreA << ", " << s.scoreC << " : " << s.getScore();
-        if ( result == QPoint(459,802) )
+        int score = s.getScore(static_cast<Score::Color>(c));
+        if ( score > bestScore[c] )
         {
-            qDebug() << "hello";
+          bestScore[c] = score;
+          result[c] = QPoint(x - 3*ds/2, y);
+//          qDebug() << "new best point for color " << c <<
+//                      " at " << result[c] <<
+//                      " with scores: " <<
+//                      s.scoreBright << "," <<
+//                      s.scoreColor[0] << "," <<
+//                      s.scoreColor[1] << "," <<
+//                      s.scoreColor[2] << ":" <<
+//                      score;
         }
       }
     }
   }
-  qDebug() << "getPoint() took" << time.elapsed() << "ms : " << (result ? *result : QPoint(0,0));
+  qDebug() << "getPoint() took" << time.elapsed() << "ms : " << result[0] << ", " << result[1] << ", " << result[2];
   return result;
 }
 
@@ -135,10 +132,10 @@ void UserInput::slotCheck()
   image.save( fileName );
 //  qDebug() << "saved to " << fileName;
 
-  std::experimental::optional<QPoint> p = getPointer();
-  if ( p )
+  std::array<QPoint,3> p = getPointer();
+  if ( p[0] != QPoint(0,0) )
   {
-    signalMouseClick(*p);
+    signalMouseClick(p[0]);
   }
 }
 
@@ -181,26 +178,81 @@ const UserInput::Image::RGB* UserInput::Image::scanLine(unsigned int y) const
   return &m_data[y * m_width];
 }
 
-UserInput::ScoreOnePixel::ScoreOnePixel(UserInput::Image::RGB c, QPoint p, QTextStream &s)
-  : color(c)
+void UserInput::Score::addPoint(UserInput::Image::RGB c)
 {
-    scoreA = c.r + c.g + c.b - 3*128;
-    scoreB = 0;
-    scoreC = 2 * c.r - c.g - c.b;
-    s << p.x() << "," << p.y() << ":" <<
-         c.r << "," << c.g << "," << c.b << '\n';
+  scoreColor[0] -= redScore(pixels[oldestPixel]);
+  scoreColor[1] -= greScore(pixels[oldestPixel]);
+  scoreColor[2] -= bluScore(pixels[oldestPixel]);
+  unsigned int oneThird = oldestPixel + ds;
+  if ( oneThird >= 3*ds ) { oneThird -= 3*ds; }
+  scoreBright -= brightScore(pixels[oneThird]);
+  scoreColor[0] += redScore (pixels[oneThird]);
+  scoreColor[1] += greScore (pixels[oneThird]);
+  scoreColor[2] += bluScore (pixels[oneThird]);
+  unsigned int twoThird = oneThird + ds;
+  if ( twoThird >= 3*ds ) { twoThird -= 3*ds; }
+  scoreBright += brightScore(pixels[twoThird]);
+  scoreColor[0] -= redScore (pixels[twoThird]);
+  scoreColor[1] -= greScore (pixels[twoThird]);
+  scoreColor[2] -= bluScore (pixels[twoThird]);
+  pixels[oldestPixel] = c;
+  scoreColor[0] += redScore(c);
+  scoreColor[1] += greScore(c);
+  scoreColor[2] += bluScore(c);
+  ++oldestPixel;
+  if ( oldestPixel == 3*ds ) { oldestPixel = 0; }
+
+  int checkSum = 0;
+  for ( unsigned int i = (oneThird+1)%(3*ds); i != (twoThird+1)%(3*ds); i=(i+1)%(3*ds) )
+  {
+    checkSum += brightScore(pixels[i]);
+  }
+  assert(checkSum == scoreBright);
 }
 
-void UserInput::Score::addPoint(UserInput::Image::RGB c, QPoint p, QTextStream &s)
+UserInput::Score::Score() : pixels(), scoreBright(0), scoreColor(), oldestPixel(0)
 {
-    ScoreOnePixel& sp = scores[newScoreIndex];
-    scoreA -= sp.scoreA;
-    scoreB -= sp.scoreB;
-    scoreC -= sp.scoreC;
-    sp = ScoreOnePixel(c, p, s);
-    scoreA += sp.scoreA;
-    scoreB += sp.scoreB;
-    scoreC += sp.scoreC;
+  Image::RGB zeroPixel{0,0,0};
+  pixels.fill(zeroPixel);
+  scoreColor.fill(0);
+  for ( unsigned int i = 0; i < ds; ++i )
+  {
+    scoreColor[0] += 2*redScore(zeroPixel);
+    scoreColor[1] += 2*greScore(zeroPixel);
+    scoreColor[2] += 2*bluScore(zeroPixel);
+    scoreBright   += brightScore(zeroPixel);
+  }
+}
 
-    newScoreIndex = (newScoreIndex+1)%ds;
+int UserInput::Score::brightScore(UserInput::Image::RGB c)
+{
+  return static_cast<int>(c.r) +
+      static_cast<int>(c.g) +
+      static_cast<int>(c.b) - 3*128;
+}
+
+int UserInput::Score::redScore(UserInput::Image::RGB c)
+{
+  return 2 * c.r - c.g - c.b;
+}
+
+int UserInput::Score::greScore(UserInput::Image::RGB c)
+{
+  return 2 * c.g - c.r - c.b;
+}
+
+int UserInput::Score::bluScore(UserInput::Image::RGB c)
+{
+  return 2 * c.b - c.r - c.g;
+}
+
+int UserInput::Score::getScore( Color c ) const
+{
+  auto scoreC = scoreColor[static_cast<unsigned int>(c)];
+  if ( scoreBright < 0 ||
+       scoreC < 0 )
+  {
+    return -1;
+  }
+  return scoreBright + scoreC;
 }
