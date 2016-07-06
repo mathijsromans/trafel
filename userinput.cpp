@@ -7,6 +7,7 @@
 #include <cassert>
 #include <ctime>
 #include <unistd.h>
+#include <unordered_set>
 
 #define USE_CAMERA 0
 
@@ -80,6 +81,40 @@ namespace
 {
 }
 
+bool UserInput::searchLine(int y, std::array<QPoint,3>& result, std::array<int, 3>& bestScore) const
+{
+  bool positiveScore = false;
+  const int width = m_currentImage.getWidth();
+  Score s;
+  const Image::RGB* line = m_currentImage.scanLine(y);
+  for ( int x = 0; x < width; ++x )
+  {
+    s.addPoint(line[x]);
+    for ( unsigned int c = 0; c < 3; ++c )
+    {
+      int score = s.getScore(static_cast<Score::Color>(c));
+      if ( score > 0 )
+      {
+        positiveScore = true;
+      }
+      if ( score > bestScore[c] )
+      {
+        bestScore[c] = score;
+        result[c] = QPoint(x - 3*ds/2, y);
+        //          qDebug() << "new best point for color " << c <<
+        //                      " at " << result[c] <<
+        //                      " with scores: " <<
+        //                      s.scoreBright << "," <<
+        //                      s.scoreColor[0] << "," <<
+        //                      s.scoreColor[1] << "," <<
+        //                      s.scoreColor[2] << ":" <<
+        //                      score;
+      }
+    }
+  }
+  return positiveScore;
+}
+
 std::array<QPoint,3> UserInput::getPointer() const
 {
   QTime time;
@@ -87,36 +122,26 @@ std::array<QPoint,3> UserInput::getPointer() const
 
   std::array<QPoint,3> result = {QPoint(0,0), QPoint(0,0), QPoint(0,0)};
 
-  const int height = m_currentImage.getHeight();
-  const int width = m_currentImage.getWidth();
   std::array<int, 3> bestScore;
   bestScore.fill(0);
-  for ( int y = 0; y < height; ++y )
+  const int height = m_currentImage.getHeight();
+  const int stepSize = 4;
+  std::unordered_set<int> moreLinesToBeSearched;
+  for ( int y = 0; y < height; y += stepSize )
   {
-    Score s;
-    const Image::RGB* line = m_currentImage.scanLine(y);
-    for ( int x = 0; x < width; ++x )
+    if( searchLine(y, result, bestScore) )
     {
-      s.addPoint(line[x]);
-      for ( unsigned int c = 0; c < 3; ++c )
+      for ( int i = y-stepSize+1; i < y+stepSize; ++i )
       {
-        int score = s.getScore(static_cast<Score::Color>(c));
-        if ( score > bestScore[c] )
-        {
-          bestScore[c] = score;
-          result[c] = QPoint(x - 3*ds/2, y);
-//          qDebug() << "new best point for color " << c <<
-//                      " at " << result[c] <<
-//                      " with scores: " <<
-//                      s.scoreBright << "," <<
-//                      s.scoreColor[0] << "," <<
-//                      s.scoreColor[1] << "," <<
-//                      s.scoreColor[2] << ":" <<
-//                      score;
-        }
+        moreLinesToBeSearched.insert(i);
       }
     }
   }
+  for ( int y : moreLinesToBeSearched )
+  {
+    searchLine(y, result, bestScore);
+  }
+
   qDebug() << "getPoint() took" << time.elapsed() << "ms : " << result[0] << ", " << result[1] << ", " << result[2];
   return result;
 }
@@ -201,13 +226,6 @@ void UserInput::Score::addPoint(UserInput::Image::RGB c)
   scoreColor[2] += bluScore(c);
   ++oldestPixel;
   if ( oldestPixel == 3*ds ) { oldestPixel = 0; }
-
-  int checkSum = 0;
-  for ( unsigned int i = (oneThird+1)%(3*ds); i != (twoThird+1)%(3*ds); i=(i+1)%(3*ds) )
-  {
-    checkSum += brightScore(pixels[i]);
-  }
-  assert(checkSum == scoreBright);
 }
 
 UserInput::Score::Score() : pixels(), scoreBright(0), scoreColor(), oldestPixel(0)
@@ -249,10 +267,10 @@ int UserInput::Score::bluScore(UserInput::Image::RGB c)
 int UserInput::Score::getScore( Color c ) const
 {
   auto scoreC = scoreColor[static_cast<unsigned int>(c)];
-  if ( scoreBright < 0 ||
-       scoreC < 0 )
+  if ( scoreBright <= 0 ||
+       scoreC <= 0 )
   {
-    return -1;
+    return 0;
   }
   return scoreBright + scoreC;
 }

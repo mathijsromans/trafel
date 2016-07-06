@@ -23,6 +23,7 @@ private slots:
   void slotCheck();
 private:
   std::array<QPoint, 3> getPointer() const;
+  bool searchLine(int y, std::array<QPoint, 3>& result, std::array<int, 3>& bestScore) const;
 private:
 
   class Image
