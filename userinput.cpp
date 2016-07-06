@@ -2,7 +2,6 @@
 #include "scorekeeper.h"
 #include <QFile>
 #include <QTime>
-#include <QTimer>
 #include <QDebug>
 #include <array>
 #include <cassert>
@@ -50,9 +49,6 @@ UserInput::UserInput()
   : m_testImage(QImage("../trafel/test_0.png")),
     m_currentImage()
 {
-  QTimer* timer = new QTimer(this);
-  connect(timer, SIGNAL(timeout()), this, SLOT(slotCheck()));
-  timer->start(200);
 }
 
 UserInput::~UserInput()
@@ -145,7 +141,7 @@ std::array<QPoint,3> UserInput::getPointer() const
   return result;
 }
 
-void UserInput::slotCheck()
+void UserInput::process()
 {
   QTime time;
   time.start();
@@ -165,6 +161,5 @@ void UserInput::slotCheck()
     signalMouseClick(event);
   }
 
-  qDebug() << "slotCheck() took" << time.elapsed() << "ms";
-
+  qDebug() << "User input loop took" << time.elapsed() << "ms";
 }

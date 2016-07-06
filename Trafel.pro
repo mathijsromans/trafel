@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     transformscene.cpp \
     image.cpp \
     scorekeeper.cpp \
-    pointerevent.cpp
+    pointerevent.cpp \
+    userinputthread.cpp
 
 HEADERS  += mainwindow.h \
     tablescene.h \
@@ -35,6 +36,7 @@ HEADERS  += mainwindow.h \
     transformscene.h \
     image.h \
     scorekeeper.h \
-    pointerevent.h
+    pointerevent.h \
+    userinputthread.h
 
 FORMS    +=

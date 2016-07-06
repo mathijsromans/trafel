@@ -16,13 +16,12 @@ class UserInput : public QObject
 public:
   UserInput();
   virtual ~UserInput();
-  void getImage();
+  void process();
 signals:
   void signalNewImage(QImage image);
   void signalMouseClick(PointerEvent point);
-private slots:
-  void slotCheck();
 private:
+  void getImage();
   std::array<QPoint, 3> getPointer() const;
   bool searchLine(int y, std::array<QPoint, 3>& result, std::array<int, 3>& bestScore) const;
 private:  

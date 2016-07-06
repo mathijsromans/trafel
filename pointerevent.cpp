@@ -1,8 +1,14 @@
 #include "pointerevent.h"
 #include <QTransform>
 
-PointerEvent::PointerEvent(const std::array<QPoint, 3>& point)
-  : m_points(point)
+PointerEvent::PointerEvent()
+  : m_points()
+{
+  m_points.fill(QPoint(0,0));
+}
+
+PointerEvent::PointerEvent(const std::array<QPoint, 3>& points)
+  : m_points(points)
 {
 }
 
