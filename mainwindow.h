@@ -1,8 +1,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "pointerevent.h"
+#include "userinputthread.h"
 #include <QMainWindow>
-#include "userinput.h"
 class QGraphicsView;
 class TableScene;
 class QLabel;
@@ -28,11 +29,11 @@ private:
   void fitInView() const;
 
 private:
+  UserInputThread m_userInputThread;
   QGraphicsView* v;
   TableScene* t;
   QLabel* m_l0;
   QLabel* m_l1;
-  UserInput m_ui;
 };
 
 #endif // MAINWINDOW_H

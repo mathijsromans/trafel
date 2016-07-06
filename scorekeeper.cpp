@@ -41,9 +41,14 @@ void ScoreKeeper::addPoint(Image::RGB c)
 
 int ScoreKeeper::getScore( Color c ) const
 {
-  auto scoreC = scoreColor[static_cast<unsigned int>(c)];
+  int i = static_cast<unsigned int>(c);
+  auto scoreC = scoreColor[i];
+  auto other1 = scoreColor[i+1<3 ? i+1 : i+1-3];
+  auto other2 = scoreColor[i+2<3 ? i+2 : i+2-3];
   if ( scoreBright <= 0 ||
-       scoreC <= 0 )
+       scoreC <= 0 ||
+       other1 > scoreC ||
+       other2 > scoreC )
   {
     return 0;
   }

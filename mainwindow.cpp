@@ -10,8 +10,11 @@
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
-  QMainWindow(parent)
+  QMainWindow(parent),
+  m_userInputThread()
 {
+  qRegisterMetaType<PointerEvent>();
+
   v = new QGraphicsView();
   t = new TableScene();
   v->setScene(t);
@@ -42,16 +45,19 @@ MainWindow::MainWindow(QWidget *parent) :
   w->setLayout( layout );
   setCentralWidget(w);
 
-  showMaximized();
-
 //  connect( b, SIGNAL(pressed()), t, SLOT(slotGo()) );
   connect( t, SIGNAL(signalMoneyChanged()), this, SLOT(slotMoneyChanged()) );
 
-  connect(&m_ui, SIGNAL(signalNewImage(QImage)), t, SLOT(slotNewImage(QImage)));
-  connect(&m_ui, SIGNAL(signalMouseClick(PointerEvent)), t, SLOT(slotLightAt(PointerEvent)));
-  t->calibrate();
+  UserInput* ui = new UserInput();
+  connect(ui, SIGNAL(signalNewImage(QImage)), t, SLOT(slotNewImage(QImage)));
+  connect(ui, SIGNAL(signalMouseClick(PointerEvent)), t, SLOT(slotLightAt(PointerEvent)));
 
+  t->calibrate();
+  showMaximized();
   slotMoneyChanged();
+
+  m_userInputThread.setUI(ui);
+  m_userInputThread.start();
 }
 
 MainWindow::~MainWindow()
