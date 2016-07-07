@@ -8,9 +8,9 @@ namespace
 template <typename T>
 T sqr(T x) { return x*x; }
 
-double dist(QPoint p1, QPoint p2)
+double dist(QPointF p1, QPointF p2)
 {
-  QPoint p = p1-p2;
+  QPointF p = p1-p2;
   return sqrt(sqr(p.x()+sqr(p.y())));
 }
 
@@ -19,34 +19,34 @@ double dist(QPoint p1, QPoint p2)
 PointerEvent::PointerEvent()
   : m_points()
 {
-  m_points.fill(QPoint(0,0));
+  m_points.fill(QPointF(0,0));
 }
 
-PointerEvent::PointerEvent(const std::array<QPoint, 3>& points)
+PointerEvent::PointerEvent(const std::array<QPointF, 3>& points)
   : m_points(points)
 {
 }
 
-QPoint PointerEvent::getAny() const
+QPointF PointerEvent::getAny() const
 {
-  for (QPoint p : m_points)
+  for (QPointF p : m_points)
   {
-    if ( p != QPoint(0,0) )
+    if ( !p.isNull() )
     {
       return p;
     }
   }
-  return QPoint(0,0);
+  return QPointF(0,0);
 }
 
-QPoint PointerEvent::getPoint(PointerEvent::Color c) const
+QPointF PointerEvent::getPoint(PointerEvent::Color c) const
 {
   return m_points[static_cast<int>(c)];
 }
 
 void PointerEvent::transform(const QTransform& t)
 {
-  for (QPoint& p : m_points)
+  for (QPointF& p : m_points)
   {
     p = t.map(QPointF(p)).toPoint();
   }

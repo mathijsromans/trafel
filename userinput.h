@@ -21,7 +21,7 @@ signals:
   void signalMouseClick(PointerEvent point);
 private:
   void getImage();
-  std::array<QPoint, 3> getPointer() const;
+  PointerEvent getEvent() const;
   bool searchLine(int y, std::array<QPoint, 3>& result, std::array<int, 3>& bestScore) const;
 private:  
   Image m_testImage;

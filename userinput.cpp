@@ -110,7 +110,7 @@ bool UserInput::searchLine(int y, std::array<QPoint,3>& result, std::array<int, 
   return positiveScore;
 }
 
-std::array<QPoint,3> UserInput::getPointer() const
+PointerEvent UserInput::getEvent() const
 {
   QTime time;
   time.start();
@@ -137,8 +137,8 @@ std::array<QPoint,3> UserInput::getPointer() const
     searchLine(y, result, bestScore);
   }
 
-  qDebug() << "getPoint() took" << time.elapsed() << "ms : " << result[0] << ", " << result[1] << ", " << result[2];
-  return result;
+  qDebug() << "getEvent() took" << time.elapsed() << "ms : " << result[0] << ", " << result[1] << ", " << result[2];
+  return PointerEvent({result[0], result[1], result[2]});
 }
 
 void UserInput::process()
@@ -153,12 +153,11 @@ void UserInput::process()
 //  image.save( fileName );
 //  qDebug() << "saved to " << fileName;
 
-  PointerEvent event( getPointer() );
+  PointerEvent event( getEvent() );
   if ( event.differsFrom( m_lastEvent ) )
   {
     if ( !event.getAny().isNull() )
     {
-      qDebug() << "signalMouseClick";
       signalMouseClick(event);
     }
     m_lastEvent = event;
