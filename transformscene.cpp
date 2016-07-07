@@ -5,7 +5,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QPixmap>
 
-const std::array<QPoint,4> TransformScene::ms_calibrationCoordinates = {QPoint{300,300},QPoint{400,300},QPoint{400,400},QPoint{300,400}};
+const std::array<QPoint,4> TransformScene::ms_calibrationCoordinates = {QPoint{200,200},QPoint{600,200},QPoint{600,600},QPoint{200,600}};
 
 namespace
 {
@@ -27,8 +27,6 @@ TransformScene::TransformScene()
    m_circle(0)
 {
   setBackgroundBrush(Qt::black);
-  m_image = new QGraphicsPixmapItem();
-  addItem(m_image);
 }
 
 TransformScene::~TransformScene()
@@ -58,18 +56,7 @@ void TransformScene::mouseClick(QPointF /*p*/)
 {
 }
 
-void TransformScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
-{
-  mouseClick(event->pos());
-
-}
-
-void TransformScene::slotNewImage(QImage i)
-{
-  m_image->setPixmap(QPixmap::fromImage(i));
-}
-
-void TransformScene::slotLightAt(PointerEvent e)
+void TransformScene::processMouseClick(PointerEvent e)
 {
   if ( m_calibrated )
   {
@@ -83,6 +70,16 @@ void TransformScene::slotLightAt(PointerEvent e)
   {
     newCalibratedPoint(e.getAny());
   }
+}
+
+void TransformScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
+{
+  processMouseClick(PointerEvent(std::array<QPoint, 3>{event->pos().toPoint(), QPoint(0,0), QPoint(0,0)}));
+}
+
+void TransformScene::slotLightAt(PointerEvent e)
+{
+  processMouseClick( e );
 }
 
 void TransformScene::newCalibratedPoint(QPoint p)
@@ -122,4 +119,6 @@ void TransformScene::newCalibratedPoint(QPoint p)
     init();
   }
 }
+
+
 

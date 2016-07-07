@@ -46,7 +46,7 @@ raspicam::RaspiCam& getCam()
 
 
 UserInput::UserInput()
-  : m_testImage(QImage("../trafel/test_0.png")),
+  : m_testImage(),
     m_currentImage()
 {
 }
@@ -147,8 +147,6 @@ void UserInput::process()
   time.start();
 
   getImage();
-  QImage image = m_currentImage.toImage();
-  signalNewImage(image);
 
 //  static int counter = 0;
 //  QString fileName = QString("grab_") + QString::number(counter++) + ".png";

@@ -18,7 +18,6 @@ public:
   virtual ~UserInput();
   void process();
 signals:
-  void signalNewImage(QImage image);
   void signalMouseClick(PointerEvent point);
 private:
   void getImage();
