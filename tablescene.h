@@ -23,7 +23,7 @@ signals:
   void signalMoneyChanged();
 
 protected:
-  void mousePressEvent(QGraphicsSceneMouseEvent* event);
+//  void mousePressEvent(QGraphicsSceneMouseEvent* event);
 
 private slots:
   void slotGo();

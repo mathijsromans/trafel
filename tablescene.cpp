@@ -103,49 +103,49 @@ QColor TableScene::getColor(unsigned int player) const
   return Qt::black;
 }
 
-void TableScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
-{
-  if ( m_travelState == TravelState::neutral )
-  {
-    auto its = items(event->scenePos());
-    unsigned int i = 0;
-    for ( ; i != m_dots.size(); ++i )
-    {
-      if ( its.contains(  m_dots[i].ellipse ) )
-      {
-        break;
-      }
-    }
-    if ( i != m_dots.size() )
-    {
-      switch( m_clickState )
-      {
-        case ClickState::neutral:
-          m_clickState = ClickState::click1;
-          m_click1 = i;
-          m_dots[m_click1].ellipse->setPen(getColor(m_currentPlayer));
-        break;
-        case ClickState::click1:
-        {
-          m_clickState = ClickState::neutral;
-          m_dots[m_click1].ellipse->setPen(m_dots[m_click1].originalPen);
-          double cost = 10*dist(m_click1, i);
-          if ( m_click1 != i && cost <= m_money[m_currentPlayer] )
-          {
-            mutateMoney(m_currentPlayer, -cost);
-            m_tracks.push_back(Track{m_click1, i, m_currentPlayer,
-                             addLine(10*m_dots[m_click1].x,
-                                     10*m_dots[m_click1].y,
-                                     10*m_dots[i].x,
-                                     10*m_dots[i].y, QPen(getColor(m_currentPlayer)) ) });
-          }
-        }
-        break;
-      }
-    }
+//void TableScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
+//{
+//  if ( m_travelState == TravelState::neutral )
+//  {
+//    auto its = items(event->scenePos());
+//    unsigned int i = 0;
+//    for ( ; i != m_dots.size(); ++i )
+//    {
+//      if ( its.contains(  m_dots[i].ellipse ) )
+//      {
+//        break;
+//      }
+//    }
+//    if ( i != m_dots.size() )
+//    {
+//      switch( m_clickState )
+//      {
+//        case ClickState::neutral:
+//          m_clickState = ClickState::click1;
+//          m_click1 = i;
+//          m_dots[m_click1].ellipse->setPen(getColor(m_currentPlayer));
+//        break;
+//        case ClickState::click1:
+//        {
+//          m_clickState = ClickState::neutral;
+//          m_dots[m_click1].ellipse->setPen(m_dots[m_click1].originalPen);
+//          double cost = 10*dist(m_click1, i);
+//          if ( m_click1 != i && cost <= m_money[m_currentPlayer] )
+//          {
+//            mutateMoney(m_currentPlayer, -cost);
+//            m_tracks.push_back(Track{m_click1, i, m_currentPlayer,
+//                             addLine(10*m_dots[m_click1].x,
+//                                     10*m_dots[m_click1].y,
+//                                     10*m_dots[i].x,
+//                                     10*m_dots[i].y, QPen(getColor(m_currentPlayer)) ) });
+//          }
+//        }
+//        break;
+//      }
+//    }
 
-  }
-}
+//  }
+//}
 
 void TableScene::slotGo()
 {

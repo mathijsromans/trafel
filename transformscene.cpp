@@ -74,7 +74,7 @@ void TransformScene::processMouseClick(PointerEvent e)
 
 void TransformScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-  processMouseClick(PointerEvent(std::array<QPoint, 3>{event->pos().toPoint(), QPoint(0,0), QPoint(0,0)}));
+  processMouseClick(PointerEvent(std::array<QPoint, 3>{event->scenePos().toPoint(), QPoint(0,0), QPoint(0,0)}));
 }
 
 void TransformScene::slotLightAt(PointerEvent e)
