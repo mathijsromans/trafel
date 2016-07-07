@@ -23,7 +23,7 @@ signals:
   void signalMoneyChanged();
 
 protected:
-//  void mousePressEvent(QGraphicsSceneMouseEvent* event);
+  virtual void mouseClick(QPointF p);
 
 private slots:
   void slotGo();
@@ -38,12 +38,12 @@ private:
   {
     unsigned int x,y;
     QGraphicsEllipseItem* ellipse;
-    QPen originalPen;
+    QBrush originalBrush;
   };
   struct Track
   {
     unsigned int from, to, player;
-    QGraphicsLineItem* ellipse;
+    QGraphicsLineItem* line;
   };
   struct PathSegment
   {
@@ -56,12 +56,19 @@ private:
   double dist( unsigned int from, unsigned int to ) const;
   double travelDist( unsigned int from, unsigned int to ) const;
   std::vector<const Track*> getBestPath(unsigned int from, unsigned int to) const;
+  QGraphicsLineItem* addDotLine(int x1, int y1, int x2, int y2 , const QColor& colorC = QColor());
+  QPointF getDotOrigin() const;
+  QPointF getDotDistance() const;
+  double getMaxDotDistance() const;
+  QPointF getDotPosition(double x, double y) const;
 
+private:
   enum class TravelState { neutral, select1, select2, startTravel, travelling };
   enum class ClickState { neutral, click1 };
 
   static const unsigned int ms_gridSize = 10;
   std::mt19937 m_rng;
+  QRectF m_visibleArea;
   Earth m_earth;
   std::vector<Dot> m_dots;
   std::vector<unsigned int> m_cities;
