@@ -1,4 +1,6 @@
 #include "transformscene.h"
+#include "utilities.h"
+#include "mouseping.h"
 
 #include <QDebug>
 #include <QGraphicsEllipseItem>
@@ -13,12 +15,12 @@ const std::array<QPoint,4> TransformScene::ms_calibrationCoordinates = {QPoint{2
 namespace
 {
 
-bool compareX(QPoint A, QPoint B)
+bool compareX(QPointF A, QPointF B)
 {
   return A.x() < B.x();
 }
 
-bool compareY(QPoint A, QPoint B)
+bool compareY(QPointF A, QPointF B)
 {
   return A.y() < B.y();
 }
@@ -50,64 +52,53 @@ void TransformScene::calibrate()
   m_cornerPoints.clear();
   m_calibratedTransform = false;
   m_calibratedCorners = false;
-  m_circle = addEllipse(squareAt(ms_calibrationCoordinates[m_calibrationLights.size()],20), QPen(Qt::green,3));
-  qDebug() << "circle at " << m_circle->boundingRect();
-
-}
-
-QRectF TransformScene::squareAt(QPointF p, double size)
-{
-  return QRectF(p.x()-0.5*size, p.y()-0.5*size, size, size);
-}
-
-QRectF TransformScene::squareAt(double x, double y, double size)
-{
-  return QRectF(x-0.5*size, y-0.5*size, size, size);
+  m_circle = addEllipse(Utilities::squareAt(ms_calibrationCoordinates[m_calibrationLights.size()],20), QPen(Qt::green,3));
 }
 
 void TransformScene::mouseClick(QPointF /*p*/)
 {
 }
 
-void TransformScene::processMouseClick(PointerEvent e)
+void TransformScene::processTransformedMouseClick(PointerEvent e)
 {
-  if ( m_calibratedTransform && m_calibratedCorners )
+  if ( !m_calibratedCorners )
   {
-    e.transform(m_transform);
-    m_circle->setRect(squareAt(e.getAny(),20));
-    m_circle->show();
-    qDebug() << "circle at " << m_circle->boundingRect();
-    mouseClick(e.getAny());
-  }
-  else
-  {
-    if ( !m_calibratedTransform )
-    {
-      newCalibratedPoint(e.getAny());
-    }
-    else if ( !m_calibratedCorners )
-    {
-      e.transform(m_transform);
-      newCornerPoint(e.getAny());
-    }
-
-    if ( m_calibratedTransform && !m_calibratedCorners )
-    {
-      std::string text = "Select corner " + std::to_string(m_cornerPoints.size()+1);
-      showInfoText(text);
-    }
-
-    if ( m_calibratedTransform && m_calibratedCorners )
+    newCornerPoint(e.getAny());
+    if ( m_calibratedCorners )
     {
       m_infoText->hide();
       init();
     }
   }
+  else
+  {
+    mouseClick(e.getAny());
+  }
+}
+
+void TransformScene::processMouseClick(PointerEvent e)
+{
+  if ( !m_calibratedTransform )
+  {
+    newCalibratedPoint(e.getAny().toPoint());
+  }
+  else
+  {
+    e.transform(m_transform);
+    addItem( new MousePing(e.getAny()) );
+    processTransformedMouseClick(e);
+  }
+
+  if ( m_calibratedTransform && !m_calibratedCorners )
+  {
+    std::string text = "Select corner " + std::to_string(m_cornerPoints.size()+1);
+    showInfoText(text);
+  }
 }
 
 void TransformScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-  processMouseClick(PointerEvent(std::array<QPoint, 3>{event->scenePos().toPoint(), QPoint(0,0), QPoint(0,0)}));
+  processMouseClick(PointerEvent(std::array<QPointF, 3>{event->scenePos(), QPointF(0,0), QPointF(0,0)}));
 }
 
 void TransformScene::slotLightAt(PointerEvent e)
@@ -121,8 +112,7 @@ void TransformScene::newCalibratedPoint(QPoint p)
   m_calibrationLights.push_back(p);
   if ( m_calibrationLights.size() < ms_calibrationCoordinates.size() )
   {
-    m_circle->setRect(squareAt(ms_calibrationCoordinates[m_calibrationLights.size()],20));
-    qDebug() << "circle at " << m_circle->boundingRect();
+    m_circle->setRect(Utilities::squareAt(ms_calibrationCoordinates[m_calibrationLights.size()],20));
   }
   else
   {
@@ -131,21 +121,20 @@ void TransformScene::newCalibratedPoint(QPoint p)
     {
       coords << p;
     }
-    QPolygonF ligths;
+    QPolygonF lights;
     for ( QPoint p : m_calibrationLights )
     {
-      ligths << p;
+      lights << p;
     }
-    bool success = QTransform::quadToQuad(ligths, coords, m_transform);
+    bool success = QTransform::quadToQuad(lights, coords, m_transform);
     qDebug() << "CREATING TRANSFORM SUCCESS " << success;
-    qDebug() << "TRANSFORM IS " << m_transform;
 
     m_circle->hide();
     m_calibratedTransform = true;
   }
 }
 
-void TransformScene::newCornerPoint(QPoint p)
+void TransformScene::newCornerPoint(QPointF p)
 {
   if ( m_cornerPoints.size() < 4 )
   {
@@ -157,19 +146,19 @@ void TransformScene::newCornerPoint(QPoint p)
     std::sort(m_cornerPoints.begin(), m_cornerPoints.end(), compareX);
     std::sort(m_cornerPoints.begin(), std::next(m_cornerPoints.begin(), 2), compareY);
     std::sort(std::next(m_cornerPoints.begin(), 2), m_cornerPoints.end(), compareY);
-    QPoint topLeft = m_cornerPoints[0];
-    QPoint bottomLeft = m_cornerPoints[1];
-    QPoint topRight = m_cornerPoints[2];
-    QPoint bottomRight = m_cornerPoints[3];
-    QPoint tableRectTopLeft(std::max(topLeft.x(), bottomLeft.x()), std::max(topLeft.y(), topRight.y()));
-    QPoint tableRectBottomRight(std::min(bottomRight.x(), topRight.x()), std::min(bottomLeft.y(), bottomRight.y()));
-    m_tableRect = QRect(tableRectTopLeft, tableRectBottomRight);
+    QPointF topLeft = m_cornerPoints[0];
+    QPointF bottomLeft = m_cornerPoints[1];
+    QPointF topRight = m_cornerPoints[2];
+    QPointF bottomRight = m_cornerPoints[3];
+    QPointF tableRectTopLeft(std::max(topLeft.x(), bottomLeft.x()), std::max(topLeft.y(), topRight.y()));
+    QPointF tableRectBottomRight(std::min(bottomRight.x(), topRight.x()), std::min(bottomLeft.y(), bottomRight.y()));
+    m_tableRect = QRectF(tableRectTopLeft, tableRectBottomRight);
     qDebug() << "TABLE RECT IS " << m_tableRect;
     m_calibratedCorners = true;
   }
 }
 
-QRect TransformScene::getTableRect() const
+QRectF TransformScene::getTableRect() const
 {
   return m_tableRect;
 }

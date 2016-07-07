@@ -1,4 +1,5 @@
 #include "trafficscene.h"
+#include "utilities.h"
 #include <algorithm>
 #include <cassert>
 #include <map>
@@ -51,7 +52,7 @@ void TrafficScene::init()
   {
     for ( unsigned int y = 0; y != ms_gridSize; ++y )
     {
-      auto ellipse = addEllipse( squareAt( getDotPosition(x,y), dotSize ),
+      auto ellipse = addEllipse( Utilities::squareAt( getDotPosition(x,y), dotSize ),
                                  QPen(Qt::NoPen),
                                  QBrush(Qt::white, Qt::SolidPattern) );
       m_dots.push_back(Dot{x, y, ellipse, QBrush()});
@@ -91,7 +92,7 @@ void TrafficScene::init()
     {
       QColor c;
       c.setHsv(m_earth.height(x, y), 255, 150);
-      addEllipse(squareAt(getDotPosition(x, y), heightMapDotSize), QPen(Qt::NoPen), QBrush(c, Qt::SolidPattern))->setZValue(-10);
+      addEllipse(Utilities::squareAt(getDotPosition(x, y), heightMapDotSize), QPen(Qt::NoPen), QBrush(c, Qt::SolidPattern))->setZValue(-10);
     }
   }
 

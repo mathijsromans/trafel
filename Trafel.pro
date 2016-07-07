@@ -26,7 +26,9 @@ SOURCES += main.cpp\
     image.cpp \
     scorekeeper.cpp \
     pointerevent.cpp \
-    userinputthread.cpp
+    userinputthread.cpp \
+    mouseping.cpp \
+    utilities.cpp
 
 HEADERS  += mainwindow.h \
     trafficscene.h \
@@ -37,6 +39,8 @@ HEADERS  += mainwindow.h \
     image.h \
     scorekeeper.h \
     pointerevent.h \
-    userinputthread.h
+    userinputthread.h \
+    mouseping.h \
+    utilities.h
 
 FORMS    +=
