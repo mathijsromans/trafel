@@ -5,7 +5,7 @@
 #include "userinputthread.h"
 #include <QMainWindow>
 class QGraphicsView;
-class TableScene;
+class TrafficScene;
 class QLabel;
 class TransformScene;
 
@@ -31,7 +31,7 @@ private:
 private:
   UserInputThread m_userInputThread;
   QGraphicsView* v;
-  TableScene* t;
+  TrafficScene* t;
   QLabel* m_l0;
   QLabel* m_l1;
 };

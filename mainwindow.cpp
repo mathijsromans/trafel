@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include "tablescene.h"
+#include "trafficscene.h"
 #include "transformscene.h"
 #include "userinput.h"
 #include <QGraphicsView>
@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
   qRegisterMetaType<PointerEvent>();
 
   v = new QGraphicsView();
-  t = new TableScene();
+  t = new TrafficScene();
   v->setScene(t);
 //  QPushButton* b = new QPushButton("Go!");
   m_l0 = new QLabel("Player 1");

@@ -1,5 +1,5 @@
-#ifndef TABLESCENE_H
-#define TABLESCENE_H
+#ifndef TRAFFICSCENE_H
+#define TRAFFICSCENE_H
 
 #include "earth.h"
 #include "transformscene.h"
@@ -8,13 +8,13 @@
 #include <array>
 #include <vector>
 
-class TableScene : public TransformScene
+class TrafficScene : public TransformScene
 {
   Q_OBJECT
 
 public:
-  TableScene();
-  virtual ~TableScene();
+  TrafficScene();
+  virtual ~TrafficScene();
   double getGridSize() const { return ms_gridSize; }
   int getMoney(unsigned int player) const;
   QColor getColor(unsigned int player) const;
@@ -78,4 +78,4 @@ private:
 
 };
 
-#endif // TABLESCENE_H
+#endif // TRAFFICSCENE_H

@@ -1,4 +1,4 @@
-#include "tablescene.h"
+#include "trafficscene.h"
 #include <algorithm>
 #include <cassert>
 #include <map>
@@ -28,7 +28,7 @@ T sqr(T x) { return x*x; }
 }
 
 
-TableScene::TableScene()
+TrafficScene::TrafficScene()
   : m_earth(ms_gridSize, ms_gridSize),
     m_travelState(TravelState::neutral),
     m_clickState(ClickState::neutral),
@@ -36,11 +36,11 @@ TableScene::TableScene()
 {  
 }
 
-TableScene::~TableScene()
+TrafficScene::~TrafficScene()
 {  
 }
 
-void TableScene::init()
+void TrafficScene::init()
 {
   std::random_device rd;
   m_rng.seed(rd());
@@ -88,12 +88,12 @@ void TableScene::init()
   }
 }
 
-int TableScene::getMoney(unsigned int player) const
+int TrafficScene::getMoney(unsigned int player) const
 {
   return m_money[player];
 }
 
-QColor TableScene::getColor(unsigned int player) const
+QColor TrafficScene::getColor(unsigned int player) const
 {
   switch (player)
   {
@@ -103,7 +103,7 @@ QColor TableScene::getColor(unsigned int player) const
   return Qt::black;
 }
 
-//void TableScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
+//void TrafficScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
 //{
 //  if ( m_travelState == TravelState::neutral )
 //  {
@@ -147,7 +147,7 @@ QColor TableScene::getColor(unsigned int player) const
 //  }
 //}
 
-void TableScene::slotGo()
+void TrafficScene::slotGo()
 {
   if ( m_travelState == TravelState::neutral &&
        m_clickState == ClickState::neutral )
@@ -156,7 +156,7 @@ void TableScene::slotGo()
   }
 }
 
-void TableScene::slotNext()
+void TrafficScene::slotNext()
 {
   std::uniform_int_distribution<unsigned int> cityRange(0, sqr(m_cities.size())-1);
 
@@ -226,13 +226,13 @@ void TableScene::slotNext()
 
 }
 
-void TableScene::mutateMoney(unsigned int player, double amount)
+void TrafficScene::mutateMoney(unsigned int player, double amount)
 {
   m_money[player] += amount;
   signalMoneyChanged();
 }
 
-double TableScene::getCost(unsigned int from, unsigned int to, std::vector<const TableScene::Track*> path) const
+double TrafficScene::getCost(unsigned int from, unsigned int to, std::vector<const TrafficScene::Track*> path) const
 {
   unsigned int at = from;
   double cost = 0;
@@ -261,13 +261,13 @@ double TableScene::getCost(unsigned int from, unsigned int to, std::vector<const
   return cost;
 }
 
-double TableScene::dist(unsigned int from, unsigned int to) const
+double TrafficScene::dist(unsigned int from, unsigned int to) const
 {
   return sqrt(sqr(m_dots[from].x-m_dots[to].x)+sqr(m_dots[from].y-m_dots[to].y));
 }
 
 double
-TableScene::travelDist(unsigned int from, unsigned int to) const
+TrafficScene::travelDist(unsigned int from, unsigned int to) const
 {
   double d = dist(from, to);
   for ( const Track& t : m_tracks )
@@ -281,7 +281,7 @@ TableScene::travelDist(unsigned int from, unsigned int to) const
   return 1e6*d;
 }
 
-std::vector<const TableScene::Track*> TableScene::getBestPath(unsigned int from, unsigned int to) const
+std::vector<const TrafficScene::Track*> TrafficScene::getBestPath(unsigned int from, unsigned int to) const
 {
   std::set<unsigned int> Q;
   Q.insert(from);
