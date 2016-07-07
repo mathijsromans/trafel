@@ -87,6 +87,7 @@ void TransformScene::processMouseClick(PointerEvent e)
     }
     else if ( !m_calibratedCorners )
     {
+      e.transform(m_transform);
       newCornerPoint(e.getAny());
     }
 
