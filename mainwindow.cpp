@@ -19,10 +19,9 @@ MainWindow::MainWindow(QWidget *parent) :
   t = new TrafficScene();
   v->setScene(t);
   setCentralWidget(v);
-  showMaximized();
+  showFullScreen();
 
   UserInput* ui = new UserInput();
-  connect( t, SIGNAL(signalMoneyChanged()), this, SLOT(slotMoneyChanged()) );
   connect(ui, SIGNAL(signalMouseClick(PointerEvent)), t, SLOT(slotLightAt(PointerEvent)));
 
   t->calibrate();
