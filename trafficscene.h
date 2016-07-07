@@ -67,7 +67,6 @@ private:
 
   static const unsigned int ms_gridSize = 10;
   std::mt19937 m_rng;
-  QRectF m_visibleArea;
   Earth m_earth;
   std::vector<Dot> m_dots;
   std::vector<unsigned int> m_cities;

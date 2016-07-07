@@ -27,19 +27,26 @@ protected:
 
 protected:
   void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+  QRect getTableRect() const;
 
 private:
 
   virtual void init() = 0;
 
   void newCalibratedPoint(QPoint p);
+  void newCornerPoint(QPoint p);
   void processMouseClick(PointerEvent e);
+  void showInfoText(const std::string& text) const;
 
 private:
   static const std::array<QPoint,4> ms_calibrationCoordinates;
   std::vector<QPoint> m_calibrationLights;
-  bool m_calibrated;
+  std::vector<QPoint> m_cornerPoints;
+  QRect m_tableRect;
+  bool m_calibratedTransform;
+  bool m_calibratedCorners;
   QGraphicsEllipseItem* m_circle;
+  QGraphicsTextItem* m_infoText;
   QTransform m_transform;
 };
 
