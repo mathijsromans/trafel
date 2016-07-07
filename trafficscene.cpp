@@ -45,8 +45,6 @@ void TrafficScene::init()
   std::random_device rd;
   m_rng.seed(rd());
 
-  m_visibleArea = QRectF( 0, 0, 1000, 800);
-
   double dotSize = getMaxDotDistance()/6+1;
 
   for ( unsigned int x = 0; x != ms_gridSize; ++x )
@@ -417,12 +415,12 @@ QGraphicsLineItem* TrafficScene::addDotLine(int x1, int y1, int x2, int y2, cons
 
 QPointF TrafficScene::getDotOrigin() const
 {
-  return m_visibleArea.topLeft() + 0.5 * getDotDistance();
+  return getTableRect().topLeft() + 0.5 * getDotDistance();
 }
 
 QPointF TrafficScene::getDotDistance() const
 {
-  return (m_visibleArea.bottomRight() - m_visibleArea.topLeft()) / (ms_gridSize+1);
+  return (getTableRect().bottomRight() - getTableRect().topLeft()) / (ms_gridSize+1);
 }
 
 double TrafficScene::getMaxDotDistance() const
