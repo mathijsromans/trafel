@@ -58,7 +58,7 @@ double LambertW1(const double z) {
   double p,e,t,w,l1,l2;
   if (z < -0.3)
     return my_lambert(z);
-  if (z<-em1 || z>=0.0 || isinf(z) || isnan(z))
+  if (z<-em1 || z>=0.0 || std::isinf(z) || std::isnan(z))
     throw("LambertW1: bad argument");
   /* initial approx for iteration... */
   if (z<-1e-6) { /* series about -1/e */
