@@ -8,6 +8,8 @@
 #include <array>
 #include <vector>
 
+class QGraphicsTextItem;
+
 class TrafficScene : public TransformScene
 {
   Q_OBJECT
@@ -17,10 +19,7 @@ public:
   virtual ~TrafficScene();
   double getGridSize() const { return ms_gridSize; }
   int getMoney(unsigned int player) const;
-  QColor getColor(unsigned int player) const;
-
-signals:
-  void signalMoneyChanged();
+  QColor getPlayerColor(unsigned int player) const;
 
 protected:
   virtual void mouseClick(QPointF p);
@@ -80,9 +79,8 @@ private:
   std::vector<Track> m_tracks;
   std::vector<QGraphicsLineItem*> m_travelLines;
   std::array<double, 2> m_money;
+  std::array<QGraphicsTextItem*, 2> m_moneyLabel;
   unsigned int m_currentPlayer = 0;
-
-
 };
 
 #endif // TRAFFICSCENE_H

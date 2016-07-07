@@ -6,8 +6,6 @@
 #include <QMainWindow>
 class QGraphicsView;
 class TrafficScene;
-class QLabel;
-class TransformScene;
 
 class MainWindow : public QMainWindow
 {
@@ -22,7 +20,6 @@ protected:
   virtual void resizeEvent(QResizeEvent* event) override;
 
 private slots:
-  void slotMoneyChanged();
   void slotLightAt(PointerEvent e);
 
 private:
@@ -32,8 +29,6 @@ private:
   UserInputThread m_userInputThread;
   QGraphicsView* v;
   TrafficScene* t;
-  QLabel* m_l0;
-  QLabel* m_l1;
 };
 
 #endif // MAINWINDOW_H

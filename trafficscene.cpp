@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QTimer>
 #include <QGraphicsEllipseItem>
+#include <QGraphicsTextItem>
 #include <QGraphicsSceneMouseEvent>
 
 namespace
@@ -24,15 +25,14 @@ bool has_if( const T1& vec, T2 condition )
 
 template <typename T>
 T sqr(T x) { return x*x; }
-
 }
-
 
 TrafficScene::TrafficScene()
   : m_earth(ms_gridSize, ms_gridSize),
     m_travelState(TravelState::neutral),
     m_clickState(ClickState::neutral),
-    m_money{ 35, 45 }
+    m_money{ 35, 45 },
+    m_moneyLabel{ 0, 0 }
 {  
 }
 
@@ -96,6 +96,19 @@ void TrafficScene::init()
       addEllipse(squareAt(getDotPosition(x, y), heightMapDotSize), QPen(Qt::NoPen), QBrush(c, Qt::SolidPattern))->setZValue(-10);
     }
   }
+
+  QFont f;
+  f.setPixelSize(getMaxDotDistance()*0.4);
+  for ( unsigned int player = 0; player != 2; ++player )
+  {
+    QGraphicsTextItem* text = addText("", f);
+    text->setDefaultTextColor(Qt::black);
+    text->setPos(getDotPosition(2+0.5*player, -0.65 + (static_cast<int>(ms_gridSize)+0.3)*(!player)));
+    m_moneyLabel[player] = text;
+    mutateMoney(player, 0);
+  }
+  m_moneyLabel[1]->setRotation(180);
+
 }
 
 int TrafficScene::getMoney(unsigned int player) const
@@ -103,7 +116,7 @@ int TrafficScene::getMoney(unsigned int player) const
   return m_money[player];
 }
 
-QColor TrafficScene::getColor(unsigned int player) const
+QColor TrafficScene::getPlayerColor(unsigned int player) const
 {
   switch (player)
   {
@@ -115,9 +128,14 @@ QColor TrafficScene::getColor(unsigned int player) const
 
 void TrafficScene::mouseClick(QPointF p)
 {
+  auto its = items(p);
+  for ( auto l : m_moneyLabel )
+  if ( its.contains(l) )
+  {
+    slotGo();
+  }
   if ( m_travelState == TravelState::neutral )
   {
-    auto its = items(p);
     unsigned int i = 0;
     for ( ; i != m_dots.size(); ++i )
     {
@@ -133,7 +151,7 @@ void TrafficScene::mouseClick(QPointF p)
         case ClickState::neutral:
           m_clickState = ClickState::click1;
           m_click1 = i;
-          m_dots[m_click1].ellipse->setBrush(getColor(m_currentPlayer));
+          m_dots[m_click1].ellipse->setBrush(getPlayerColor(m_currentPlayer));
         break;
         case ClickState::click1:
         {
@@ -145,7 +163,7 @@ void TrafficScene::mouseClick(QPointF p)
             mutateMoney(m_currentPlayer, -cost);
             QGraphicsLineItem* line = addDotLine(m_dots[m_click1].x, m_dots[m_click1].y,
                                                  m_dots[i].x, m_dots[i].y,
-                                                 getColor(m_currentPlayer));
+                                                 getPlayerColor(m_currentPlayer));
             m_tracks.push_back(Track{m_click1, i, m_currentPlayer, line});
           }
         }
@@ -238,7 +256,9 @@ void TrafficScene::slotNext()
 void TrafficScene::mutateMoney(unsigned int player, double amount)
 {
   m_money[player] += amount;
-  signalMoneyChanged();
+  m_moneyLabel[player]->setHtml("<div style='background-color: " +
+                                getPlayerColor(player).name() +
+                                ";'>" + QString::number(m_money[player]) + "</div>");
 }
 
 double TrafficScene::getCost(unsigned int from, unsigned int to, std::vector<const TrafficScene::Track*> path) const
