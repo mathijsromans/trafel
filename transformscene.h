@@ -33,6 +33,7 @@ private:
 
   void newCalibratedPoint(QPoint p);
   void newCornerPoint(QPointF pC);
+  void processTransformedMouseClick(PointerEvent e);
   void processMouseClick(PointerEvent e);
   void showInfoText(const std::string& text) const;
 

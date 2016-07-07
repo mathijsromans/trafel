@@ -59,40 +59,40 @@ void TransformScene::mouseClick(QPointF /*p*/)
 {
 }
 
-void TransformScene::processMouseClick(PointerEvent e)
+void TransformScene::processTransformedMouseClick(PointerEvent e)
 {
-  if ( m_calibratedTransform && m_calibratedCorners )
+  if ( !m_calibratedCorners )
   {
-    e.transform(m_transform);
-    m_circle->setRect(Utilities::squareAt(e.getAny(),20));
-    m_circle->show();
-    addItem( new MousePing(e.getAny(),20) );
-    qDebug() << "circle at " << m_circle->boundingRect();
-    mouseClick(e.getAny());
-  }
-  else
-  {
-    if ( !m_calibratedTransform )
-    {
-      newCalibratedPoint(e.getAny().toPoint());
-    }
-    else if ( !m_calibratedCorners )
-    {
-      e.transform(m_transform);
-      newCornerPoint(e.getAny());
-    }
-
-    if ( m_calibratedTransform && !m_calibratedCorners )
-    {
-      std::string text = "Select corner " + std::to_string(m_cornerPoints.size()+1);
-      showInfoText(text);
-    }
-
-    if ( m_calibratedTransform && m_calibratedCorners )
+    newCornerPoint(e.getAny());
+    if ( m_calibratedCorners )
     {
       m_infoText->hide();
       init();
     }
+  }
+  else
+  {
+    mouseClick(e.getAny());
+  }
+}
+
+void TransformScene::processMouseClick(PointerEvent e)
+{
+  if ( !m_calibratedTransform )
+  {
+    newCalibratedPoint(e.getAny().toPoint());
+  }
+  else
+  {
+    e.transform(m_transform);
+    addItem( new MousePing(e.getAny()) );
+    processTransformedMouseClick(e);
+  }
+
+  if ( m_calibratedTransform && !m_calibratedCorners )
+  {
+    std::string text = "Select corner " + std::to_string(m_cornerPoints.size()+1);
+    showInfoText(text);
   }
 }
 
