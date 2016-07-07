@@ -1,19 +1,21 @@
 #include "mouseping.h"
 #include "utilities.h"
+#include <QDebug>
 #include <QPen>
 
-MousePing::MousePing(QPointF p)
+MousePing::MousePing(QPointF p, const QColor& color)
   : QObject(),
     QGraphicsEllipseItem( Utilities::squareAt(p, 0) ),
     m_size(0),
     m_animation(this, "size")
 {
+  qDebug() << "PING" << p;
   QPen pen;
-  pen.setWidth(3);
-  pen.setColor(Qt::blue);
+  pen.setWidth(7);
+  pen.setColor(color);
   setPen(pen);
 
-  m_animation.setDuration(100);
+  m_animation.setDuration(1000);
   m_animation.setStartValue(5);
   m_animation.setEndValue(55);
   m_animation.start();

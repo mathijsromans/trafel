@@ -16,6 +16,8 @@ double dist(QPointF p1, QPointF p2)
 
 }
 
+const std::array<QColor, 3> PointerEvent::ms_qcolors = { Qt::red, Qt::green, Qt::blue };
+
 PointerEvent::PointerEvent()
   : m_points()
 {
@@ -39,16 +41,27 @@ QPointF PointerEvent::getAny() const
   return QPointF(0,0);
 }
 
-QPointF PointerEvent::getPoint(PointerEvent::Color c) const
+std::vector<PointerEvent::CPoint> PointerEvent::getPoints() const
 {
-  return m_points[static_cast<int>(c)];
+  std::vector<CPoint> result;
+  for (unsigned int i = 0; i != m_points.size(); ++i )
+  {
+    if ( !m_points[i].isNull() )
+    {
+      result.push_back( CPoint{static_cast<Color>(i), ms_qcolors[i], m_points[i]} );
+    }
+  }
+  return result;
 }
 
 void PointerEvent::transform(const QTransform& t)
 {
   for (QPointF& p : m_points)
   {
-    p = t.map(QPointF(p)).toPoint();
+    if ( !p.isNull() )
+    {
+      p = t.map(p);
+    }
   }
 }
 

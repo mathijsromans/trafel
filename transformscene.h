@@ -46,6 +46,7 @@ private:
   bool m_calibratedCorners;
   QGraphicsEllipseItem* m_circle;
   QGraphicsTextItem* m_infoText;
+  QGraphicsRectItem* m_tableRectItem;
   QTransform m_transform;
 };
 
