@@ -48,7 +48,10 @@ void PointerEvent::transform(const QTransform& t)
 {
   for (QPointF& p : m_points)
   {
-    p = t.map(QPointF(p)).toPoint();
+    if ( !p.isNull() )
+    {
+      p = t.map(p);
+    }
   }
 }
 

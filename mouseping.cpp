@@ -1,5 +1,6 @@
 #include "mouseping.h"
 #include "utilities.h"
+#include <QDebug>
 #include <QPen>
 
 MousePing::MousePing(QPointF p)
@@ -8,12 +9,13 @@ MousePing::MousePing(QPointF p)
     m_size(0),
     m_animation(this, "size")
 {
+  qDebug() << "PING" << p;
   QPen pen;
-  pen.setWidth(3);
+  pen.setWidth(7);
   pen.setColor(Qt::blue);
   setPen(pen);
 
-  m_animation.setDuration(100);
+  m_animation.setDuration(1000);
   m_animation.setStartValue(5);
   m_animation.setEndValue(55);
   m_animation.start();
