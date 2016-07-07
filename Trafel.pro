@@ -18,7 +18,7 @@ CONFIG += console
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    tablescene.cpp \
+    trafficscene.cpp \
     earth.cpp \
     distributions.cpp \
     userinput.cpp \
@@ -29,7 +29,7 @@ SOURCES += main.cpp\
     userinputthread.cpp
 
 HEADERS  += mainwindow.h \
-    tablescene.h \
+    trafficscene.h \
     earth.h \
     distributions.h \
     userinput.h \

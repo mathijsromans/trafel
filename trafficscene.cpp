@@ -1,4 +1,4 @@
-#include "tablescene.h"
+#include "trafficscene.h"
 #include <algorithm>
 #include <cassert>
 #include <map>
@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QTimer>
 #include <QGraphicsEllipseItem>
+#include <QGraphicsTextItem>
 #include <QGraphicsSceneMouseEvent>
 
 namespace
@@ -24,32 +25,38 @@ bool has_if( const T1& vec, T2 condition )
 
 template <typename T>
 T sqr(T x) { return x*x; }
-
 }
 
-
-TableScene::TableScene()
+TrafficScene::TrafficScene()
   : m_earth(ms_gridSize, ms_gridSize),
     m_travelState(TravelState::neutral),
     m_clickState(ClickState::neutral),
-    m_money{ 35, 45 }
+    m_money{ 35, 45 },
+    m_moneyLabel{ 0, 0 }
 {  
 }
 
-TableScene::~TableScene()
+TrafficScene::~TrafficScene()
 {  
 }
 
-void TableScene::init()
+void TrafficScene::init()
 {
   std::random_device rd;
   m_rng.seed(rd());
+
+  m_visibleArea = QRectF( 0, 0, 1000, 800);
+
+  double dotSize = getMaxDotDistance()/6+1;
 
   for ( unsigned int x = 0; x != ms_gridSize; ++x )
   {
     for ( unsigned int y = 0; y != ms_gridSize; ++y )
     {
-      m_dots.push_back(Dot{x, y, addEllipse( squareAt(10*x, 10*y, 1), QPen(Qt::white)), QPen()});
+      auto ellipse = addEllipse( squareAt( getDotPosition(x,y), dotSize ),
+                                 QPen(Qt::NoPen),
+                                 QBrush(Qt::white, Qt::SolidPattern) );
+      m_dots.push_back(Dot{x, y, ellipse, QBrush()});
     }
   }
 
@@ -64,36 +71,52 @@ void TableScene::init()
     while ( contains( m_cities, n ) );
 
     m_cities.push_back(n);
-    m_dots[n].ellipse->setPen(QColor(Qt::magenta));
+    QBrush brush = m_dots[n].ellipse->brush();
+    brush.setColor(QColor(Qt::magenta));
+    m_dots[n].ellipse->setBrush(brush);
     QFont f;
-    f.setPixelSize(5);
+    f.setPixelSize(getMaxDotDistance()*0.4);
     QGraphicsTextItem* text = addText(QString::number(i+1), f);
-    text->setPos(10.0*m_dots[n].x-4, 10.0*m_dots[n].y-4);
+    text->setPos(getDotPosition(m_dots[n].x,m_dots[n].y));
     text->setDefaultTextColor(Qt::white);
   }
 
   for ( auto&& d : m_dots )
   {
-    d.originalPen = d.ellipse->pen();
+    d.originalBrush = d.ellipse->brush();
   }
 
-  for ( int x = -5; x != 10*ms_gridSize-5; ++x )
+  double heightMapDotSize = 0.15*getMaxDotDistance();
+  for ( double x = -0.5; x < ms_gridSize-0.5; x += 0.1 )
   {
-    for ( int y = -5; y != 10*ms_gridSize-5; ++y )
+    for ( double y = -0.5; y < ms_gridSize-0.5; y += 0.1 )
     {
       QColor c;
-      c.setHsv(m_earth.height(0.1*x, 0.1*y), 255, 150);
-      addEllipse(squareAt(x, y, 0.93), QPen(c))->setZValue(-10);
+      c.setHsv(m_earth.height(x, y), 255, 150);
+      addEllipse(squareAt(getDotPosition(x, y), heightMapDotSize), QPen(Qt::NoPen), QBrush(c, Qt::SolidPattern))->setZValue(-10);
     }
   }
+
+  QFont f;
+  f.setPixelSize(getMaxDotDistance()*0.4);
+  for ( unsigned int player = 0; player != 2; ++player )
+  {
+    QGraphicsTextItem* text = addText("", f);
+    text->setDefaultTextColor(Qt::black);
+    text->setPos(getDotPosition(2+0.5*player, -0.65 + (static_cast<int>(ms_gridSize)+0.3)*(!player)));
+    m_moneyLabel[player] = text;
+    mutateMoney(player, 0);
+  }
+  m_moneyLabel[1]->setRotation(180);
+
 }
 
-int TableScene::getMoney(unsigned int player) const
+int TrafficScene::getMoney(unsigned int player) const
 {
   return m_money[player];
 }
 
-QColor TableScene::getColor(unsigned int player) const
+QColor TrafficScene::getPlayerColor(unsigned int player) const
 {
   switch (player)
   {
@@ -103,11 +126,16 @@ QColor TableScene::getColor(unsigned int player) const
   return Qt::black;
 }
 
-void TableScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
+void TrafficScene::mouseClick(QPointF p)
 {
+  auto its = items(p);
+  for ( auto l : m_moneyLabel )
+  if ( its.contains(l) )
+  {
+    slotGo();
+  }
   if ( m_travelState == TravelState::neutral )
   {
-    auto its = items(event->scenePos());
     unsigned int i = 0;
     for ( ; i != m_dots.size(); ++i )
     {
@@ -123,21 +151,20 @@ void TableScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
         case ClickState::neutral:
           m_clickState = ClickState::click1;
           m_click1 = i;
-          m_dots[m_click1].ellipse->setPen(getColor(m_currentPlayer));
+          m_dots[m_click1].ellipse->setBrush(getPlayerColor(m_currentPlayer));
         break;
         case ClickState::click1:
         {
           m_clickState = ClickState::neutral;
-          m_dots[m_click1].ellipse->setPen(m_dots[m_click1].originalPen);
+          m_dots[m_click1].ellipse->setBrush(m_dots[m_click1].originalBrush);
           double cost = 10*dist(m_click1, i);
           if ( m_click1 != i && cost <= m_money[m_currentPlayer] )
           {
             mutateMoney(m_currentPlayer, -cost);
-            m_tracks.push_back(Track{m_click1, i, m_currentPlayer,
-                             addLine(10*m_dots[m_click1].x,
-                                     10*m_dots[m_click1].y,
-                                     10*m_dots[i].x,
-                                     10*m_dots[i].y, QPen(getColor(m_currentPlayer)) ) });
+            QGraphicsLineItem* line = addDotLine(m_dots[m_click1].x, m_dots[m_click1].y,
+                                                 m_dots[i].x, m_dots[i].y,
+                                                 getPlayerColor(m_currentPlayer));
+            m_tracks.push_back(Track{m_click1, i, m_currentPlayer, line});
           }
         }
         break;
@@ -147,7 +174,7 @@ void TableScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
   }
 }
 
-void TableScene::slotGo()
+void TrafficScene::slotGo()
 {
   if ( m_travelState == TravelState::neutral &&
        m_clickState == ClickState::neutral )
@@ -156,7 +183,7 @@ void TableScene::slotGo()
   }
 }
 
-void TableScene::slotNext()
+void TrafficScene::slotNext()
 {
   std::uniform_int_distribution<unsigned int> cityRange(0, sqr(m_cities.size())-1);
 
@@ -165,7 +192,7 @@ void TableScene::slotNext()
     case TravelState::select1:
       m_travelState = TravelState::select2;
       m_travel1 = static_cast<unsigned int>(sqrt(cityRange(m_rng)));
-      m_dots[m_cities[m_travel1]].ellipse->setPen(QColor(Qt::blue));
+      m_dots[m_cities[m_travel1]].ellipse->setBrush(QColor(Qt::blue));
     break;
     case TravelState::select2:
       m_travelState = TravelState::startTravel;
@@ -174,7 +201,7 @@ void TableScene::slotNext()
         m_travel2 = static_cast<unsigned int>(sqrt(cityRange(m_rng)));
       }
       while (m_travel2 == m_travel1);
-      m_dots[m_cities[m_travel2]].ellipse->setPen(QColor(Qt::blue));
+      m_dots[m_cities[m_travel2]].ellipse->setBrush(QColor(Qt::blue));
     break;
     case TravelState::startTravel:
     {
@@ -195,19 +222,19 @@ void TableScene::slotNext()
         const Dot& dot1 = m_dots[at];
         const Dot& dot2 = m_dots[t1];
         const Dot& dot3 = m_dots[t2];
-        m_travelLines.push_back(addLine(10*dot1.x, 10*dot1.y, 10*dot2.x, 10*dot2.y));
-        m_travelLines.push_back(addLine(10*dot2.x, 10*dot2.y, 10*dot3.x, 10*dot3.y));
+        m_travelLines.push_back(addDotLine(dot1.x, dot1.y, dot2.x, dot2.y));
+        m_travelLines.push_back(addDotLine(dot2.x, dot2.y, dot3.x, dot3.y));
         at = t2;
       }
       const Dot& dot1 = m_dots[at];
       const Dot& dot2 = m_dots[m_cities[m_travel2]];
-      m_travelLines.push_back(addLine(10*dot1.x, 10*dot1.y, 10*dot2.x, 10*dot2.y));
+      m_travelLines.push_back(addDotLine(dot1.x, dot1.y, dot2.x, dot2.y));
     }
     break;
     case TravelState::travelling:
       m_travelState = TravelState::neutral;
-      m_dots[m_cities[m_travel1]].ellipse->setPen(m_dots[m_cities[m_travel1]].originalPen);
-      m_dots[m_cities[m_travel2]].ellipse->setPen(m_dots[m_cities[m_travel2]].originalPen);
+      m_dots[m_cities[m_travel1]].ellipse->setBrush(m_dots[m_cities[m_travel1]].originalBrush);
+      m_dots[m_cities[m_travel2]].ellipse->setBrush(m_dots[m_cities[m_travel2]].originalBrush);
       for ( auto l : m_travelLines )
       {
         delete l;
@@ -226,13 +253,15 @@ void TableScene::slotNext()
 
 }
 
-void TableScene::mutateMoney(unsigned int player, double amount)
+void TrafficScene::mutateMoney(unsigned int player, double amount)
 {
   m_money[player] += amount;
-  signalMoneyChanged();
+  m_moneyLabel[player]->setHtml("<div style='background-color: " +
+                                getPlayerColor(player).name() +
+                                ";'>" + QString::number(m_money[player]) + "</div>");
 }
 
-double TableScene::getCost(unsigned int from, unsigned int to, std::vector<const TableScene::Track*> path) const
+double TrafficScene::getCost(unsigned int from, unsigned int to, std::vector<const TrafficScene::Track*> path) const
 {
   unsigned int at = from;
   double cost = 0;
@@ -261,13 +290,13 @@ double TableScene::getCost(unsigned int from, unsigned int to, std::vector<const
   return cost;
 }
 
-double TableScene::dist(unsigned int from, unsigned int to) const
+double TrafficScene::dist(unsigned int from, unsigned int to) const
 {
   return sqrt(sqr(m_dots[from].x-m_dots[to].x)+sqr(m_dots[from].y-m_dots[to].y));
 }
 
 double
-TableScene::travelDist(unsigned int from, unsigned int to) const
+TrafficScene::travelDist(unsigned int from, unsigned int to) const
 {
   double d = dist(from, to);
   for ( const Track& t : m_tracks )
@@ -281,7 +310,7 @@ TableScene::travelDist(unsigned int from, unsigned int to) const
   return 1e6*d;
 }
 
-std::vector<const TableScene::Track*> TableScene::getBestPath(unsigned int from, unsigned int to) const
+std::vector<const TrafficScene::Track*> TrafficScene::getBestPath(unsigned int from, unsigned int to) const
 {
   std::set<unsigned int> Q;
   Q.insert(from);
@@ -376,3 +405,36 @@ std::vector<const TableScene::Track*> TableScene::getBestPath(unsigned int from,
 
 }
 
+QGraphicsLineItem* TrafficScene::addDotLine(int x1, int y1, int x2, int y2, const QColor& color)
+{
+  QGraphicsLineItem* line = addLine(QLineF(getDotPosition(x1, y1), getDotPosition(x2, y2)));
+  QPen pen;
+  pen.setWidthF( 0.1 * getMaxDotDistance() );
+  pen.setColor(color);
+  line->setPen(pen);
+  return line;
+}
+
+QPointF TrafficScene::getDotOrigin() const
+{
+  return m_visibleArea.topLeft() + 0.5 * getDotDistance();
+}
+
+QPointF TrafficScene::getDotDistance() const
+{
+  return (m_visibleArea.bottomRight() - m_visibleArea.topLeft()) / (ms_gridSize+1);
+}
+
+double TrafficScene::getMaxDotDistance() const
+{
+  QPointF dotDistance = getDotDistance();
+  return std::max(dotDistance.x(), dotDistance.y());
+}
+
+QPointF TrafficScene::getDotPosition( double x, double y ) const
+{
+  QPointF dotDistance = getDotDistance();
+  return getDotOrigin() + QPoint( dotDistance.x()*x,
+                                  dotDistance.y()*y );
+
+}

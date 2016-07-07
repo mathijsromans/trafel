@@ -5,9 +5,7 @@
 #include "userinputthread.h"
 #include <QMainWindow>
 class QGraphicsView;
-class TableScene;
-class QLabel;
-class TransformScene;
+class TrafficScene;
 
 class MainWindow : public QMainWindow
 {
@@ -22,7 +20,6 @@ protected:
   virtual void resizeEvent(QResizeEvent* event) override;
 
 private slots:
-  void slotMoneyChanged();
   void slotLightAt(PointerEvent e);
 
 private:
@@ -31,9 +28,7 @@ private:
 private:
   UserInputThread m_userInputThread;
   QGraphicsView* v;
-  TableScene* t;
-  QLabel* m_l0;
-  QLabel* m_l1;
+  TrafficScene* t;
 };
 
 #endif // MAINWINDOW_H

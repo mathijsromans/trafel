@@ -1,5 +1,5 @@
-#ifndef TABLESCENE_H
-#define TABLESCENE_H
+#ifndef TRAFFICSCENE_H
+#define TRAFFICSCENE_H
 
 #include "earth.h"
 #include "transformscene.h"
@@ -8,22 +8,21 @@
 #include <array>
 #include <vector>
 
-class TableScene : public TransformScene
+class QGraphicsTextItem;
+
+class TrafficScene : public TransformScene
 {
   Q_OBJECT
 
 public:
-  TableScene();
-  virtual ~TableScene();
+  TrafficScene();
+  virtual ~TrafficScene();
   double getGridSize() const { return ms_gridSize; }
   int getMoney(unsigned int player) const;
-  QColor getColor(unsigned int player) const;
-
-signals:
-  void signalMoneyChanged();
+  QColor getPlayerColor(unsigned int player) const;
 
 protected:
-  void mousePressEvent(QGraphicsSceneMouseEvent* event);
+  virtual void mouseClick(QPointF p);
 
 private slots:
   void slotGo();
@@ -38,12 +37,12 @@ private:
   {
     unsigned int x,y;
     QGraphicsEllipseItem* ellipse;
-    QPen originalPen;
+    QBrush originalBrush;
   };
   struct Track
   {
     unsigned int from, to, player;
-    QGraphicsLineItem* ellipse;
+    QGraphicsLineItem* line;
   };
   struct PathSegment
   {
@@ -56,12 +55,19 @@ private:
   double dist( unsigned int from, unsigned int to ) const;
   double travelDist( unsigned int from, unsigned int to ) const;
   std::vector<const Track*> getBestPath(unsigned int from, unsigned int to) const;
+  QGraphicsLineItem* addDotLine(int x1, int y1, int x2, int y2 , const QColor& colorC = QColor());
+  QPointF getDotOrigin() const;
+  QPointF getDotDistance() const;
+  double getMaxDotDistance() const;
+  QPointF getDotPosition(double x, double y) const;
 
+private:
   enum class TravelState { neutral, select1, select2, startTravel, travelling };
   enum class ClickState { neutral, click1 };
 
   static const unsigned int ms_gridSize = 10;
   std::mt19937 m_rng;
+  QRectF m_visibleArea;
   Earth m_earth;
   std::vector<Dot> m_dots;
   std::vector<unsigned int> m_cities;
@@ -73,9 +79,8 @@ private:
   std::vector<Track> m_tracks;
   std::vector<QGraphicsLineItem*> m_travelLines;
   std::array<double, 2> m_money;
+  std::array<QGraphicsTextItem*, 2> m_moneyLabel;
   unsigned int m_currentPlayer = 0;
-
-
 };
 
-#endif // TABLESCENE_H
+#endif // TRAFFICSCENE_H

@@ -18,7 +18,6 @@ public:
   void calibrate();
 
 public slots:
-  void slotNewImage( QImage i );
   void slotLightAt( PointerEvent e );
 
 protected:
@@ -34,6 +33,7 @@ private:
   virtual void init() = 0;
 
   void newCalibratedPoint(QPoint p);
+  void processMouseClick(PointerEvent e);
 
 private:
   static const std::array<QPoint,4> ms_calibrationCoordinates;
@@ -41,7 +41,6 @@ private:
   bool m_calibrated;
   QGraphicsEllipseItem* m_circle;
   QTransform m_transform;
-  QGraphicsPixmapItem* m_image;
 };
 
 #endif // TRANSFORMSCENE_H

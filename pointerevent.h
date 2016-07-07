@@ -16,6 +16,7 @@ public:
   QPoint getPoint( Color c ) const;
   const std::array<QPoint, 3>& getPoints() const { return m_points; }
   void transform( const QTransform& t );
+  bool differsFrom( const PointerEvent& other ) const;
 private:
   std::array<QPoint, 3> m_points;
 };
