@@ -7,20 +7,6 @@
 
 const std::array<QPoint,4> TransformScene::ms_calibrationCoordinates = {QPoint{200,200},QPoint{600,200},QPoint{600,600},QPoint{200,600}};
 
-namespace
-{
-
-template <typename T>
-T sqr(T x) { return x*x; }
-
-double dist(QPoint p1, QPoint p2)
-{
-  QPoint p = p1-p2;
-  return sqrt(sqr(p.x()+sqr(p.y())));
-}
-
-}
-
 TransformScene::TransformScene()
  : m_calibrationLights(),
    m_calibrated(false),
@@ -85,13 +71,6 @@ void TransformScene::slotLightAt(PointerEvent e)
 void TransformScene::newCalibratedPoint(QPoint p)
 {
   // calibrate
-  for ( auto c : m_calibrationLights )
-  {
-    if ( dist(p,c) < 10 )
-    {
-      return;
-    }
-  }
   m_calibrationLights.push_back(p);
   if ( m_calibrationLights.size() < ms_calibrationCoordinates.size() )
   {

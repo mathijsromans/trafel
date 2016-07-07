@@ -1,5 +1,20 @@
 #include "pointerevent.h"
+#include <cmath>
 #include <QTransform>
+
+namespace
+{
+
+template <typename T>
+T sqr(T x) { return x*x; }
+
+double dist(QPoint p1, QPoint p2)
+{
+  QPoint p = p1-p2;
+  return sqrt(sqr(p.x()+sqr(p.y())));
+}
+
+}
 
 PointerEvent::PointerEvent()
   : m_points()
@@ -35,5 +50,18 @@ void PointerEvent::transform(const QTransform& t)
   {
     p = t.map(QPointF(p)).toPoint();
   }
+}
+
+bool PointerEvent::differsFrom(const PointerEvent& other) const
+{
+  for ( unsigned int i = 0; i != m_points.size(); ++i )
+  {
+    if ( m_points[i].isNull() != other.m_points[i].isNull() ||
+         dist(m_points[i], other.m_points[i]) > 10 )
+    {
+      return true;
+    }
+  }
+  return false;
 }
 

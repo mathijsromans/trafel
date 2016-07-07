@@ -26,6 +26,7 @@ private:
 private:  
   Image m_testImage;
   Image m_currentImage;
+  PointerEvent m_lastEvent;
 };
 
 #endif // USERINPUT_H

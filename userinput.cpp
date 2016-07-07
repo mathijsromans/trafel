@@ -154,9 +154,14 @@ void UserInput::process()
 //  qDebug() << "saved to " << fileName;
 
   PointerEvent event( getPointer() );
-  if ( event.getAny() != QPoint(0,0) )
+  if ( event.differsFrom( m_lastEvent ) )
   {
-    signalMouseClick(event);
+    if ( !event.getAny().isNull() )
+    {
+      qDebug() << "signalMouseClick";
+      signalMouseClick(event);
+    }
+    m_lastEvent = event;
   }
 
   qDebug() << "User input loop took" << time.elapsed() << "ms";
