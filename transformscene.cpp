@@ -34,7 +34,8 @@ TransformScene::TransformScene()
    m_calibratedTransform(false),
    m_calibratedCorners(false),
    m_circle(0),
-   m_infoText(0)
+   m_infoText(0),
+   m_tableRectItem(0)
 {
   setBackgroundBrush(Qt::black);
   m_infoText = addText("Help Text");
@@ -154,6 +155,9 @@ void TransformScene::newCornerPoint(QPointF p)
     QPointF tableRectBottomRight(std::min(bottomRight.x(), topRight.x()), std::min(bottomLeft.y(), bottomRight.y()));
     m_tableRect = QRectF(tableRectTopLeft, tableRectBottomRight);
     qDebug() << "TABLE RECT IS " << m_tableRect;
+    QPen pen(Qt::white);
+    pen.setWidth(3);
+    m_tableRectItem = addRect(m_tableRect, pen);
     m_calibratedCorners = true;
   }
 }
