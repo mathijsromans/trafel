@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QPen>
 
-MousePing::MousePing(QPointF p)
+MousePing::MousePing(QPointF p, const QColor& color)
   : QObject(),
     QGraphicsEllipseItem( Utilities::squareAt(p, 0) ),
     m_size(0),
@@ -12,7 +12,7 @@ MousePing::MousePing(QPointF p)
   qDebug() << "PING" << p;
   QPen pen;
   pen.setWidth(7);
-  pen.setColor(Qt::blue);
+  pen.setColor(color);
   setPen(pen);
 
   m_animation.setDuration(1000);

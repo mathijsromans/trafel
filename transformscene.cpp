@@ -86,7 +86,10 @@ void TransformScene::processMouseClick(PointerEvent e)
   else
   {
     e.transform(m_transform);
-    addItem( new MousePing(e.getAny()) );
+    for ( auto p : e.getPoints() )
+    {
+      addItem( new MousePing(p.point, p.qcolor) );
+    }
     processTransformedMouseClick(e);
   }
 
