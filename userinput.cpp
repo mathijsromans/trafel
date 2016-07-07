@@ -150,7 +150,7 @@ void UserInput::process()
 
 //  static int counter = 0;
 //  QString fileName = QString("grab_") + QString::number(counter++) + ".png";
-//  image.save( fileName );
+//  m_currentImage.save( fileName );
 //  qDebug() << "saved to " << fileName;
 
   PointerEvent event( getEvent() );
