@@ -178,6 +178,7 @@ void TransformScene::showInfoText(const std::string& text) const
   QFont font;
   font.setPixelSize(40);
   m_infoText->setFont(font);
+  m_infoText->setDefaultTextColor(Qt::white);
   m_infoText->setPlainText(QString::fromStdString(text));
   m_infoText->setPos(200, 200);
   m_infoText->show();
