@@ -1,8 +1,7 @@
 #include "gravityscene.h"
 
-#include "bodyitem.h"
-
-#include "environment.h"
+#include "spafel/bodyitem.h"
+#include "spafel/environment.h"
 
 #include <QDebug>
 #include <QGraphicsEllipseItem>
@@ -30,7 +29,9 @@ namespace
 GravityScene::GravityScene()
 : TransformScene(),
   m_environment(new Environment()),
+  m_bodyItems(),
   m_newBody(),
+  m_trackItems(),
   m_tempBodyItem(0),
   m_sunItem(0),
   m_timer(new QTimer(this))
@@ -49,7 +50,6 @@ GravityScene::addBody(Body* body, const QColor& color)
   m_environment->addBody(body);
   BodyItem* bodyItem = new BodyItem(body, color);
   m_bodyItems.push_back(bodyItem);
-  m_bodies.push_back(body);
   addItem(bodyItem);
   return bodyItem;
 }
@@ -79,6 +79,8 @@ GravityScene::step()
   }
 
   detectCollisionWithSun();
+
+  updateTrackItems();
 }
 
 
@@ -139,12 +141,17 @@ GravityScene::removeBodyItem(BodyItem* bodyItem)
 {
   m_bodyItems.erase( std::remove(m_bodyItems.begin(), m_bodyItems.end(), bodyItem), m_bodyItems.end() );
   removeItem(bodyItem);
-  for (Body* body : m_bodies)
+  for (Body* body : m_environment->getBodies())
   {
     if (body == bodyItem->getBody())
     {
       m_environment->removeBody(body);
-      delete body;
+      for (const auto& lineItem : m_trackItems[body])
+      {
+        removeItem(lineItem);
+        delete lineItem;
+      }
+      m_trackItems[body].clear();
       break;
     }
   }
@@ -181,6 +188,32 @@ double
 GravityScene::getScaleFactor(const QRectF& tableRect)
 {
   return std::min(tableRect.width(), tableRect.height()) * zoom;
+}
+
+
+void
+GravityScene::updateTrackItems()
+{
+  for (const auto& body : m_environment->getBodies())
+  {
+    const Body::Track& track = body->getTrack();
+    if (track.points.size() > 2)
+    {
+      QLineF newLine(envToScene(track.points[1], getTableRect()), envToScene(track.points[0], getTableRect()));
+      QGraphicsLineItem* line = addLine(newLine, QPen(Qt::red));
+      line->setZValue(-10);
+      m_trackItems[body].push_front(line);
+    }
+
+    if (m_trackItems[body].size() > 50)
+    {
+      QGraphicsLineItem* line = m_trackItems[body].back();
+      removeItem(line);
+      m_trackItems[body].pop_back();
+      delete line;
+    }
+  }
+
 }
 
 

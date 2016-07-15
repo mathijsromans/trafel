@@ -17,6 +17,7 @@ public:
   void addMasslessBody(Body* body);
   void removeBody(Body* body);
   void clearAllBodies();
+  const std::vector<Body*>& getBodies() const;
 
   void oneStep(double tEnd, double stepsize);
 

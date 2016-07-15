@@ -11,7 +11,8 @@ Body::Body(Environment* environment)
   m_para(),
   m_integrator(),
   m_environment(environment),
-  m_nSteps(0)
+  m_nSteps(0),
+  m_track()
 {
   m_x[0] = 200.0;
   m_x[1] = 200.0;
@@ -91,6 +92,7 @@ Body::printPosition() const
   std::cout << "pos: " << m_x[0] << ", " << m_x[1] << ", distance: " << distance << std::endl;
 }
 
+
 void
 Body::printVelocity() const
 {
@@ -98,10 +100,18 @@ Body::printVelocity() const
   std::cout << "vel: " << m_x[2] << ", " << m_x[3] << ", speed: " << speed << std::endl;
 }
 
+
 unsigned int
 Body::getId() const
 {
   return m_id;
+}
+
+
+const Body::Track&
+Body::getTrack() const
+{
+  return m_track;
 }
 
 
@@ -112,3 +122,13 @@ Body::random(double start, double end)
   return randomDouble;
 }
 
+
+void
+Body::updateTrack()
+{
+  m_track.points.push_front(QPointF(m_x[0], m_x[1]));
+  if (m_track.points.size() > 100)
+  {
+    m_track.points.pop_back();
+  }
+}

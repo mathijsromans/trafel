@@ -5,6 +5,7 @@
 
 #include <QObject>
 
+#include <deque>
 #include <memory>
 
 class Environment;
@@ -44,6 +45,7 @@ private slots:
 private:
   BodyItem* addBody(Body* body, const QColor& color=Qt::white);
   void detectCollisionWithSun();
+  void updateTrackItems();
   void removeBodyItem(BodyItem* bodyItem);
   void createCelestialBodies();
   static double getScaleFactor(const QRectF& tableRect);
@@ -51,8 +53,8 @@ private:
 private:
   std::unique_ptr<Environment> m_environment;
   std::vector<BodyItem*> m_bodyItems;
-  std::vector<Body*> m_bodies;
   std::unique_ptr<NewBodyData> m_newBody;
+  std::map<Body*, std::deque<QGraphicsLineItem*>> m_trackItems;  // TODO: move BodyItem
   QGraphicsEllipseItem* m_tempBodyItem;
   BodyItem* m_sunItem;
   QTimer* m_timer;

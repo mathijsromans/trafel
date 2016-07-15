@@ -59,6 +59,12 @@ Environment::clearAllBodies()
   mo_masslessBodies.clear();
 }
 
+const std::vector<Body*>&
+Environment::getBodies() const
+{
+  return mo_bodies;
+}
+
 
 void
 Environment::oneStep(double tEnd, double stepsize)
@@ -75,14 +81,19 @@ Environment::oneStep(double tEnd, double stepsize)
 
   for (int i = 0; i < steps; ++i)
   {
-    for (std::size_t i = 0; i < mo_bodies.size(); i++)
+    for (Body* body: mo_bodies)
     {
-      mo_bodies[i]->oneStep(stepsize);
+      body->oneStep(stepsize);
     }
-    for (std::size_t i = 0; i < mo_masslessBodies.size(); i++)
+    for (Body* body: mo_masslessBodies)
     {
-      mo_masslessBodies[i]->oneStep(stepsize);
+      body->oneStep(stepsize);
     }
+  }
+
+  for (Body* body: mo_bodies)
+  {
+    body->updateTrack();
   }
 }
 

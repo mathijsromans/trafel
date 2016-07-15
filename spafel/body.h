@@ -1,7 +1,10 @@
 #ifndef BODY_H_
 #define BODY_H_
 
+#include <QPointF>
+#include <QLineF>
 #include <array>
+#include <deque>
 #include <memory>
 #include <iostream>
 #include <vector>
@@ -12,6 +15,13 @@ class Environment;
 
 class Body
 {
+public:
+  struct Track
+  {
+    std::deque<QPointF> points;
+    std::deque<QLineF> lines;
+  };
+
 public:
   explicit Body(Environment* environment);
   ~Body();
@@ -32,6 +42,9 @@ public:
 
   unsigned int getId() const;
 
+  const Track& getTrack() const;
+  void updateTrack();
+
 private:
   double random(double start, double end);
 
@@ -45,6 +58,8 @@ private:
   Environment* m_environment;
 
   int m_nSteps;
+
+  Track m_track;
 };
 
 #endif /* BODY_H_ */
