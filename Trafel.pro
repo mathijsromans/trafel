@@ -52,7 +52,6 @@ HEADERS  += mainwindow.h \
     spafel/body.h \
     spafel/bodyitem.h \
     spafel/environment.h \
-    spafel/integrator.h \
     spafel/gravityscene.h \
     button.h \
     clickableitem.h

@@ -47,6 +47,7 @@ public:
 
 private:
   double random(double start, double end);
+  void integrate(double stepsize);
 
 private:
   static unsigned int ms_nextUniqueId;
@@ -54,7 +55,6 @@ private:
   std::array<double, 4> m_x;
   std::array<double, 2> m_para; // {mass, radius}
 
-  std::unique_ptr<Integrator> m_integrator;
   Environment* m_environment;
 
   int m_nSteps;
