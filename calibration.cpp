@@ -196,6 +196,7 @@ void Calibration::newCornerPoint(QPointF p)
     QPen pen(Qt::white);
     pen.setWidth(3);
     m_tableRectItem = m_scene.addRect(m_tableRect, pen);    
+    done();
     QSettings settings("TafelSoft", "Tafel");
     settings.beginGroup("Calibration");
     settings.setValue("version", ms_version);
@@ -203,7 +204,6 @@ void Calibration::newCornerPoint(QPointF p)
     settings.setValue("transform", m_transform);
     settings.setValue("tablerect", m_tableRect);
     settings.endGroup();
-    done();
   }
 }
 
