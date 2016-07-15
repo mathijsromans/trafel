@@ -16,6 +16,8 @@ namespace
   const double AU = 149.6e9;
   const double muSun = 1.32712440018e20;
   const double zoom = 0.4;
+  const unsigned int fps = 60;
+  const unsigned int stepsize = 120.0;
 
   double calcOrbitalVelocity(double apogeeX, double eccentricity, double muCentralBody)
   {
@@ -61,7 +63,7 @@ GravityScene::init()
   createCelestialBodies();
 
   connect(m_timer, SIGNAL(timeout()), this, SLOT(step()));
-  m_timer->start(1000/80);
+  m_timer->start(1000/fps);
 }
 
 
@@ -69,7 +71,6 @@ void
 GravityScene::step()
 {
   double tEnd = 60*60*6.0;
-  double stepsize = 30.0;
   m_environment->oneStep(tEnd, stepsize);
 
   for (BodyItem* planet : m_bodyItems)
