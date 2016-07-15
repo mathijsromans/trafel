@@ -114,9 +114,9 @@ Environment::getStateDerivative(const std::array<double, 4>& x, Body* ignoreBody
     else
     {
       // TODO: make a better rule
+      std::cout << "WARNING- Environment::getStateDerivative() : close approach, skip force calculation" << std::endl;
       std::cout << "limit: " << 1.0/std::sqrt(m_gravitationalConstant) << std::endl;
-      std::cout << "r: " << r << std::endl;
-      assert(false);
+      std::cout << "distance: " << r << std::endl;
     }
   }
 

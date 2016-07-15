@@ -19,7 +19,6 @@ BodyItem::BodyItem(Body* body, const QColor& color)
   m_radius(1.0)
 {
   m_radius = calcRadius(body->getMass());
-  std::cout << "radius: " << m_radius << std::endl;
   setRect(0, 0, 2*m_radius, 2*m_radius);
   setPen(QPen(color));
   setBrush(QBrush(color));
