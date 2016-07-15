@@ -32,7 +32,6 @@ SOURCES += main.cpp\
     spafel/body.cpp \
     spafel/bodyitem.cpp \
     spafel/environment.cpp \
-    spafel/integrator.cpp \
     spafel/gravityscene.cpp \
     button.cpp \
     clickableitem.cpp
