@@ -20,7 +20,6 @@ Environment::~Environment() {
 void
 Environment::addBody(Body* body)
 {
-//  std::lock_guard<std::mutex> lock(m_mutex);
   m_bodies.push_back(body);
 }
 
@@ -35,7 +34,6 @@ Environment::removeBody(Body* body)
 void
 Environment::addMasslessBody(Body* body)
 {
-//  std::lock_guard<std::mutex> lock(m_mutex);
   m_masslessBodies.push_back(body);
 }
 
@@ -43,7 +41,6 @@ Environment::addMasslessBody(Body* body)
 void
 Environment::clearAllBodies()
 {
-//  std::lock_guard<std::mutex> lock(m_mutex);
   m_bodies.clear();
   m_masslessBodies.clear();
 }
@@ -52,23 +49,6 @@ Environment::clearAllBodies()
 void
 Environment::oneStep(double tEnd, double stepsize)
 {
-  oneStepImpl(tEnd, stepsize);
-}
-
-
-//void
-//Environment::oneStepThread(double tEnd, double stepsize)
-//{
-//  std::thread t(&Environment::oneStepImpl, this, tEnd, stepsize);
-//  t.detach();
-//}
-
-
-void
-Environment::oneStepImpl(double tEnd, double stepsize)
-{
-  std::lock_guard<std::mutex> lock(m_mutex);
-
   double stepsizeAbsolute = std::fabs(stepsize);
   if (stepsizeAbsolute < 1.0e-6)
   {
@@ -105,10 +85,10 @@ Environment::getStateDerivative(const std::array<double, 4>& x, Body* ignoreBody
       continue;
     }
 
-    m_x2 = (*iter)->getState();
-    double x12 = x[0]-m_x2[0];
-    double y12 = x[1]-m_x2[1];
-    double r = sqrt(x12*x12+y12*y12);
+    const std::array<double, 4>& x2 = (*iter)->getState();
+    double x12 = x[0]-x2[0];
+    double y12 = x[1]-x2[1];
+    double r = std::sqrt(x12*x12+y12*y12);
     if (r > 0.1/std::sqrt(m_gravitationalConstant))
     {
       double mu = (*iter)->getMass() * m_gravitationalConstant;
