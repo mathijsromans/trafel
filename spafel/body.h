@@ -16,11 +16,6 @@ class Environment;
 class Body
 {
 public:
-  struct Track
-  {
-    std::deque<QPointF> points;
-    std::deque<QLineF> lines;
-  };
 
 public:
   explicit Body(double x, double y, double vx, double vy, double mass, Environment* environment);
@@ -34,8 +29,6 @@ public:
 
   unsigned int getId() const;
 
-  const Track& getTrack() const;
-  void updateTrack();
 
 private:
   double random(double start, double end);
@@ -44,12 +37,12 @@ private:
 private:
   static unsigned int ms_nextUniqueId;
   unsigned int m_id;
-  std::vector<std::array<double, 4>> m_x;
+  static const unsigned int ms_history = 200;
+  std::array<std::array<double, 4>, ms_history> m_x;
+  unsigned int m_lastTime;
   std::array<double, 2> m_para; // {mass, radius}
 
   Environment* m_environment;
-
-  Track m_track;
 };
 
 #endif /* BODY_H_ */

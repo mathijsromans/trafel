@@ -90,10 +90,6 @@ Environment::oneStep(double stepsize, unsigned int time)
     ++m_lastTime;
   }
 
-  for (Body* body: mo_bodies)
-  {
-    body->updateTrack();
-  }
 }
 
 

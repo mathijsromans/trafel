@@ -166,20 +166,20 @@ GravityScene::getScaleFactor(const QRectF& tableRect)
   return std::min(tableRect.width(), tableRect.height()) * zoom;
 }
 
-
 void
 GravityScene::updateTrackItems()
 {
   for (const auto& body : m_environment->getBodies())
   {
-    const Body::Track& track = body->getTrack();
-    if (track.points.size() > 2)
-    {
-      QLineF newLine(envToScene(track.points.back(), getTableRect()), envToScene(*std::prev(track.points.end(), 2), getTableRect()));
-      QGraphicsLineItem* line = addLine(newLine, QPen(Qt::red));
-      line->setZValue(-10);
-      m_trackItems[body].push_front(line);
-    }
+
+    auto s1 = body->getState(m_time+50);
+    auto s2 = body->getState(m_time+51);
+
+
+    QLineF newLine(envToScene(QPointF(s2[0], s2[1]), getTableRect()), envToScene(QPointF(s1[0], s1[1]), getTableRect()));
+    QGraphicsLineItem* line = addLine(newLine, QPen(Qt::red));
+    line->setZValue(-10);
+    m_trackItems[body].push_front(line);
 
     if (m_trackItems[body].size() > 50)
     {

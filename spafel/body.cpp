@@ -7,10 +7,10 @@ unsigned int Body::ms_nextUniqueId = 1;
 
 Body::Body(double x, double y, double vx, double vy, double mass, Environment* environment)
 : m_id(ms_nextUniqueId++),
-  m_x(1),
+  m_x(),
+  m_lastTime(0),
   m_para(),
-  m_environment(environment),
-  m_track()
+  m_environment(environment)
 {
   m_x[0][0] = x;
   m_x[0][1] = y;
@@ -44,10 +44,10 @@ Body::getMass() const
 const std::array<double, 4>&
 Body::getState(unsigned int time) const
 {
-  assert(time<m_x.size());
-  return m_x[time];
+  assert(time<=m_lastTime);
+  assert(time+m_x.size()>m_lastTime);
+  return m_x[time%m_x.size()];
 }
-
 
 const std::array<double, 2>&
 Body::getParameters() const
@@ -62,14 +62,6 @@ Body::getId() const
   return m_id;
 }
 
-
-const Body::Track&
-Body::getTrack() const
-{
-  return m_track;
-}
-
-
 double
 Body::random(double start, double end)
 {
@@ -79,19 +71,9 @@ Body::random(double start, double end)
 
 
 void
-Body::updateTrack()
-{
-  m_track.points.clear();
-  for ( auto&& x : m_x )
-  {
-    m_track.points.push_back(QPointF(x[0], x[1]));
-  }
-}
-
-void
 Body::integrate(double stepsize, unsigned int time)
 {
-  assert(time == m_x.size()-1);
+  assert(time == m_lastTime);
   std::array<double, 4> x = getState(time);
   std::array<double, 4> force = m_environment->getStateDerivative(x, this, time);
 
@@ -130,10 +112,10 @@ Body::integrate(double stepsize, unsigned int time)
     k4[j] = stepsize * force[j];
   }
 
-  m_x.push_back({});
   for (std::size_t i = 0; i < 4; i++)
   {
-    m_x.back()[i] = x[i] + 1.0/6.0 * (k1[i]+2*k2[i]+2*k3[i]+k4[i]);
+    m_x[(m_lastTime+1)%m_x.size()][i] = x[i] + 1.0/6.0 * (k1[i]+2*k2[i]+2*k3[i]+k4[i]);
   }
+  m_lastTime++;
 
 }
