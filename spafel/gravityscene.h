@@ -35,7 +35,6 @@ public:
   static QPointF envToScene(const QPointF& point, const QRectF& tableRect);
   static QPointF sceneToEnv(const QPointF& point, const QRectF& tableRect);
 
-
 protected:
   virtual void mouseClick(QPointF point) override;
 

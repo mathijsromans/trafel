@@ -3,20 +3,20 @@
 
 #include <memory>
 
-#include <QPointF>
 #include <QColor>
+#include <QGraphicsEllipseItem>
+#include <QPointF>
 
 class Body;
-class QGraphicsEllipseItem;
 class QRectF;
 
-class BodyItem
+
+class BodyItem : public QGraphicsEllipseItem
 {
 public:
   BodyItem(Body* body, const QColor& color=Qt::white);
 
   void update(const QRectF& tableRect);
-  QGraphicsEllipseItem* getItem() const;
   Body* getBody() const;
   unsigned int getRadius() const;
   static unsigned int calcRadius(double mass);
@@ -24,8 +24,7 @@ public:
 private:
 
 private:
-  std::unique_ptr<Body> m_body;
-  QGraphicsEllipseItem* m_item;
+  Body* m_body;
   double m_radius;
 };
 

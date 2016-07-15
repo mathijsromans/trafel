@@ -14,29 +14,22 @@ namespace
 }
 
 BodyItem::BodyItem(Body* body, const QColor& color)
-: m_body(body),
-  m_item(0),
+: QGraphicsEllipseItem(),
+  m_body(body),
   m_radius(1.0)
 {
   m_radius = calcRadius(body->getMass());
   std::cout << "radius: " << m_radius << std::endl;
-  m_item = new QGraphicsEllipseItem(0, 0, 2*m_radius, 2*m_radius);
-  m_item->setPen(QPen(color));
-  m_item->setBrush(QBrush(color));
-}
-
-
-QGraphicsEllipseItem*
-BodyItem::getItem() const
-{
-  return m_item;
+  setRect(0, 0, 2*m_radius, 2*m_radius);
+  setPen(QPen(color));
+  setBrush(QBrush(color));
 }
 
 
 Body*
 BodyItem::getBody() const
 {
-  return m_body.get();
+  return m_body;
 }
 
 
@@ -59,5 +52,5 @@ BodyItem::update(const QRectF& tableRect)
 {
   const std::array<double, 4> state = m_body->getState();
   QPointF scenePos = GravityScene::envToScene(QPointF(state[0], state[1]), tableRect);
-  m_item->setPos(scenePos.x() - m_radius, scenePos.y() - m_radius);
+  setPos(scenePos.x() - m_radius, scenePos.y() - m_radius);
 }

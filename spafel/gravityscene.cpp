@@ -53,7 +53,7 @@ GravityScene::addBody(Body* body, const QColor& color)
   BodyItem* bodyItem = new BodyItem(body, color);
   m_bodyItems.push_back(bodyItem);
   m_bodies.push_back(body);
-  addItem(bodyItem->getItem());
+  addItem(bodyItem);
   return bodyItem;
 }
 
@@ -119,7 +119,7 @@ GravityScene::detectCollisionWithSun()
 {
   for (const auto& bodyItem : m_bodyItems)
   {
-    if (bodyItem != m_sunItem && bodyItem->getItem()->collidesWithItem(m_sunItem->getItem()))
+    if (bodyItem != m_sunItem && bodyItem->collidesWithItem(m_sunItem))
     {
       std::cout << "COLLISION" << std::endl;
       // conserve momentum
@@ -142,12 +142,13 @@ void
 GravityScene::removeBodyItem(BodyItem* bodyItem)
 {
   m_bodyItems.erase( std::remove(m_bodyItems.begin(), m_bodyItems.end(), bodyItem), m_bodyItems.end() );
-  removeItem(bodyItem->getItem());
-  for (const auto& body : m_bodies)
+  removeItem(bodyItem); //TODO: ownership of removed item
+  for (Body* body : m_bodies)
   {
     if (body == bodyItem->getBody())
     {
       m_environment->removeBody(body);
+      delete body;
       break;
     }
   }

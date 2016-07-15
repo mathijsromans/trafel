@@ -8,12 +8,27 @@
 
 
 Environment::Environment(double gravitationalConstant)
-  : m_gravitationalConstant(gravitationalConstant)
+: m_gravitationalConstant(gravitationalConstant),
+  m_bodies(),
+  m_masslessBodies(),
+  m_stateDerivative()
 {
 }
 
 
-Environment::~Environment() {
+Environment::~Environment()
+{
+  for (Body* body : m_bodies)
+  {
+    delete body;
+  }
+  m_bodies.clear();
+
+  for (Body* body : m_masslessBodies)
+  {
+    delete body;
+  }
+  m_masslessBodies.clear();
 }
 
 
