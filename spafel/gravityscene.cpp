@@ -137,7 +137,7 @@ void
 GravityScene::removeBodyItem(BodyItem* bodyItem)
 {
   m_bodyItems.erase( std::remove(m_bodyItems.begin(), m_bodyItems.end(), bodyItem), m_bodyItems.end() );
-  removeItem(bodyItem); //TODO: ownership of removed item
+  removeItem(bodyItem);
   for (Body* body : m_bodies)
   {
     if (body == bodyItem->getBody())
