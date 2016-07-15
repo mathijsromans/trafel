@@ -6,6 +6,7 @@
 #include <QMainWindow>
 class QGraphicsView;
 class TrafficScene;
+class TransformScene;
 
 class MainWindow : public QMainWindow
 {
@@ -28,7 +29,7 @@ private:
 private:
   UserInputThread m_userInputThread;
   QGraphicsView* v;
-  TrafficScene* t;
+  TransformScene* t;
 };
 
 #endif // MAINWINDOW_H

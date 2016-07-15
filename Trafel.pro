@@ -17,7 +17,7 @@ QMAKE_CXXFLAGS += -std=c++1y -Wall -g
 CONFIG += console
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
+    mainwindow.cpp \
     trafficscene.cpp \
     earth.cpp \
     userinput.cpp \
@@ -28,7 +28,12 @@ SOURCES += main.cpp\
     userinputthread.cpp \
     mouseping.cpp \
     utilities.cpp \
-    calibration.cpp
+    calibration.cpp \
+    spafel/body.cpp \
+    spafel/bodyitem.cpp \
+    spafel/environment.cpp \
+    spafel/integrator.cpp \
+    spafel/gravityscene.cpp
 
 HEADERS  += mainwindow.h \
     trafficscene.h \
@@ -41,6 +46,11 @@ HEADERS  += mainwindow.h \
     userinputthread.h \
     mouseping.h \
     utilities.h \
-    calibration.h
+    calibration.h \
+    spafel/body.h \
+    spafel/bodyitem.h \
+    spafel/environment.h \
+    spafel/integrator.h \
+    spafel/gravityscene.h
 
 FORMS    +=

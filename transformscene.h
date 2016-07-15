@@ -25,7 +25,7 @@ public slots:
 
 protected:
   void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
-  QRectF getTableRect() const;
+  const QRectF& getTableRect() const;
 
 private:
   Calibration m_calibration;

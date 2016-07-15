@@ -38,7 +38,7 @@ void TransformScene::slotLightAt(PointerEvent e)
   m_calibration.processMouseClick( e );
 }
 
-QRectF TransformScene::getTableRect() const
+const QRectF& TransformScene::getTableRect() const
 {
   return m_calibration.getTableRect();
 }
