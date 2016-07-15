@@ -5,6 +5,7 @@
 #include "transformscene.h"
 #include <QDebug>
 #include <QGraphicsEllipseItem>
+#include <QSettings>
 
 const std::array<QPoint,4> Calibration::ms_calibrationCoordinates = {QPoint{200,200},QPoint{600,200},QPoint{600,600},QPoint{200,600}};
 
@@ -34,16 +35,39 @@ Calibration::Calibration(TransformScene& scene)
    m_infoText(0),
    m_tableRectItem(0)
 {
+  QSettings settings("TafelSoft", "Tafel");
+  settings.beginGroup("Calibration");
+  unsigned int version = settings.value("version", 0u).toUInt();
+  if ( version == ms_version )
+  {
+    m_status = static_cast<Status>(settings.value("status", static_cast<unsigned int>(Status::uninitialised)).toUInt());
+    m_transform = settings.value("transform", QTransform()).value<QTransform>();
+    m_tableRect = settings.value("tablerect", QRectF()).value<QRectF>();
+    if ( m_status == Status::done )
+    {
+      m_status = Status::testing;
+    }
+  }
+  settings.endGroup();
 }
 
 void Calibration::calibrate()
 {
-  m_calibrationLights.clear();
-  m_cornerPoints.clear();
-  m_status = Status::uninitialised;
-  m_circle = m_scene.addEllipse(Utilities::squareAt(ms_calibrationCoordinates[m_calibrationLights.size()],20), QPen(Qt::green,3));
-  m_infoText = m_scene.addText("Help Text");
-  m_infoText->hide();
+  if ( m_status == Status::testing )
+  {
+    m_testingLocation = 0.5 * ( m_tableRect.center() + m_tableRect.bottomRight());
+    m_circle = m_scene.addEllipse( Utilities::squareAt(m_testingLocation,10), QPen(Qt::white,3));
+    m_infoText = m_scene.addText("Verify calibration");
+  }
+  else
+  {
+    m_calibrationLights.clear();
+    m_cornerPoints.clear();
+    m_status = Status::uninitialised;
+    m_circle = m_scene.addEllipse(Utilities::squareAt(ms_calibrationCoordinates[m_calibrationLights.size()],20), QPen(Qt::green,3));
+    m_infoText = m_scene.addText("");
+    m_infoText->hide();
+  }
 }
 
 QRectF Calibration::getTableRect() const
@@ -52,14 +76,36 @@ QRectF Calibration::getTableRect() const
 }
 
 void Calibration::processTransformedMouseClick(PointerEvent e)
-{
+{  
   if ( m_status == Status::transformDone )
   {
     newCornerPoint(e.getAny());
     if ( m_status == Status::done )
     {
+      QSettings settings("TafelSoft", "Tafel");
+      settings.beginGroup("Calibration");
+      settings.setValue("version", ms_version);
+      settings.setValue("status", static_cast<unsigned int>(m_status));
+      settings.setValue("transform", m_transform);
+      settings.setValue("tablerect", m_tableRect);
+      settings.endGroup();
       m_infoText->hide();
       m_scene.init();
+    }
+  }
+  else if ( m_status == Status::testing )
+  {
+    if ( Utilities::dist( e.getAny(), m_testingLocation ) < 10 )
+    {
+      m_status = Status::done;
+      m_infoText->hide();
+      m_circle->hide();
+      m_scene.init();
+    }
+    else
+    {
+      clear();
+      calibrate();
     }
   }
   else
@@ -89,6 +135,19 @@ void Calibration::processMouseClick(PointerEvent e)
     std::string text = "Select corner " + std::to_string(m_cornerPoints.size()+1);
     showInfoText(text);
   }
+}
+
+void Calibration::clear()
+{
+  m_status = Status::uninitialised;
+  m_calibrationLights.clear();
+  m_cornerPoints.clear();
+  delete m_circle;
+  delete m_infoText;
+  delete m_tableRectItem;
+  m_tableRect = QRectF();
+  m_transform.reset();
+  m_testingLocation = QPointF();
 }
 
 void Calibration::newCalibratePoint(QPoint p)
