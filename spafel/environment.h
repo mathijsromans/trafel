@@ -29,9 +29,8 @@ private:
 
 private:
   const double m_gravitationalConstant;
-  std::vector<Body*> m_bodies;
-  std::vector<Body*> m_masslessBodies;
-  std::array<double, 4> m_stateDerivative;
+  std::vector<Body*> mo_bodies;
+  std::vector<Body*> mo_masslessBodies;
 };
 
 #endif /* ENVIRONMENT_H_ */
