@@ -63,6 +63,7 @@ void TransformScene::inputEvent(const PointerEvent& e)
 void TransformScene::doInit()
 {
   Button* quitButton = new Button("Quit");
+  quitButton->setPos(getTableRect().topLeft());
   addItem( quitButton );
   connect(quitButton, SIGNAL(pressed()), this, SLOT(slotQuit()));
 
