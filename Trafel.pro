@@ -20,7 +20,6 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     trafficscene.cpp \
     earth.cpp \
-    distributions.cpp \
     userinput.cpp \
     transformscene.cpp \
     image.cpp \
@@ -33,7 +32,6 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     trafficscene.h \
     earth.h \
-    distributions.h \
     userinput.h \
     transformscene.h \
     image.h \

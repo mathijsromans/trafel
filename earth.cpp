@@ -1,7 +1,6 @@
 #include "earth.h"
 
 #include <random>
-#include "distributions.h"
 #include <QDebug>
 
 namespace
