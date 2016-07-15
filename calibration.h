@@ -23,10 +23,11 @@ public:
 
 private:
   void clear();
+  void done();
   void newCalibratePoint(QPoint p);
   void newCornerPoint(QPointF pC);
   void processTransformedMouseClick(PointerEvent e);
-  void showInfoText(const std::string& text) const;
+  void showInfoText(const std::string& text);
 
 private:
   enum class Status { uninitialised, transformDone, testing, done };

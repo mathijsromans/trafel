@@ -57,7 +57,10 @@ void Calibration::calibrate()
   {
     m_testingLocation = 0.5 * ( m_tableRect.center() + m_tableRect.bottomRight());
     m_circle = m_scene.addEllipse( Utilities::squareAt(m_testingLocation,10), QPen(Qt::white,3));
-    m_infoText = m_scene.addText("Verify calibration");
+    showInfoText("Verify calibration");
+    QPen pen(Qt::white);
+    pen.setWidth(3);
+    m_tableRectItem = m_scene.addRect(m_tableRect, pen);
   }
   else
   {
@@ -65,8 +68,6 @@ void Calibration::calibrate()
     m_cornerPoints.clear();
     m_status = Status::uninitialised;
     m_circle = m_scene.addEllipse(Utilities::squareAt(ms_calibrationCoordinates[m_calibrationLights.size()],20), QPen(Qt::green,3));
-    m_infoText = m_scene.addText("");
-    m_infoText->hide();
   }
 }
 
@@ -80,27 +81,12 @@ void Calibration::processTransformedMouseClick(PointerEvent e)
   if ( m_status == Status::transformDone )
   {
     newCornerPoint(e.getAny());
-    if ( m_status == Status::done )
-    {
-      QSettings settings("TafelSoft", "Tafel");
-      settings.beginGroup("Calibration");
-      settings.setValue("version", ms_version);
-      settings.setValue("status", static_cast<unsigned int>(m_status));
-      settings.setValue("transform", m_transform);
-      settings.setValue("tablerect", m_tableRect);
-      settings.endGroup();
-      m_infoText->hide();
-      m_scene.init();
-    }
   }
   else if ( m_status == Status::testing )
   {
     if ( Utilities::dist( e.getAny(), m_testingLocation ) < 10 )
     {
-      m_status = Status::done;
-      m_infoText->hide();
-      m_circle->hide();
-      m_scene.init();
+      done();
     }
     else
     {
@@ -142,12 +128,21 @@ void Calibration::clear()
   m_status = Status::uninitialised;
   m_calibrationLights.clear();
   m_cornerPoints.clear();
-  delete m_circle;
-  delete m_infoText;
-  delete m_tableRectItem;
+  delete m_circle; m_circle = 0;
+  delete m_infoText; m_infoText = 0;
+  delete m_tableRectItem; m_tableRectItem = 0;
   m_tableRect = QRectF();
   m_transform.reset();
   m_testingLocation = QPointF();
+}
+
+void Calibration::done()
+{
+  m_status = Status::done;
+  m_circle->hide();
+  m_infoText->hide();
+  m_tableRectItem->hide();
+  m_scene.init();
 }
 
 void Calibration::newCalibratePoint(QPoint p)
@@ -200,13 +195,24 @@ void Calibration::newCornerPoint(QPointF p)
     qDebug() << "TABLE RECT IS " << m_tableRect;
     QPen pen(Qt::white);
     pen.setWidth(3);
-    m_tableRectItem = m_scene.addRect(m_tableRect, pen);
-    m_status = Status::done;
+    m_tableRectItem = m_scene.addRect(m_tableRect, pen);    
+    QSettings settings("TafelSoft", "Tafel");
+    settings.beginGroup("Calibration");
+    settings.setValue("version", ms_version);
+    settings.setValue("status", static_cast<unsigned int>(m_status));
+    settings.setValue("transform", m_transform);
+    settings.setValue("tablerect", m_tableRect);
+    settings.endGroup();
+    done();
   }
 }
 
-void Calibration::showInfoText(const std::string& text) const
+void Calibration::showInfoText(const std::string& text)
 {
+  if ( !m_infoText )
+  {
+    m_infoText = m_scene.addText("");
+  }
   QFont font;
   font.setPixelSize(40);
   m_infoText->setFont(font);
