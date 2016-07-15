@@ -1,20 +1,7 @@
 #include "pointerevent.h"
+#include "utilities.h"
 #include <cmath>
 #include <QTransform>
-
-namespace
-{
-
-template <typename T>
-T sqr(T x) { return x*x; }
-
-double dist(QPointF p1, QPointF p2)
-{
-  QPointF p = p1-p2;
-  return sqrt(sqr(p.x()+sqr(p.y())));
-}
-
-}
 
 const std::array<QColor, 3> PointerEvent::ms_qcolors = { Qt::red, Qt::green, Qt::blue };
 
@@ -70,7 +57,7 @@ bool PointerEvent::differsFrom(const PointerEvent& other) const
   for ( unsigned int i = 0; i != m_points.size(); ++i )
   {
     if ( m_points[i].isNull() != other.m_points[i].isNull() ||
-         dist(m_points[i], other.m_points[i]) > 10 )
+          Utilities::dist(m_points[i], other.m_points[i]) > 10 )
     {
       return true;
     }
