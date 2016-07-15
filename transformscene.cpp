@@ -165,7 +165,7 @@ void TransformScene::newCornerPoint(QPointF p)
   }
 }
 
-QRectF TransformScene::getTableRect() const
+const QRectF& TransformScene::getTableRect() const
 {
   return m_tableRect;
 }
