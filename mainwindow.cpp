@@ -2,7 +2,7 @@
 #include "trafficscene.h"
 #include "transformscene.h"
 #include "userinput.h"
-#include "spafel/solarsystemscene.h"
+#include "spafel/gravityscene.h"
 #include <QGraphicsView>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
   qRegisterMetaType<PointerEvent>();
 
   v = new QGraphicsView();
-  t = new SolarSystemScene();
+  t = new GravityScene();
 //  t = new TrafficScene();
   v->setScene(t);
   setCentralWidget(v);

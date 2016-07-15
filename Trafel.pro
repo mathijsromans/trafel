@@ -33,7 +33,7 @@ SOURCES += main.cpp\
     spafel/bodyitem.cpp \
     spafel/environment.cpp \
     spafel/integrator.cpp \
-    spafel/solarsystemscene.cpp
+    spafel/gravityscene.cpp
 
 HEADERS  += mainwindow.h \
     trafficscene.h \
@@ -51,6 +51,6 @@ HEADERS  += mainwindow.h \
     spafel/bodyitem.h \
     spafel/environment.h \
     spafel/integrator.h \
-    spafel/solarsystemscene.h
+    spafel/gravityscene.h
 
 FORMS    +=

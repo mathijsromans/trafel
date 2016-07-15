@@ -1,7 +1,7 @@
 #include "bodyitem.h"
 
 #include "body.h"
-#include "solarsystemscene.h"
+#include "gravityscene.h"
 
 #include <QDebug>
 #include <QGraphicsEllipseItem>
@@ -58,6 +58,6 @@ void
 BodyItem::update(const QRectF& tableRect)
 {
   const std::array<double, 4> state = m_body->getState();
-  QPointF scenePos = SolarSystemScene::envToScene(QPointF(state[0], state[1]), tableRect);
+  QPointF scenePos = GravityScene::envToScene(QPointF(state[0], state[1]), tableRect);
   m_item->setPos(scenePos.x() - m_radius, scenePos.y() - m_radius);
 }

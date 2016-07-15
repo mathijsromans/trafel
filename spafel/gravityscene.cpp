@@ -1,4 +1,4 @@
-#include "solarsystemscene.h"
+#include "gravityscene.h"
 
 #include "bodyitem.h"
 
@@ -15,7 +15,7 @@ namespace
 {
   const double AU = 149.6e9;
   const double muSun = 1.32712440018e20;
-  const double zoom = 1.0/2.5;
+  const double zoom = 0.4;
 
   double calcOrbitalVelocity(double apogeeX, double eccentricity, double muCentralBody)
   {
@@ -25,7 +25,7 @@ namespace
 }
 
 
-SolarSystemScene::SolarSystemScene()
+GravityScene::GravityScene()
 : TransformScene(),
   m_environment(new Environment()),
   m_newBody(),
@@ -36,7 +36,7 @@ SolarSystemScene::SolarSystemScene()
 }
 
 
-SolarSystemScene::~SolarSystemScene()
+GravityScene::~GravityScene()
 {
   for (auto body : m_bodies)
   {
@@ -47,7 +47,7 @@ SolarSystemScene::~SolarSystemScene()
 
 
 BodyItem*
-SolarSystemScene::addBody(Body* body, const QColor& color)
+GravityScene::addBody(Body* body, const QColor& color)
 {
   m_environment->addBody(body);
   BodyItem* bodyItem = new BodyItem(body, color);
@@ -59,7 +59,7 @@ SolarSystemScene::addBody(Body* body, const QColor& color)
 
 
 void
-SolarSystemScene::init()
+GravityScene::init()
 {
   setBackgroundBrush(QBrush(Qt::black));
 
@@ -71,7 +71,7 @@ SolarSystemScene::init()
 
 
 void
-SolarSystemScene::step()
+GravityScene::step()
 {
   double tEnd = 60*60*6.0;
   double stepsize = 30.0;
@@ -87,13 +87,13 @@ SolarSystemScene::step()
 
 
 void
-SolarSystemScene::mouseClick(QPointF point)
+GravityScene::mouseClick(QPointF point)
 {
   if (m_newBody)
   {
     Body* body = new Body(m_environment.get());
     body->setMass(m_newBody->m_mass);
-    QPointF envPos = SolarSystemScene::sceneToEnv(m_newBody->scenePos, getTableRect());
+    QPointF envPos = GravityScene::sceneToEnv(m_newBody->scenePos, getTableRect());
     QPointF velVect = point - m_newBody->scenePos;
     velVect = velVect * 2.0e2;
     body->setPosition(envPos.x(), envPos.y());
@@ -115,7 +115,7 @@ SolarSystemScene::mouseClick(QPointF point)
 
 
 void
-SolarSystemScene::detectCollisionWithSun()
+GravityScene::detectCollisionWithSun()
 {
   for (const auto& bodyItem : m_bodyItems)
   {
@@ -139,7 +139,7 @@ SolarSystemScene::detectCollisionWithSun()
 
 
 void
-SolarSystemScene::removeBodyItem(BodyItem* bodyItem)
+GravityScene::removeBodyItem(BodyItem* bodyItem)
 {
   m_bodyItems.erase( std::remove(m_bodyItems.begin(), m_bodyItems.end(), bodyItem), m_bodyItems.end() );
   removeItem(bodyItem->getItem());
@@ -155,7 +155,7 @@ SolarSystemScene::removeBodyItem(BodyItem* bodyItem)
 
 
 QPointF
-SolarSystemScene::envToScene(const QPointF& point, const QRectF& tableRect)
+GravityScene::envToScene(const QPointF& point, const QRectF& tableRect)
 {
   double sceneCentreOffsetX = tableRect.topLeft().x() + tableRect.width() / 2.0;
   double sceneCentreOffsetY = tableRect.topLeft().y() + tableRect.height() / 2.0;
@@ -168,7 +168,7 @@ SolarSystemScene::envToScene(const QPointF& point, const QRectF& tableRect)
 
 
 QPointF
-SolarSystemScene::sceneToEnv(const QPointF& point, const QRectF& tableRect)
+GravityScene::sceneToEnv(const QPointF& point, const QRectF& tableRect)
 {
   double sceneCentreOffsetX = tableRect.topLeft().x() + tableRect.width() / 2.0;
   double sceneCentreOffsetY = tableRect.topLeft().y() + tableRect.height() / 2.0;
@@ -180,14 +180,14 @@ SolarSystemScene::sceneToEnv(const QPointF& point, const QRectF& tableRect)
 
 
 double
-SolarSystemScene::getScaleFactor(const QRectF& tableRect)
+GravityScene::getScaleFactor(const QRectF& tableRect)
 {
   return std::min(tableRect.width(), tableRect.height()) * zoom;
 }
 
 
 void
-SolarSystemScene::createCelestialBodies()
+GravityScene::createCelestialBodies()
 {
   const double sunMass = 1.989e30;
   Body* sun = new Body(m_environment.get());

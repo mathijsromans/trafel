@@ -1,5 +1,5 @@
-#ifndef SOLARSYSTEMSCENE_H
-#define SOLARSYSTEMSCENE_H
+#ifndef GRAVITYSCENE_H
+#define GRAVITYSCENE_H
 
 #include "transformscene.h"
 
@@ -12,7 +12,7 @@ class Body;
 class BodyItem;
 class QTimer;
 
-class SolarSystemScene : public TransformScene
+class GravityScene : public TransformScene
 {
   Q_OBJECT
 
@@ -27,8 +27,8 @@ public:
   };
 
 public:
-  explicit SolarSystemScene();
-  virtual ~SolarSystemScene();
+  explicit GravityScene();
+  virtual ~GravityScene();
 
   virtual void init() override;
 
@@ -59,4 +59,4 @@ private:
   QTimer* m_timer;
 };
 
-#endif // SOLARSYSTEMSCENE_H
+#endif // GRAVITYSCENE_H
