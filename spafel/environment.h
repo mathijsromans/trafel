@@ -19,17 +19,19 @@ public:
   void clearAllBodies();
   const std::vector<Body*>& getBodies() const;
 
-  void oneStep(double tEnd, double stepsize);
+  void oneStep(double stepsize, unsigned int time);
+  void prepare();
 
-  std::array<double, 4> getStateDerivative(const std::array<double, 4>& x0, Body* ignoreBody);
+  std::array<double, 4> getStateDerivative(const std::array<double, 4>& x0, Body* ignoreBody, unsigned int time);
 
-  double getFieldStrength(double x, double y);
   double getGravitationalConstant() const;
 
 private:
 
 private:
   const double m_gravitationalConstant;
+  static const unsigned int timeAhead = 100;
+  unsigned int m_lastTime;
   std::vector<Body*> mo_bodies;
   std::vector<Body*> mo_masslessBodies;
 };

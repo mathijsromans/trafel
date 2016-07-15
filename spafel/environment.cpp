@@ -9,6 +9,7 @@
 
 Environment::Environment(double gravitationalConstant)
 : m_gravitationalConstant(gravitationalConstant),
+  m_lastTime(0),
   mo_bodies(),
   mo_masslessBodies()
 {
@@ -67,28 +68,26 @@ Environment::getBodies() const
 
 
 void
-Environment::oneStep(double tEnd, double stepsize)
+Environment::oneStep(double stepsize, unsigned int time)
 {
-  double stepsizeAbsolute = std::fabs(stepsize);
-  if (stepsizeAbsolute < 1.0e-6)
+  while ( m_lastTime < time + timeAhead )
   {
-    std::cerr << "Environment::oneStepImpl() - ERROR: stepsize too small: " << stepsize << std::endl;
-    return;
-  }
+    double stepsizeAbsolute = std::fabs(stepsize);
+    if (stepsizeAbsolute < 1.0e-6)
+    {
+      std::cerr << "Environment::oneStepImpl() - ERROR: stepsize too small: " << stepsize << std::endl;
+      return;
+    }
 
-  int steps = tEnd/stepsizeAbsolute;
-  assert(steps >= 0);
-
-  for (int i = 0; i < steps; ++i)
-  {
     for (Body* body: mo_bodies)
     {
-      body->oneStep(stepsize);
+      body->oneStep(stepsize, m_lastTime);
     }
     for (Body* body: mo_masslessBodies)
     {
-      body->oneStep(stepsize);
+      body->oneStep(stepsize, m_lastTime);
     }
+    ++m_lastTime;
   }
 
   for (Body* body: mo_bodies)
@@ -99,7 +98,7 @@ Environment::oneStep(double tEnd, double stepsize)
 
 
 std::array<double, 4>
-Environment::getStateDerivative(const std::array<double, 4>& x, Body* ignoreBody)
+Environment::getStateDerivative(const std::array<double, 4>& x, Body* ignoreBody, unsigned int time)
 {
   std::array<double, 4> stateDerivative;
   stateDerivative.fill(0.0);
@@ -111,7 +110,7 @@ Environment::getStateDerivative(const std::array<double, 4>& x, Body* ignoreBody
       continue;
     }
 
-    const std::array<double, 4>& x2 = (*iter)->getState();
+    const std::array<double, 4>& x2 = (*iter)->getState(time);
     double x12 = x[0]-x2[0];
     double y12 = x[1]-x2[1];
     double r = std::sqrt(x12*x12+y12*y12);
@@ -134,37 +133,6 @@ Environment::getStateDerivative(const std::array<double, 4>& x, Body* ignoreBody
   stateDerivative[0] = x[2];
   stateDerivative[1] = x[3];
   return stateDerivative;
-}
-
-
-double
-Environment::getFieldStrength(double x, double y)
-{
-  std::array<double, 4> x2;
-  double x12[2];
-  double gravityAcc = 0.0;
-  double gravityAccX = 0.0;
-  double gravityAccY = 0.0;
-
-  for (auto iter = mo_bodies.begin(); iter != mo_bodies.end(); iter++)
-  {
-    x2 = (*iter)->getState();
-    if (x2[0] != x && x2[1] != y)
-    {
-      double mass = (*iter)->getMass();
-      x12[0] = x-x2[0];
-      x12[1] = y-x2[1];
-      double r = sqrt(x12[0]*x12[0]+x12[1]*x12[1]);
-      if (r > 1)
-      {
-        gravityAccX += mass/(r*r*r)*x12[0];
-        gravityAccY += mass/(r*r*r)*x12[1];
-      }
-    }
-  }
-
-  gravityAcc = sqrt( pow(gravityAccX, 2) + pow(gravityAccY, 2) );
-  return gravityAcc;
 }
 
 

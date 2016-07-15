@@ -44,7 +44,6 @@ private slots:
 
 private:
   BodyItem* addBody(Body* body, const QColor& color=Qt::white);
-  void detectCollisionWithSun();
   void updateTrackItems();
   void removeBodyItem(BodyItem* bodyItem);
   void createCelestialBodies();
@@ -58,6 +57,7 @@ private:
   QGraphicsEllipseItem* m_tempBodyItem;
   BodyItem* m_sunItem;
   QTimer* m_timer;
+  unsigned int m_time;
 };
 
 #endif // GRAVITYSCENE_H

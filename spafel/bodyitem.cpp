@@ -47,9 +47,9 @@ BodyItem::calcRadius(double mass)
 
 
 void
-BodyItem::update(const QRectF& tableRect)
+BodyItem::update(const QRectF& tableRect, unsigned int time)
 {
-  const std::array<double, 4> state = m_body->getState();
+  const std::array<double, 4> state = m_body->getState(time);
   QPointF scenePos = GravityScene::envToScene(QPointF(state[0], state[1]), tableRect);
   setPos(scenePos.x() - m_radius, scenePos.y() - m_radius);
 }

@@ -23,22 +23,14 @@ public:
   };
 
 public:
-  explicit Body(Environment* environment);
+  explicit Body(double x, double y, double vx, double vy, double mass, Environment* environment);
   ~Body();
 
-  void oneStep(double stepsize);
-
-  void setPosition(double m_x, double y);
-  void setVelocity(double vxin, double vyin);
-
-  void setMass(double mass);
+  void oneStep(double stepsize, unsigned int time);
 
   double getMass() const;
-  const std::array<double, 4>& getState() const;
+  const std::array<double, 4>& getState(unsigned int time) const;
   const std::array<double, 2>& getParameters() const;
-
-  void printPosition() const;
-  void printVelocity() const;
 
   unsigned int getId() const;
 
@@ -47,17 +39,15 @@ public:
 
 private:
   double random(double start, double end);
-  void integrate(double stepsize);
+  void integrate(double stepsize, unsigned int time);
 
 private:
   static unsigned int ms_nextUniqueId;
   unsigned int m_id;
-  std::array<double, 4> m_x;
+  std::vector<std::array<double, 4>> m_x;
   std::array<double, 2> m_para; // {mass, radius}
 
   Environment* m_environment;
-
-  int m_nSteps;
 
   Track m_track;
 };

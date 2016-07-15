@@ -16,7 +16,7 @@ class BodyItem : public QGraphicsEllipseItem
 public:
   BodyItem(Body* body, const QColor& color=Qt::white);
 
-  void update(const QRectF& tableRect);
+  void update(const QRectF& tableRect, unsigned int time);
   Body* getBody() const;
   unsigned int getRadius() const;
   static unsigned int calcRadius(double mass);
