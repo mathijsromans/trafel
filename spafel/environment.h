@@ -31,7 +31,6 @@ private:
   const double m_gravitationalConstant;
   std::vector<Body*> m_bodies;
   std::vector<Body*> m_masslessBodies;
-
   std::array<double, 4> m_stateDerivative;
 };
 

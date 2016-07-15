@@ -38,11 +38,6 @@ GravityScene::GravityScene()
 
 GravityScene::~GravityScene()
 {
-  for (auto body : m_bodies)
-  {
-    delete body;
-  }
-  m_bodies.clear();
 }
 
 
@@ -125,9 +120,9 @@ GravityScene::detectCollisionWithSun()
       // conserve momentum
       Body* sun = m_sunItem->getBody();
       const Body* other = bodyItem->getBody();
+      double combinedMass = sun->getMass() + other->getMass();
       double momentumStartX = other->getState()[2] * other->getMass() + sun->getState()[2] * sun->getMass();
       double momentumStartY = other->getState()[3] * other->getMass() + sun->getState()[3] * sun->getMass();
-      double combinedMass = sun->getMass() + other->getMass();
       double vxSunNew = momentumStartX / combinedMass;
       double vySunNew = momentumStartY / combinedMass;
       sun->setVelocity(vxSunNew, vySunNew);
@@ -152,6 +147,7 @@ GravityScene::removeBodyItem(BodyItem* bodyItem)
       break;
     }
   }
+  delete bodyItem;
 }
 
 
