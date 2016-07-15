@@ -10,7 +10,6 @@
 class TransformScene;
 class QGraphicsRectItem;
 class QGraphicsEllipseItem;
-class QGraphicsTextItem;
 class PointerEvent;
 
 class Calibration
@@ -27,7 +26,6 @@ private:
   void newCalibratePoint(QPoint p);
   void newCornerPoint(QPointF pC);
   void processTransformedMouseClick(PointerEvent e);
-  void showInfoText(const std::string& text);
 
 private:
   enum class Status { uninitialised, transformDone, testing, done };
@@ -36,8 +34,7 @@ private:
   std::vector<QPoint> m_calibrationLights;
   std::vector<QPointF> m_cornerPoints;
   QRectF m_tableRect;
-  QGraphicsEllipseItem* m_circle;
-  QGraphicsTextItem* m_infoText;
+  QGraphicsEllipseItem* m_circle;  
   QGraphicsRectItem* m_tableRectItem;
   QTransform m_transform;
   QPointF m_testingLocation;

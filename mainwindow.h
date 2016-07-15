@@ -1,7 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "pointerevent.h"
 #include "userinputthread.h"
 #include <QMainWindow>
 class QGraphicsView;
@@ -21,7 +20,7 @@ protected:
   virtual void resizeEvent(QResizeEvent* event) override;
 
 private slots:
-  void slotLightAt(PointerEvent e);
+  void slotQuit();
 
 private:
   void fitInView() const;

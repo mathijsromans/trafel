@@ -32,7 +32,6 @@ Calibration::Calibration(TransformScene& scene)
    m_cornerPoints(),
    m_tableRect(QPoint(200, 200), QPoint(600, 600)),
    m_circle(0),
-   m_infoText(0),
    m_tableRectItem(0)
 {
   QSettings settings("TafelSoft", "Tafel");
@@ -57,7 +56,7 @@ void Calibration::calibrate()
   {
     m_testingLocation = 0.5 * ( m_tableRect.center() + m_tableRect.bottomRight());
     m_circle = m_scene.addEllipse( Utilities::squareAt(m_testingLocation,10), QPen(Qt::white,3));
-    showInfoText("Verify calibration");
+    m_scene.showInfoText("Verify calibration");
     QPen pen(Qt::white);
     pen.setWidth(3);
     m_tableRectItem = m_scene.addRect(m_tableRect, pen);
@@ -96,7 +95,7 @@ void Calibration::processTransformedMouseClick(PointerEvent e)
   }
   else
   {
-    m_scene.mouseClick(e.getAny());
+    m_scene.inputEvent(e);
   }
 }
 
@@ -119,7 +118,7 @@ void Calibration::processMouseClick(PointerEvent e)
   if ( m_status == Status::transformDone )
   {
     std::string text = "Select corner " + std::to_string(m_cornerPoints.size()+1);
-    showInfoText(text);
+    m_scene.showInfoText(text);
   }
 }
 
@@ -129,20 +128,20 @@ void Calibration::clear()
   m_calibrationLights.clear();
   m_cornerPoints.clear();
   delete m_circle; m_circle = 0;
-  delete m_infoText; m_infoText = 0;
   delete m_tableRectItem; m_tableRectItem = 0;
   m_tableRect = QRectF();
   m_transform.reset();
   m_testingLocation = QPointF();
+  m_scene.showInfoText("");
 }
 
 void Calibration::done()
 {
   m_status = Status::done;
   m_circle->hide();
-  m_infoText->hide();
+  m_scene.showInfoText("");
   m_tableRectItem->hide();
-  m_scene.init();
+  m_scene.doInit();
 }
 
 void Calibration::newCalibratePoint(QPoint p)
@@ -206,19 +205,3 @@ void Calibration::newCornerPoint(QPointF p)
     settings.endGroup();
   }
 }
-
-void Calibration::showInfoText(const std::string& text)
-{
-  if ( !m_infoText )
-  {
-    m_infoText = m_scene.addText("");
-  }
-  QFont font;
-  font.setPixelSize(40);
-  m_infoText->setFont(font);
-  m_infoText->setDefaultTextColor(Qt::white);
-  m_infoText->setPlainText(QString::fromStdString(text));
-  m_infoText->setPos(200, 200);
-  m_infoText->show();
-}
-

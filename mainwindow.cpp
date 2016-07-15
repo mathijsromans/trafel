@@ -3,6 +3,7 @@
 #include "transformscene.h"
 #include "userinput.h"
 #include "spafel/gravityscene.h"
+#include <QCoreApplication>
 #include <QGraphicsView>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -26,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
   UserInput* ui = new UserInput();
   connect(ui, SIGNAL(signalMouseClick(PointerEvent)), t, SLOT(slotLightAt(PointerEvent)));
+  connect(t, SIGNAL(quit()), this, SLOT(slotQuit()));
 
   t->calibrate();
 
@@ -47,14 +49,12 @@ void MainWindow::resizeEvent(QResizeEvent* /*event*/)
   fitInView();
 }
 
-void MainWindow::slotLightAt(PointerEvent e)
+void MainWindow::slotQuit()
 {
-  qDebug() << e.getAny();
+  QCoreApplication::exit();
 }
 
 void MainWindow::fitInView() const
 {
   v->setSceneRect(QRectF(0,0,1000,800));
-  qDebug() << "sceneRect " << v->sceneRect();
-//  v->fitInView(t->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
