@@ -9,55 +9,54 @@
 
 Environment::Environment(double gravitationalConstant)
 : m_gravitationalConstant(gravitationalConstant),
-  m_bodies(),
-  m_masslessBodies(),
-  m_stateDerivative()
+  mo_bodies(),
+  mo_masslessBodies()
 {
 }
 
 
 Environment::~Environment()
 {
-  for (Body* body : m_bodies)
+  for (Body* body : mo_bodies)
   {
     delete body;
   }
-  m_bodies.clear();
+  mo_bodies.clear();
 
-  for (Body* body : m_masslessBodies)
+  for (Body* body : mo_masslessBodies)
   {
     delete body;
   }
-  m_masslessBodies.clear();
+  mo_masslessBodies.clear();
 }
 
 
 void
 Environment::addBody(Body* body)
 {
-  m_bodies.push_back(body);
+  mo_bodies.push_back(body);
 }
 
 
 void
 Environment::removeBody(Body* body)
 {
-  m_bodies.erase( std::remove(m_bodies.begin(), m_bodies.end(), body), m_bodies.end() );
+  mo_bodies.erase( std::remove(mo_bodies.begin(), mo_bodies.end(), body), mo_bodies.end() );
 }
 
 
 void
 Environment::addMasslessBody(Body* body)
 {
-  m_masslessBodies.push_back(body);
+  mo_masslessBodies.push_back(body);
 }
 
 
 void
 Environment::clearAllBodies()
 {
-  m_bodies.clear();
-  m_masslessBodies.clear();
+  mo_bodies.clear();
+  mo_masslessBodies.clear();
 }
 
 
@@ -76,13 +75,13 @@ Environment::oneStep(double tEnd, double stepsize)
 
   for (int i = 0; i < steps; ++i)
   {
-    for (std::size_t i = 0; i < m_bodies.size(); i++)
+    for (std::size_t i = 0; i < mo_bodies.size(); i++)
     {
-      m_bodies[i]->oneStep(stepsize);
+      mo_bodies[i]->oneStep(stepsize);
     }
-    for (std::size_t i = 0; i < m_masslessBodies.size(); i++)
+    for (std::size_t i = 0; i < mo_masslessBodies.size(); i++)
     {
-      m_masslessBodies[i]->oneStep(stepsize);
+      mo_masslessBodies[i]->oneStep(stepsize);
     }
   }
 }
@@ -91,9 +90,10 @@ Environment::oneStep(double tEnd, double stepsize)
 std::array<double, 4>
 Environment::getStateDerivative(const std::array<double, 4>& x, Body* ignoreBody)
 {
-  m_stateDerivative.fill(0.0);
+  std::array<double, 4> stateDerivative;
+  stateDerivative.fill(0.0);
 
-  for (auto iter = m_bodies.begin(); iter != m_bodies.end(); iter++)
+  for (auto iter = mo_bodies.begin(); iter != mo_bodies.end(); iter++)
   {
     if (ignoreBody == *iter)
     {
@@ -108,8 +108,8 @@ Environment::getStateDerivative(const std::array<double, 4>& x, Body* ignoreBody
     {
       double mu = (*iter)->getMass() * m_gravitationalConstant;
       double r3 = r*r*r;
-      m_stateDerivative[2] -= mu / r3 * x12;
-      m_stateDerivative[3] -= mu / r3 * y12;
+      stateDerivative[2] -= mu / r3 * x12;
+      stateDerivative[3] -= mu / r3 * y12;
     }
     else
     {
@@ -120,10 +120,9 @@ Environment::getStateDerivative(const std::array<double, 4>& x, Body* ignoreBody
     }
   }
 
-  m_stateDerivative[0] = x[2];
-  m_stateDerivative[1] = x[3];
-
-  return m_stateDerivative;
+  stateDerivative[0] = x[2];
+  stateDerivative[1] = x[3];
+  return stateDerivative;
 }
 
 
@@ -136,7 +135,7 @@ Environment::getFieldStrength(double x, double y)
   double gravityAccX = 0.0;
   double gravityAccY = 0.0;
 
-  for (auto iter = m_bodies.begin(); iter != m_bodies.end(); iter++)
+  for (auto iter = mo_bodies.begin(); iter != mo_bodies.end(); iter++)
   {
     x2 = (*iter)->getState();
     if (x2[0] != x && x2[1] != y)

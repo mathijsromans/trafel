@@ -43,11 +43,6 @@ private:
   std::array<double, 4> k2;
   std::array<double, 4> k3;
   std::array<double, 4> k4;
-
-  std::array<double, 4> pforce1;
-  std::array<double, 4> pforce2;
-  std::array<double, 4> pforce3;
-  std::array<double, 4> pforce4;
 };
 
 #endif /*INTEGRATOR_H_*/
