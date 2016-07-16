@@ -33,6 +33,7 @@ SOURCES += main.cpp\
     spafel/bodyitem.cpp \
     spafel/environment.cpp \
     spafel/gravityscene.cpp \
+    spafel/spaceship.cpp \
     button.cpp \
     clickableitem.cpp
 
@@ -52,6 +53,7 @@ HEADERS  += mainwindow.h \
     spafel/bodyitem.h \
     spafel/environment.h \
     spafel/gravityscene.h \
+    spafel/spaceship.h \
     button.h \
     clickableitem.h
 

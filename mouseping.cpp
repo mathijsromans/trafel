@@ -9,7 +9,6 @@ MousePing::MousePing(QPointF p, const QColor& color)
     m_size(0),
     m_animation(this, "size")
 {
-  qDebug() << "PING" << p;
   QPen pen;
   pen.setWidth(7);
   pen.setColor(color);

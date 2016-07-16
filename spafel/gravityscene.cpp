@@ -2,6 +2,7 @@
 
 #include "spafel/bodyitem.h"
 #include "spafel/environment.h"
+#include "spaceship.h"
 
 #include <QDebug>
 #include <QGraphicsEllipseItem>
@@ -49,12 +50,22 @@ BodyItem*
 GravityScene::addBody(Body* body, const QColor& color)
 {
   m_environment->addBody(body);
+  m_bodies.push_back(body);
   BodyItem* bodyItem = new BodyItem(body, color);
   m_bodyItems.push_back(bodyItem);
   addItem(bodyItem);
   return bodyItem;
 }
 
+//void
+//GravityScene::addSpaceship(Body* body)
+//{
+//  m_environment->addBody(body);
+//  m_bodies.push_back(body);
+//  Spaceship* ship = new Spaceship(body);
+//  m_spaceships.push_back(ship);
+//  addItem(ship);
+//}
 
 void
 GravityScene::init()
@@ -62,6 +73,7 @@ GravityScene::init()
   setBackgroundBrush(QBrush(Qt::black));
 
   createCelestialBodies();
+  createSpaceShips();
 
   connect(m_timer, SIGNAL(timeout()), this, SLOT(step()));
   m_timer->start(1000/fps);
@@ -220,4 +232,16 @@ GravityScene::createCelestialBodies()
   double mercuryVy = calcOrbitalVelocity(mercuryX, mercuryEccentricity, muSun);
   Body* mercury = new Body(mercuryX, 0.0, 0.0, -mercuryVy, mercuryMass, m_environment.get());
   addBody(mercury);
+}
+
+void
+GravityScene::createSpaceShips()
+{
+//  Body* ss1 = new Body(m_environment.get());
+//  double earthEccentricity = 0.0167086;
+//  double ss1X = 152.10e9;
+//  double ss1Vy = calcOrbitalVelocity(ss1X, earthEccentricity, muSun);
+//  ss1->setPosition(-ss1X, 0.0);
+//  ss1->setVelocity(0.0, -ss1Vy);
+//  addSpaceship(ss1);
 }
