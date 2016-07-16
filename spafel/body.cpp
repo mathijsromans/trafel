@@ -9,16 +9,13 @@ Body::Body(double x, double y, double vx, double vy, double mass, Environment* e
 : m_id(ms_nextUniqueId++),
   m_x(),
   m_lastTime(0),
-  m_para(),
+  m_mass(mass),
   m_environment(environment)
 {
   m_x[0][0] = x;
   m_x[0][1] = y;
   m_x[0][2] = vx;
   m_x[0][3] = vy;
-
-  m_para[0] = mass; // mass [kg]
-  m_para[1] = 15.0; // radius [m]
 }
 
 
@@ -37,7 +34,7 @@ Body::oneStep(double stepsize, unsigned int time)
 double
 Body::getMass() const
 {
-  return m_para[0];
+  return m_mass;
 }
 
 
@@ -47,12 +44,6 @@ Body::getState(unsigned int time) const
   assert(time<=m_lastTime);
   assert(time+m_x.size()>m_lastTime);
   return m_x[time%m_x.size()];
-}
-
-const std::array<double, 2>&
-Body::getParameters() const
-{
-  return m_para;
 }
 
 

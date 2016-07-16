@@ -25,7 +25,6 @@ public:
 
   double getMass() const;
   const std::array<double, 4>& getState(unsigned int time) const;
-  const std::array<double, 2>& getParameters() const;
 
   unsigned int getId() const;
 
@@ -40,7 +39,7 @@ private:
   static const unsigned int ms_history = 200;
   std::array<std::array<double, 4>, ms_history> m_x;
   unsigned int m_lastTime;
-  std::array<double, 2> m_para; // {mass, radius}
+  double m_mass;
 
   Environment* m_environment;
 };
