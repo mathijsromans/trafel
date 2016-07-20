@@ -11,7 +11,6 @@
 class Environment;
 class Body;
 class BodyItem;
-class Spaceship;
 class QTimer;
 
 class GravityScene : public TransformScene
@@ -44,9 +43,9 @@ private slots:
   void step();
 
 private:
-  BodyItem* addBody(Body* body, const QColor& color=Qt::white);
+  void addBody(Body* body, const QColor& color=Qt::white);
+  void addSpaceship(Body* body);
   void updateTrackItems();
-  void removeBodyItem(BodyItem* bodyItem);
   void createCelestialBodies();
   void createSpaceShips();
   static double getScaleFactor(const QRectF& tableRect);
@@ -56,9 +55,8 @@ private:
   std::vector<BodyItem*> m_bodyItems;
   std::vector<Body*> m_bodies;
   std::unique_ptr<NewBodyData> m_newBody;
-  std::map<Body*, std::deque<QGraphicsLineItem*>> m_trackItems;  // TODO: move BodyItem
-  QGraphicsEllipseItem* m_tempBodyItem;
-  BodyItem* m_sunItem;
+  std::map<Body*, std::deque<QGraphicsLineItem*>> m_trackItems;  // TODO: move Planet
+  QGraphicsEllipseItem* m_tempPlanet;
   QTimer* m_timer;
   unsigned int m_time;
 };

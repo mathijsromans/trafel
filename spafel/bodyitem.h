@@ -1,31 +1,18 @@
 #ifndef BODYITEM_H
 #define BODYITEM_H
 
-#include <memory>
-
-#include <QColor>
-#include <QGraphicsEllipseItem>
-#include <QPointF>
-
+#include <QGraphicsItem>
 class Body;
-class QRectF;
 
-
-class BodyItem : public QGraphicsEllipseItem
+class BodyItem : public QGraphicsItem
 {
 public:
-  BodyItem(Body* body, const QColor& color=Qt::white);
-
+  BodyItem(Body* body);
   void update(const QRectF& tableRect, unsigned int time);
   Body* getBody() const;
-  unsigned int getRadius() const;
-  static unsigned int calcRadius(double mass);
-
-private:
 
 private:
   Body* m_body;
-  double m_radius;
 };
 
 #endif // BODYITEM_H

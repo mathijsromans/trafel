@@ -35,7 +35,8 @@ SOURCES += main.cpp\
     spafel/gravityscene.cpp \
     spafel/spaceship.cpp \
     button.cpp \
-    clickableitem.cpp
+    clickableitem.cpp \
+    spafel/planet.cpp
 
 HEADERS  += mainwindow.h \
     trafficscene.h \
@@ -55,6 +56,7 @@ HEADERS  += mainwindow.h \
     spafel/gravityscene.h \
     spafel/spaceship.h \
     button.h \
-    clickableitem.h
+    clickableitem.h \
+    spafel/planet.h
 
 FORMS    +=

@@ -1,37 +1,31 @@
 #include "body.h"
 #include "gravityscene.h"
 #include "spaceship.h"
-#include <QDebug>
 #include <QPainter>
 
 std::unique_ptr<QPixmap> Spaceship::ms_blueSpaceship;
 
 Spaceship::Spaceship(Body* body)
-  : m_body(body)
+  : BodyItem(body),
+    m_pixmap()
 {
   if ( !ms_blueSpaceship )
   {
     ms_blueSpaceship = std::make_unique<QPixmap>("../trafel/resources/rocket_blue.png");
   }
-  setPixmap(*ms_blueSpaceship);
-  setOffset(-0.5*pixmap().rect().bottomRight());
+  m_pixmap = *ms_blueSpaceship;
 }
 
-void
-Spaceship::update(const QRectF& tableRect)
+QRectF Spaceship::boundingRect() const
 {
-//  const std::array<double, 4> state = m_body->getState();
-//  QPointF scenePos = GravityScene::envToScene(QPointF(state[0], state[1]), tableRect);
-//  setPos(scenePos);
+  QSize s = m_pixmap.size();
+  return QRectF(-0.5*s.width(), -0.5*s.height(), s.width(), s.height());
 }
 
 void Spaceship::paint(QPainter* painter,
-                      const QStyleOptionGraphicsItem* option,
-                      QWidget* widget)
+                      const QStyleOptionGraphicsItem* /*option*/,
+                      QWidget* /*widget*/)
 {
-  painter->setPen(Qt::white);
-  painter->drawRect(boundingRect());
-  painter->drawPoint(boundingRect().center());
-  QGraphicsPixmapItem::paint(painter, option, widget);
+  painter->drawPixmap(boundingRect().topLeft(), m_pixmap);
 }
 

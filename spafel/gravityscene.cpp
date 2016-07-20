@@ -1,6 +1,6 @@
 #include "gravityscene.h"
 
-#include "spafel/bodyitem.h"
+#include "spafel/planet.h"
 #include "spafel/environment.h"
 #include "spaceship.h"
 
@@ -33,8 +33,7 @@ GravityScene::GravityScene()
   m_bodyItems(),
   m_newBody(),
   m_trackItems(),
-  m_tempBodyItem(0),
-  m_sunItem(0),
+  m_tempPlanet(0),
   m_timer(new QTimer(this)),
   m_time(0)
 {
@@ -46,26 +45,24 @@ GravityScene::~GravityScene()
 }
 
 
-BodyItem*
-GravityScene::addBody(Body* body, const QColor& color)
+void GravityScene::addBody(Body* body, const QColor& color)
 {
   m_environment->addBody(body);
   m_bodies.push_back(body);
-  BodyItem* bodyItem = new BodyItem(body, color);
+  Planet* bodyItem = new Planet(body, color);
   m_bodyItems.push_back(bodyItem);
   addItem(bodyItem);
-  return bodyItem;
 }
 
-//void
-//GravityScene::addSpaceship(Body* body)
-//{
-//  m_environment->addBody(body);
-//  m_bodies.push_back(body);
-//  Spaceship* ship = new Spaceship(body);
-//  m_spaceships.push_back(ship);
-//  addItem(ship);
-//}
+void
+GravityScene::addSpaceship(Body* body)
+{
+  m_environment->addBody(body);
+  m_bodies.push_back(body);
+  Spaceship* ship = new Spaceship(body);
+  m_bodyItems.push_back(ship);
+  addItem(ship);
+}
 
 void
 GravityScene::init()
@@ -88,9 +85,9 @@ GravityScene::step()
     m_environment->oneStep(stepsize, m_time);
     ++m_time;
   }
-  for (BodyItem* planet : m_bodyItems)
+  for (BodyItem* bodyItem : m_bodyItems)
   {
-    planet->update(getTableRect(), m_time);
+    bodyItem->update(getTableRect(), m_time);
   }
 
   updateTrackItems();
@@ -110,42 +107,19 @@ GravityScene::mouseClick(QPointF /*point*/)
 //    body->setPosition(envPos.x(), envPos.y());
 //    body->setVelocity(velVect.x(), velVect.y());
 //    addBody(body, Qt::green);
-//    removeItem(m_tempBodyItem);
-//    delete m_tempBodyItem;
-//    m_tempBodyItem = 0;
+//    removeItem(m_tempPlanet);
+//    delete m_tempPlanet;
+//    m_tempPlanet = 0;
 //    m_newBody.release();
 //  }
 //  else
 //  {
 //    double mass = 5.0e28;
-//    double radius = BodyItem::calcRadius(mass);
-//    m_tempBodyItem = addEllipse(point.x()-radius, point.y()-radius, 2*radius, 2*radius, QPen(Qt::darkGreen), QBrush(Qt::darkGreen));
+//    double radius = Planet::calcRadius(mass);
+//    m_tempPlanet = addEllipse(point.x()-radius, point.y()-radius, 2*radius, 2*radius, QPen(Qt::darkGreen), QBrush(Qt::darkGreen));
 //    m_newBody.reset(new NewBodyData(mass, point));
 //  }
 }
-
-void
-GravityScene::removeBodyItem(BodyItem* bodyItem)
-{
-  m_bodyItems.erase( std::remove(m_bodyItems.begin(), m_bodyItems.end(), bodyItem), m_bodyItems.end() );
-  removeItem(bodyItem);
-  for (Body* body : m_environment->getBodies())
-  {
-    if (body == bodyItem->getBody())
-    {
-      m_environment->removeBody(body);
-      for (const auto& lineItem : m_trackItems[body])
-      {
-        removeItem(lineItem);
-        delete lineItem;
-      }
-      m_trackItems[body].clear();
-      break;
-    }
-  }
-  delete bodyItem;
-}
-
 
 QPointF
 GravityScene::envToScene(const QPointF& point, const QRectF& tableRect)
@@ -210,7 +184,7 @@ GravityScene::createCelestialBodies()
 {
   const double sunMass = 1.989e30;
   Body* sun = new Body(0.0, 0.0, 0.0, 0.0, sunMass, m_environment.get());
-  m_sunItem = addBody(sun, Qt::yellow);
+  addBody(sun, Qt::yellow);
 
   double earthEccentricity = 0.0167086;
   const double earthMass = 5.972e24;
@@ -237,11 +211,9 @@ GravityScene::createCelestialBodies()
 void
 GravityScene::createSpaceShips()
 {
-//  Body* ss1 = new Body(m_environment.get());
-//  double earthEccentricity = 0.0167086;
-//  double ss1X = 152.10e9;
-//  double ss1Vy = calcOrbitalVelocity(ss1X, earthEccentricity, muSun);
-//  ss1->setPosition(-ss1X, 0.0);
-//  ss1->setVelocity(0.0, -ss1Vy);
-//  addSpaceship(ss1);
+  double earthEccentricity = 0.0167086;
+  double s1X = 152.10e9;
+  double s1Vy = calcOrbitalVelocity(s1X, earthEccentricity, muSun);
+  Body* s1 = new Body(-s1X, 0.0, 0.0, -s1Vy, 0, m_environment.get());
+  addSpaceship(s1);
 }
