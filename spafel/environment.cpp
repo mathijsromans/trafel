@@ -10,11 +10,9 @@
 Environment::Environment(double gravitationalConstant)
 : m_gravitationalConstant(gravitationalConstant),
   m_lastTime(0),
-  mo_bodies(),
-  mo_masslessBodies()
+  mo_bodies()
 {
 }
-
 
 Environment::~Environment()
 {
@@ -23,12 +21,6 @@ Environment::~Environment()
     delete body;
   }
   mo_bodies.clear();
-
-  for (Body* body : mo_masslessBodies)
-  {
-    delete body;
-  }
-  mo_masslessBodies.clear();
 }
 
 
@@ -36,28 +28,6 @@ void
 Environment::addBody(Body* body)
 {
   mo_bodies.push_back(body);
-}
-
-
-void
-Environment::removeBody(Body* body)
-{
-  mo_bodies.erase( std::remove(mo_bodies.begin(), mo_bodies.end(), body), mo_bodies.end() );
-}
-
-
-void
-Environment::addMasslessBody(Body* body)
-{
-  mo_masslessBodies.push_back(body);
-}
-
-
-void
-Environment::clearAllBodies()
-{
-  mo_bodies.clear();
-  mo_masslessBodies.clear();
 }
 
 const std::vector<Body*>&
@@ -83,10 +53,6 @@ Environment::oneStep(double stepsize, unsigned int time)
     {
       body->oneStep(stepsize, m_lastTime);
     }
-    for (Body* body: mo_masslessBodies)
-    {
-      body->oneStep(stepsize, m_lastTime);
-    }
     ++m_lastTime;
   }
 
@@ -99,20 +65,21 @@ Environment::getStateDerivative(const std::array<double, 4>& x, Body* ignoreBody
   std::array<double, 4> stateDerivative;
   stateDerivative.fill(0.0);
 
-  for (auto iter = mo_bodies.begin(); iter != mo_bodies.end(); iter++)
+  for (Body* body : mo_bodies )
   {
-    if (ignoreBody == *iter)
+    double mass = body->getMass();
+    if (ignoreBody == body || mass == 0)
     {
       continue;
     }
 
-    const std::array<double, 4>& x2 = (*iter)->getState(time);
+    const std::array<double, 4>& x2 = body->getState(time);
     double x12 = x[0]-x2[0];
     double y12 = x[1]-x2[1];
     double r = std::sqrt(x12*x12+y12*y12);
     if (r > 0.1/std::sqrt(m_gravitationalConstant))
     {
-      double mu = (*iter)->getMass() * m_gravitationalConstant;
+      double mu = mass * m_gravitationalConstant;
       double r3 = r*r*r;
       stateDerivative[2] -= mu / r3 * x12;
       stateDerivative[3] -= mu / r3 * y12;
@@ -130,11 +97,3 @@ Environment::getStateDerivative(const std::array<double, 4>& x, Body* ignoreBody
   stateDerivative[1] = x[3];
   return stateDerivative;
 }
-
-
-double
-Environment::getGravitationalConstant() const
-{
-  return m_gravitationalConstant;
-}
-

@@ -55,7 +55,7 @@ private:
   std::vector<BodyItem*> m_bodyItems;
   std::vector<Body*> m_bodies;
   std::unique_ptr<NewBodyData> m_newBody;
-  std::map<Body*, std::deque<QGraphicsLineItem*>> m_trackItems;  // TODO: move Planet
+  std::map<Body*, std::deque<QGraphicsLineItem*>> m_trackItems;
   QGraphicsEllipseItem* m_tempPlanet;
   QTimer* m_timer;
   unsigned int m_time;

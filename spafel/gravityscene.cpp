@@ -157,10 +157,8 @@ GravityScene::updateTrackItems()
 {
   for (const auto& body : m_environment->getBodies())
   {
-
     auto s1 = body->getState(m_time+50);
     auto s2 = body->getState(m_time+51);
-
 
     QLineF newLine(envToScene(QPointF(s2[0], s2[1]), getTableRect()), envToScene(QPointF(s1[0], s1[1]), getTableRect()));
     QGraphicsLineItem* line = addLine(newLine, QPen(Qt::red));
@@ -175,7 +173,6 @@ GravityScene::updateTrackItems()
       delete line;
     }
   }
-
 }
 
 
