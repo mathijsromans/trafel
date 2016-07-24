@@ -21,21 +21,16 @@ public:
   explicit Body(double x, double y, double vx, double vy, double mass, Environment* environment);
   ~Body();
 
-  void oneStep(double stepsize, unsigned int time);
+  void oneStep(unsigned int time);
 
   double getMass() const;
   const std::array<double, 4>& getState(unsigned int time) const;
 
-  unsigned int getId() const;
+  enum class Direction { up, down, left, right };
+  void boost(Direction d);
 
 
 private:
-  double random(double start, double end);
-  void integrate(double stepsize, unsigned int time);
-
-private:
-  static unsigned int ms_nextUniqueId;
-  unsigned int m_id;
   static const unsigned int ms_history = 200;
   std::array<std::array<double, 4>, ms_history> m_x;
   unsigned int m_lastTime;

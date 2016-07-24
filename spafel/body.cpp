@@ -3,11 +3,8 @@
 #include "body.h"
 #include <cassert>
 
-unsigned int Body::ms_nextUniqueId = 1;
-
 Body::Body(double x, double y, double vx, double vy, double mass, Environment* environment)
-: m_id(ms_nextUniqueId++),
-  m_x(),
+: m_x(),
   m_lastTime(0),
   m_mass(mass),
   m_environment(environment)
@@ -25,45 +22,9 @@ Body::~Body()
 
 
 void
-Body::oneStep(double stepsize, unsigned int time)
+Body::oneStep(unsigned int time)
 {
-  integrate(stepsize, time);
-}
-
-
-double
-Body::getMass() const
-{
-  return m_mass;
-}
-
-
-const std::array<double, 4>&
-Body::getState(unsigned int time) const
-{
-  assert(time<=m_lastTime);
-  assert(time+m_x.size()>m_lastTime);
-  return m_x[time%m_x.size()];
-}
-
-
-unsigned int
-Body::getId() const
-{
-  return m_id;
-}
-
-double
-Body::random(double start, double end)
-{
-  double randomDouble = start+(end-start)*rand()/(RAND_MAX + 1.0);
-  return randomDouble;
-}
-
-
-void
-Body::integrate(double stepsize, unsigned int time)
-{
+  double stepsize = m_environment->getStepsize();
   assert(time == m_lastTime);
   std::array<double, 4> x = getState(time);
   std::array<double, 4> force = m_environment->getStateDerivative(x, this, time);
@@ -108,5 +69,40 @@ Body::integrate(double stepsize, unsigned int time)
     m_x[(m_lastTime+1)%m_x.size()][i] = x[i] + 1.0/6.0 * (k1[i]+2*k2[i]+2*k3[i]+k4[i]);
   }
   m_lastTime++;
+}
 
+double
+Body::getMass() const
+{
+  return m_mass;
+}
+
+
+const std::array<double, 4>&
+Body::getState(unsigned int time) const
+{
+  assert(time<=m_lastTime);
+  assert(time+m_x.size()>m_lastTime);
+  return m_x[time%m_x.size()];
+}
+
+void Body::boost(Body::Direction d)
+{
+  assert( m_lastTime > m_x.size() );
+  unsigned int currentTime = m_lastTime+1-m_x.size();
+  double& vx = m_x[currentTime%m_x.size()][2];
+  double& vy = m_x[currentTime%m_x.size()][3];
+  switch (d)
+  {
+    case Direction::up: vx *= 1.1; vy *= 1.1; break;
+    case Direction::down:break;
+    case Direction::left:break;
+    case Direction::right:break;
+  }
+
+  m_lastTime = currentTime;
+  for ( unsigned int i = 0; i != m_x.size()-1; ++i )
+  {
+    oneStep(m_lastTime);
+  }
 }

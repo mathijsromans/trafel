@@ -44,16 +44,19 @@ private slots:
 
 private:
   void addBody(Body* body, const QColor& color=Qt::white);
-  void addSpaceship(Body* body);
+  void addSpaceship(Body* body, unsigned int id);
   void updateTrackItems();
   void createCelestialBodies();
   void createSpaceShips();
   static double getScaleFactor(const QRectF& tableRect);
 
+private slots:
+  void slotButtonPressed();
+
 private:
+  static const unsigned int ms_numSpaceships = 3;
   std::unique_ptr<Environment> m_environment;
   std::vector<BodyItem*> m_bodyItems;
-  std::vector<Body*> m_bodies;
   std::unique_ptr<NewBodyData> m_newBody;
   std::map<Body*, std::deque<QGraphicsLineItem*>> m_trackItems;
   QGraphicsEllipseItem* m_tempPlanet;

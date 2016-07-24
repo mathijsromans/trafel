@@ -1,5 +1,6 @@
 #include "gravityscene.h"
 
+#include "button.h"
 #include "spafel/planet.h"
 #include "spafel/environment.h"
 #include "spaceship.h"
@@ -7,6 +8,7 @@
 #include <QDebug>
 #include <QGraphicsEllipseItem>
 #include <QGraphicsSceneMouseEvent>
+#include <QSignalMapper>
 #include <QTimer>
 
 #include <cmath>
@@ -16,8 +18,9 @@ namespace
   const double AU = 149.6e9;
   const double muSun = 1.32712440018e20;
   const double zoom = 0.4;
-  const unsigned int fps = 60;
-  const unsigned int stepsize = 120000.0;
+  const double fps = 30;            // number of frames per second
+  const double speedup = 3000000;   // speedup factor, number of seconds per second
+  const double stepsize = speedup/fps;
 
   double calcOrbitalVelocity(double apogeeX, double eccentricity, double muCentralBody)
   {
@@ -29,7 +32,7 @@ namespace
 
 GravityScene::GravityScene()
 : TransformScene(),
-  m_environment(new Environment()),
+  m_environment(new Environment(stepsize)),
   m_bodyItems(),
   m_newBody(),
   m_trackItems(),
@@ -48,18 +51,16 @@ GravityScene::~GravityScene()
 void GravityScene::addBody(Body* body, const QColor& color)
 {
   m_environment->addBody(body);
-  m_bodies.push_back(body);
   Planet* bodyItem = new Planet(body, color);
   m_bodyItems.push_back(bodyItem);
   addItem(bodyItem);
 }
 
 void
-GravityScene::addSpaceship(Body* body)
+GravityScene::addSpaceship(Body* body, unsigned int id)
 {
-  m_environment->addBody(body);
-  m_bodies.push_back(body);
-  Spaceship* ship = new Spaceship(body);
+  m_environment->addSpaceship(body);
+  Spaceship* ship = new Spaceship(body, id);
   m_bodyItems.push_back(ship);
   addItem(ship);
 }
@@ -74,17 +75,33 @@ GravityScene::init()
 
   connect(m_timer, SIGNAL(timeout()), this, SLOT(step()));
   m_timer->start(1000/fps);
+
+//  QSignalMapper* signalMapper = new QSignalMapper(this);
+//  std::
+
+//  connect(button, SIGNAL(clicked()), signalMapper, SLOT(map()));
+//        signalMapper->setMapping(button, texts[i]);
+//        gridLayout->addWidget(button, i / 3, i % 3);
+//    }
+
+//    connect(signalMapper, SIGNAL(mapped(QString)),
+//            this, SIGNAL(clicked(QString)));
+
+
+
+
+  Button* button = new Button("Up");
+  button->setPos(getTableRect().bottomLeft());
+  addItem( button );
+  connect( button, SIGNAL(pressed()), this, SLOT(slotButtonPressed()) );
 }
 
 
 void
 GravityScene::step()
 {
-  for ( unsigned int i = 0; i != 60*60*60 /stepsize; ++i )
-  {
-    m_environment->oneStep(stepsize, m_time);
-    ++m_time;
-  }
+  m_environment->oneStep(m_time);
+  ++m_time;
   for (BodyItem* bodyItem : m_bodyItems)
   {
     bodyItem->update(getTableRect(), m_time);
@@ -152,6 +169,12 @@ GravityScene::getScaleFactor(const QRectF& tableRect)
   return std::min(tableRect.width(), tableRect.height()) * zoom;
 }
 
+void GravityScene::slotButtonPressed()
+{
+  m_environment->boost(0, Body::Direction::up);
+
+}
+
 void
 GravityScene::updateTrackItems()
 {
@@ -208,9 +231,17 @@ GravityScene::createCelestialBodies()
 void
 GravityScene::createSpaceShips()
 {
-  double earthEccentricity = 0.0167086;
-  double s1X = 152.10e9;
-  double s1Vy = calcOrbitalVelocity(s1X, earthEccentricity, muSun);
-  Body* s1 = new Body(-s1X, 0.0, 0.0, -s1Vy, 0, m_environment.get());
-  addSpaceship(s1);
+  const double earthEccentricity = 0.0167086;
+  const double s1X = 152.10e9;
+  const double s1Vy = calcOrbitalVelocity(s1X, earthEccentricity, muSun);
+  for ( unsigned int i = 0; i != ms_numSpaceships; ++i )
+  {
+    double angle = 2 * M_PI * i / ms_numSpaceships;
+    double x = sin(angle) * s1X;
+    double y = cos(angle) * s1X;
+    double vx = -cos(angle) * s1Vy;
+    double vy = sin(angle) * s1Vy;
+    Body* s1 = new Body(x, y, vx, vy, 0, m_environment.get());
+    addSpaceship(s1, i);
+  }
 }

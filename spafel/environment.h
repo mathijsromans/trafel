@@ -10,18 +10,23 @@
 class Environment {
 
 public:
-  explicit Environment(double gravitationalConstant=6.67408e-11);
+  explicit Environment(unsigned int stepsize, double gravitationalConstant=6.67408e-11);
   ~Environment();
   void addBody(Body* body);
+  void addSpaceship(Body* body);
   const std::vector<Body*>& getBodies() const;
-  void oneStep(double stepsize, unsigned int time);
+  void oneStep(unsigned int time);
   std::array<double, 4> getStateDerivative(const std::array<double, 4>& x0, Body* ignoreBody, unsigned int time);
+  void boost(unsigned int spaceshipId, Body::Direction d);
+  unsigned int getStepsize() const;
 
 private:
-  static const unsigned int timeAhead = 100;
+  static const unsigned int timeAhead = 200;
+  const unsigned int m_stepsize;
   const double m_gravitationalConstant;
   unsigned int m_lastTime;
   std::vector<Body*> mo_bodies;
+  std::vector<Body*> m_spaceships;
 };
 
 #endif /* ENVIRONMENT_H_ */

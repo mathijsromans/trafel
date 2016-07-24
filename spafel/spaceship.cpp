@@ -3,17 +3,24 @@
 #include "spaceship.h"
 #include <QPainter>
 
+std::unique_ptr<QPixmap> Spaceship::ms_redSpaceship;
+std::unique_ptr<QPixmap> Spaceship::ms_greenSpaceship;
 std::unique_ptr<QPixmap> Spaceship::ms_blueSpaceship;
 
-Spaceship::Spaceship(Body* body)
+Spaceship::Spaceship(Body* body, unsigned int id)
   : BodyItem(body),
     m_pixmap()
 {
   if ( !ms_blueSpaceship )
   {
-    ms_blueSpaceship = std::make_unique<QPixmap>("../trafel/resources/rocket_blue.png");
+    initPixmaps();
   }
-  m_pixmap = *ms_blueSpaceship;
+  switch (id%3)
+  {
+    case 0: m_pixmap = *ms_redSpaceship; break;
+    case 1: m_pixmap = *ms_greenSpaceship; break;
+    case 2: m_pixmap = *ms_blueSpaceship; break;
+  }
 }
 
 QRectF Spaceship::boundingRect() const
@@ -27,5 +34,13 @@ void Spaceship::paint(QPainter* painter,
                       QWidget* /*widget*/)
 {
   painter->drawPixmap(boundingRect().topLeft(), m_pixmap);
+}
+
+void Spaceship::initPixmaps()
+{
+  ms_redSpaceship = std::make_unique<QPixmap>("../trafel/resources/rocket_red.png");
+  ms_greenSpaceship = std::make_unique<QPixmap>("../trafel/resources/rocket_green.png");
+  ms_blueSpaceship = std::make_unique<QPixmap>("../trafel/resources/rocket_blue.png");
+
 }
 

@@ -7,10 +7,12 @@
 #include <thread>
 
 
-Environment::Environment(double gravitationalConstant)
-: m_gravitationalConstant(gravitationalConstant),
+Environment::Environment(unsigned int stepsize, double gravitationalConstant)
+: m_stepsize(stepsize),
+  m_gravitationalConstant(gravitationalConstant),
   m_lastTime(0),
-  mo_bodies()
+  mo_bodies(),
+  m_spaceships()
 {
 }
 
@@ -30,6 +32,13 @@ Environment::addBody(Body* body)
   mo_bodies.push_back(body);
 }
 
+void
+Environment::addSpaceship(Body* body)
+{
+  addBody(body);
+  m_spaceships.push_back(body);
+}
+
 const std::vector<Body*>&
 Environment::getBodies() const
 {
@@ -38,20 +47,13 @@ Environment::getBodies() const
 
 
 void
-Environment::oneStep(double stepsize, unsigned int time)
+Environment::oneStep(unsigned int time)
 {
   while ( m_lastTime < time + timeAhead )
   {
-    double stepsizeAbsolute = std::fabs(stepsize);
-    if (stepsizeAbsolute < 1.0e-6)
-    {
-      std::cerr << "Environment::oneStepImpl() - ERROR: stepsize too small: " << stepsize << std::endl;
-      return;
-    }
-
     for (Body* body: mo_bodies)
     {
-      body->oneStep(stepsize, m_lastTime);
+      body->oneStep(m_lastTime);
     }
     ++m_lastTime;
   }
@@ -96,4 +98,15 @@ Environment::getStateDerivative(const std::array<double, 4>& x, Body* ignoreBody
   stateDerivative[0] = x[2];
   stateDerivative[1] = x[3];
   return stateDerivative;
+}
+
+void Environment::boost(unsigned int spaceshipId, Body::Direction d)
+{
+  assert(spaceshipId < m_spaceships.size());
+  m_spaceships[spaceshipId]->boost(d);
+}
+
+unsigned int Environment::getStepsize() const
+{
+  return m_stepsize;
 }
