@@ -5,7 +5,8 @@
 
 Body::Body(double x, double y, double vx, double vy, double mass, Environment* environment)
 : m_x(),
-  m_lastTime(0),
+  m_trackChanged(true),
+  m_currentTime(0),
   m_mass(mass),
   m_environment(environment)
 {
@@ -22,12 +23,20 @@ Body::~Body()
 
 
 void
-Body::oneStep(unsigned int time)
+Body::oneStep()
+{  
+  ++m_currentTime;
+  calculate(m_currentTime+m_x.size()-1);
+}
+
+void
+Body::calculate(unsigned int time)
 {
+  assert(time > m_currentTime);
+  assert(time < m_currentTime + m_x.size());
   double stepsize = m_environment->getStepsize();
-  assert(time == m_lastTime);
-  std::array<double, 4> x = getState(time);
-  std::array<double, 4> force = m_environment->getStateDerivative(x, this, time);
+  const std::array<double, 4> x = getState(time-1);
+  std::array<double, 4> force = m_environment->getStateDerivative(x, this, time-1);
 
   std::array<double, 4> x0k1;
   std::array<double, 4> x0k2;
@@ -43,21 +52,21 @@ Body::oneStep(unsigned int time)
     x0k1[j] = x[j] + 1./2.* k1[j]; // used in next step
   }
 
-  force = m_environment->getStateDerivative(x0k1, this, time);
+  force = m_environment->getStateDerivative(x0k1, this, time-1);
   for (std::size_t j = 0; j < 4; j++)
   {
     k2[j] = stepsize * force[j];
     x0k2[j] = x[j] + 1./2.* k2[j]; // used in next step
   }
 
-  force = m_environment->getStateDerivative(x0k2, this, time);
+  force = m_environment->getStateDerivative(x0k2, this, time-1);
   for (std::size_t j = 0; j < 4; j++)
   {
     k3[j] = stepsize * force[j];
     x0k3[j] = x[j] + k3[j]; // used in next step
   }
 
-  force = m_environment->getStateDerivative(x0k3, this, time);
+  force = m_environment->getStateDerivative(x0k3, this, time-1);
 
   for (std::size_t j = 0; j < 4; j++)
   {
@@ -66,9 +75,8 @@ Body::oneStep(unsigned int time)
 
   for (std::size_t i = 0; i < 4; i++)
   {
-    m_x[(m_lastTime+1)%m_x.size()][i] = x[i] + 1.0/6.0 * (k1[i]+2*k2[i]+2*k3[i]+k4[i]);
+    m_x[time%m_x.size()][i] = x[i] + 1.0/6.0 * (k1[i]+2*k2[i]+2*k3[i]+k4[i]);
   }
-  m_lastTime++;
 }
 
 double
@@ -79,19 +87,23 @@ Body::getMass() const
 
 
 const std::array<double, 4>&
+Body::getCurrentState() const
+{
+  return getState(m_currentTime);
+}
+
+const std::array<double, 4>&
 Body::getState(unsigned int time) const
 {
-  assert(time<=m_lastTime);
-  assert(time+m_x.size()>m_lastTime);
+  assert(time >= m_currentTime);
+  assert(time < m_currentTime+m_x.size());
   return m_x[time%m_x.size()];
 }
 
 void Body::boost(Body::Direction d)
 {
-  assert( m_lastTime > m_x.size() );
-  unsigned int currentTime = m_lastTime+1-m_x.size();
-  double& vx = m_x[currentTime%m_x.size()][2];
-  double& vy = m_x[currentTime%m_x.size()][3];
+  double& vx = m_x[m_currentTime%m_x.size()][2];
+  double& vy = m_x[m_currentTime%m_x.size()][3];
   switch (d)
   {
     case Direction::up: vx *= 1.1; vy *= 1.1; break;
@@ -100,9 +112,17 @@ void Body::boost(Body::Direction d)
     case Direction::right:break;
   }
 
-  m_lastTime = currentTime;
-  for ( unsigned int i = 0; i != m_x.size()-1; ++i )
+  for ( unsigned int t = 1; t != m_x.size(); ++t )
   {
-    oneStep(m_lastTime);
+    calculate(m_currentTime+t);
   }
+
+  m_trackChanged = true;
+}
+
+bool Body::trackChanged()
+{
+  bool result = m_trackChanged;
+  m_trackChanged = false;
+  return result;
 }

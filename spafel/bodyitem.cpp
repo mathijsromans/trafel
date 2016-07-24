@@ -17,9 +17,9 @@ BodyItem::getBody() const
 }
 
 void
-BodyItem::update(const QRectF& tableRect, unsigned int time)
+BodyItem::updateItem(const QRectF& tableRect)
 {
-  const std::array<double, 4> state = m_body->getState(time);
+  const std::array<double, 4> state = m_body->getCurrentState();
   QPointF scenePos = GravityScene::envToScene(QPointF(state[0], state[1]), tableRect);
   setPos(scenePos.x(), scenePos.y());
   setRotation(180*atan2(state[3], state[2])/M_PI);

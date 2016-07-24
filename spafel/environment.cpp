@@ -10,7 +10,7 @@
 Environment::Environment(unsigned int stepsize, double gravitationalConstant)
 : m_stepsize(stepsize),
   m_gravitationalConstant(gravitationalConstant),
-  m_lastTime(0),
+  m_currentTime(0),
   mo_bodies(),
   m_spaceships()
 {
@@ -39,6 +39,18 @@ Environment::addSpaceship(Body* body)
   m_spaceships.push_back(body);
 }
 
+void Environment::init()
+{
+  assert(m_currentTime == 0);
+  for ( unsigned int time = 1; time != Body::timeAhead; ++time )
+  {
+    for (Body* body: mo_bodies)
+    {
+      body->calculate(time);
+    }
+  }
+}
+
 const std::vector<Body*>&
 Environment::getBodies() const
 {
@@ -47,17 +59,13 @@ Environment::getBodies() const
 
 
 void
-Environment::oneStep(unsigned int time)
+Environment::oneStep()
 {
-  while ( m_lastTime < time + timeAhead )
+  for (Body* body: mo_bodies)
   {
-    for (Body* body: mo_bodies)
-    {
-      body->oneStep(m_lastTime);
-    }
-    ++m_lastTime;
+    body->oneStep();
   }
-
+  ++m_currentTime;
 }
 
 
@@ -109,4 +117,9 @@ void Environment::boost(unsigned int spaceshipId, Body::Direction d)
 unsigned int Environment::getStepsize() const
 {
   return m_stepsize;
+}
+
+unsigned int Environment::getCurrentTime() const
+{
+  return m_currentTime;
 }

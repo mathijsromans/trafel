@@ -37,8 +37,7 @@ GravityScene::GravityScene()
   m_newBody(),
   m_trackItems(),
   m_tempPlanet(0),
-  m_timer(new QTimer(this)),
-  m_time(0)
+  m_timer(new QTimer(this))
 {
 }
 
@@ -72,6 +71,7 @@ GravityScene::init()
 
   createCelestialBodies();
   createSpaceShips();
+  m_environment->init();
 
   connect(m_timer, SIGNAL(timeout()), this, SLOT(step()));
   m_timer->start(1000/fps);
@@ -100,11 +100,10 @@ GravityScene::init()
 void
 GravityScene::step()
 {
-  m_environment->oneStep(m_time);
-  ++m_time;
+  m_environment->oneStep();
   for (BodyItem* bodyItem : m_bodyItems)
   {
-    bodyItem->update(getTableRect(), m_time);
+    bodyItem->updateItem(getTableRect());
   }
 
   updateTrackItems();
@@ -178,26 +177,40 @@ void GravityScene::slotButtonPressed()
 void
 GravityScene::updateTrackItems()
 {
-  for (const auto& body : m_environment->getBodies())
+  for (Body* body : m_environment->getBodies())
   {
-    auto s1 = body->getState(m_time+50);
-    auto s2 = body->getState(m_time+51);
-
-    QLineF newLine(envToScene(QPointF(s2[0], s2[1]), getTableRect()), envToScene(QPointF(s1[0], s1[1]), getTableRect()));
-    QGraphicsLineItem* line = addLine(newLine, QPen(Qt::red));
-    line->setZValue(-10);
-    m_trackItems[body].push_front(line);
-
-    if (m_trackItems[body].size() > 50)
+    std::deque<QGraphicsLineItem*>& lines = m_trackItems[body];
+    unsigned int createFromTime = -1;
+    if ( body->trackChanged() )
     {
-      QGraphicsLineItem* line = m_trackItems[body].back();
+      for ( QGraphicsLineItem* line : lines )
+      {
+        removeItem(line);
+        delete line;
+      }
+      lines.clear();
+      createFromTime = 0;
+    }
+    else
+    {
+      QGraphicsLineItem* line = lines.front();
+      lines.pop_front();
       removeItem(line);
-      m_trackItems[body].pop_back();
       delete line;
+      createFromTime = Body::timeAhead - 2;
+    }
+    for ( unsigned int t = createFromTime; t != Body::timeAhead - 1; ++t )
+    {
+      unsigned int time = t + m_environment->getCurrentTime();
+      auto s1 = body->getState(time);
+      auto s2 = body->getState(time + 1);
+      QLineF newLine(envToScene(QPointF(s2[0], s2[1]), getTableRect()), envToScene(QPointF(s1[0], s1[1]), getTableRect()));
+      QGraphicsLineItem* line = addLine(newLine, QPen(Qt::red));
+      line->setZValue(-10);
+      lines.push_back(line);
     }
   }
 }
-
 
 void
 GravityScene::createCelestialBodies()

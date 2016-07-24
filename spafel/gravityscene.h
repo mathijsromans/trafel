@@ -61,7 +61,6 @@ private:
   std::map<Body*, std::deque<QGraphicsLineItem*>> m_trackItems;
   QGraphicsEllipseItem* m_tempPlanet;
   QTimer* m_timer;
-  unsigned int m_time;
 };
 
 #endif // GRAVITYSCENE_H
