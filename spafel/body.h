@@ -1,6 +1,7 @@
 #ifndef BODY_H_
 #define BODY_H_
 
+#include <QColor>
 #include <QPointF>
 #include <QLineF>
 #include <array>
@@ -18,7 +19,7 @@ class Body
 public:
 
 public:
-  explicit Body(double x, double y, double vx, double vy, double mass, Environment* environment);
+  explicit Body(double x, double y, double vx, double vy, double mass, QColor color, Environment* environment);
   ~Body();
 
   void oneStep();
@@ -33,11 +34,14 @@ public:
   bool trackChanged();
 
   static const unsigned int timeAhead = 200;
+  QColor getColor() const;
+
 private:
   std::array<std::array<double, 4>, timeAhead> m_x; // contains states from m_currentTime to m_currentTime + m_x.size()
   bool m_trackChanged;
   unsigned int m_currentTime;
   double m_mass;
+  QColor m_color;
 
   Environment* m_environment;
 };

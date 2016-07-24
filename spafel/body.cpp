@@ -3,11 +3,12 @@
 #include "body.h"
 #include <cassert>
 
-Body::Body(double x, double y, double vx, double vy, double mass, Environment* environment)
+Body::Body(double x, double y, double vx, double vy, double mass, QColor color, Environment* environment)
 : m_x(),
   m_trackChanged(true),
   m_currentTime(0),
   m_mass(mass),
+  m_color(color),
   m_environment(environment)
 {
   m_x[0][0] = x;
@@ -125,4 +126,9 @@ bool Body::trackChanged()
   bool result = m_trackChanged;
   m_trackChanged = false;
   return result;
+}
+
+QColor Body::getColor() const
+{
+  return m_color;
 }

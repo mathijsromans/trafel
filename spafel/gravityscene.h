@@ -43,7 +43,7 @@ private slots:
   void step();
 
 private:
-  void addBody(Body* body, const QColor& color=Qt::white);
+  void addBody(Body* body);
   void addSpaceship(Body* body, unsigned int id);
   void updateTrackItems();
   void createCelestialBodies();

@@ -10,10 +10,9 @@ namespace
   const double earthMass = 5.972e24;
 }
 
-Planet::Planet(Body* body, const QColor& color)
+Planet::Planet(Body* body)
 : BodyItem(body),
-  m_radius(calcRadius(getBody()->getMass())),
-  m_color(color)
+  m_radius(calcRadius(getBody()->getMass()))
 {
 }
 
@@ -25,8 +24,9 @@ QRectF Planet::boundingRect() const
 void Planet::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/,
                    QWidget */*widget*/)
 {
-  QPen pen(m_color);
-  QBrush brush(m_color);
+  QColor color = getBody()->getColor();
+  QPen pen(color);
+  QBrush brush(color);
   painter->setPen(pen);
   painter->setBrush(brush);
   painter->drawEllipse(boundingRect());

@@ -10,7 +10,7 @@
 class Environment {
 
 public:
-  explicit Environment(unsigned int stepsize, double gravitationalConstant=6.67408e-11);
+  explicit Environment(unsigned int stepsize);
   ~Environment();
   void addBody(Body* body);
   void addSpaceship(Body* body);
@@ -23,10 +23,12 @@ public:
 
   unsigned int getCurrentTime() const;
 
+  static double calcOrbitalVelocity(double apogeeX, double eccentricity, double massCentralBody);
+
 private:
+  static constexpr double gravitationalConstant=6.67408e-11;
   static const unsigned int timeAhead = 200;
   const unsigned int m_stepsize;
-  const double m_gravitationalConstant;
   unsigned int m_currentTime;
   std::vector<Body*> mo_bodies;
   std::vector<Body*> m_spaceships;
