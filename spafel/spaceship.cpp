@@ -3,6 +3,11 @@
 #include "spaceship.h"
 #include <QPainter>
 
+namespace
+{
+  const int width = 70;
+}
+
 std::unique_ptr<QPixmap> Spaceship::ms_redSpaceship;
 std::unique_ptr<QPixmap> Spaceship::ms_greenSpaceship;
 std::unique_ptr<QPixmap> Spaceship::ms_blueSpaceship;
@@ -21,6 +26,7 @@ Spaceship::Spaceship(Body* body, unsigned int id)
     case 1: m_pixmap = *ms_greenSpaceship; break;
     case 2: m_pixmap = *ms_blueSpaceship; break;
   }
+  m_pixmap = m_pixmap.scaledToWidth(width);
 }
 
 QRectF Spaceship::boundingRect() const
