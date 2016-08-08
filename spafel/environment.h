@@ -17,13 +17,16 @@ public:
   void init();
   const std::vector<Body*>& getBodies() const;
   void oneStep();
-  std::array<double, 4> getStateDerivative(const std::array<double, 4>& x0, Body* ignoreBody, unsigned int time);
+  std::array<double, 4> getStateDerivative(const std::array<double, 4>& x0, const Body* ignoreBody, unsigned int time) const;
   void boost(unsigned int spaceshipId, Body::Direction d);
   unsigned int getStepsize() const;
 
   unsigned int getCurrentTime() const;
 
   static double calcOrbitalVelocity(double apogeeX, double eccentricity, double massCentralBody);
+
+private:
+  void preventCollisions() const;
 
 private:
   static constexpr double gravitationalConstant=6.67408e-11;
