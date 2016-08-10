@@ -62,6 +62,7 @@ private:
   QPointF getDotDistance() const;
   double getMaxDotDistance() const;
   QPointF getDotPosition(double x, double y) const;
+  void createCities();
 
 private:
   enum class TravelState { neutral, select1, select2, startTravel, travelling };

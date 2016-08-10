@@ -41,6 +41,34 @@ TrafficScene::~TrafficScene()
 {  
 }
 
+void TrafficScene::createCities()
+{
+  std::uniform_int_distribution<unsigned int> range(0, m_dots.size());
+  std::array<unsigned int, ms_gridSize> xCities;
+  std::array<unsigned int, ms_gridSize> yCities;
+  do
+  {
+    m_cities.clear();
+    xCities.fill(0);
+    yCities.fill(0);
+    for (unsigned int i = 0; i != 12; ++i )
+    {
+      unsigned int n;
+      do
+      {
+        n = range(m_rng);
+      }
+      while ( contains( m_cities, n ) );
+
+      m_cities.push_back(n);
+      ++xCities[m_dots[n].x];
+      ++yCities[m_dots[n].y];
+    }
+  }
+  while ( xCities[0] == 0 || xCities[ms_gridSize-1] == 0 ||
+          yCities[0] == 0 || yCities[ms_gridSize-1] == 0 );
+}
+
 void TrafficScene::init()
 {
   std::random_device rd;
@@ -59,24 +87,17 @@ void TrafficScene::init()
     }
   }
 
-  std::uniform_int_distribution<unsigned int> range(0, m_dots.size());
+  createCities();
   for (unsigned int i = 0; i != 12; ++i )
   {
-    unsigned int n;
-    do
-    {
-      n = range(m_rng);
-    }
-    while ( contains( m_cities, n ) );
-
-    m_cities.push_back(n);
-    QBrush brush = m_dots[n].ellipse->brush();
+    Dot dot = m_dots[m_cities[i]];
+    QBrush brush = dot.ellipse->brush();
     brush.setColor(QColor(Qt::magenta));
-    m_dots[n].ellipse->setBrush(brush);
+    dot.ellipse->setBrush(brush);
     QFont f;
     f.setPixelSize(getMaxDotDistance()*0.4);
     QGraphicsTextItem* text = addText(QString::number(i+1), f);
-    text->setPos(getDotPosition(m_dots[n].x,m_dots[n].y));
+    text->setPos(getDotPosition(dot.x,dot.y));
     text->setDefaultTextColor(Qt::white);
   }
 
@@ -85,10 +106,10 @@ void TrafficScene::init()
     d.originalBrush = d.ellipse->brush();
   }
 
-  double heightMapDotSize = 0.15*getMaxDotDistance();
-  for ( double x = -0.5; x < ms_gridSize-0.5; x += 0.1 )
+  double heightMapDotSize = 0.3*getMaxDotDistance();
+  for ( double x = -0.5; x <= ms_gridSize-0.5; x += 0.2 )
   {
-    for ( double y = -0.5; y < ms_gridSize-0.5; y += 0.1 )
+    for ( double y = -0.5; y <= ms_gridSize-0.5; y += 0.2 )
     {
       QColor c;
       c.setHsv(m_earth.height(x, y), 255, 150);
