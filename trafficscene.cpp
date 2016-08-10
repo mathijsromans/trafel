@@ -1,3 +1,4 @@
+#include "mouseping.h"
 #include "trafficscene.h"
 #include "utilities.h"
 #include <algorithm>
@@ -219,18 +220,26 @@ void TrafficScene::slotNext()
   switch( m_travelState )
   {
     case TravelState::select1:
+    {
       m_travelState = TravelState::select2;
       m_travel1 = static_cast<unsigned int>(sqrt(cityRange(m_rng)));
-      m_dots[m_cities[m_travel1]].ellipse->setBrush(QColor(Qt::blue));
+      Dot dot = m_dots[m_cities[m_travel1]];
+      dot.ellipse->setBrush(QColor(Qt::blue));
+      addItem( new MousePing(getDotPosition(dot.x,dot.y), QColor(Qt::blue) ) );
+    }
     break;
     case TravelState::select2:
+    {
       m_travelState = TravelState::startTravel;
       do
       {
         m_travel2 = static_cast<unsigned int>(sqrt(cityRange(m_rng)));
       }
       while (m_travel2 == m_travel1);
-      m_dots[m_cities[m_travel2]].ellipse->setBrush(QColor(Qt::blue));
+      Dot dot = m_dots[m_cities[m_travel2]];
+      dot.ellipse->setBrush(QColor(Qt::blue));
+      addItem( new MousePing(getDotPosition(dot.x,dot.y), QColor(Qt::blue) ) );
+    }
     break;
     case TravelState::startTravel:
     {
