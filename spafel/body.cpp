@@ -92,14 +92,16 @@ Body::setState(const std::array<double, 4>& x, unsigned int time)
 
 void Body::boost(Body::Direction d)
 {
+  const double power = 0.05;
+  const double change = 1.0 + power;
   double& vx = m_x[m_currentTime%m_x.size()][2];
   double& vy = m_x[m_currentTime%m_x.size()][3];
   switch (d)
   {
-    case Direction::up: vx *= 1.1; vy *= 1.1; break;
-    case Direction::down:break;
-    case Direction::left:break;
-    case Direction::right:break;
+    case Direction::up:  vx *= change; vy *= change; break;
+    case Direction::down:vx /= change; vy /= change; break;
+    case Direction::left:  std::tie(vx, vy) = std::make_pair(vx + power * vy, vy - power * vx); break;
+    case Direction::right: std::tie(vx, vy) = std::make_pair(vx - power * vy, vy + power * vx); break;
   }
 
   for ( unsigned int t = 1; t != m_x.size(); ++t )

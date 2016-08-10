@@ -36,6 +36,9 @@ protected:
   void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
   QRectF getTableRect() const;
 
+  /// returns unit vector with origin at the player's position
+  QLineF getPlayerPosition( unsigned int player, unsigned int numPlayers );
+
 private:
   virtual void init() = 0;
   virtual void mouseClick(QPointF p);

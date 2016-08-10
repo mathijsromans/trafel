@@ -51,10 +51,22 @@ private:
   static double getScaleFactor(const QRectF& tableRect);
 
 private slots:
-  void slotButtonPressed();
+  void slotButtonPressed(int b);
 
 private:
-  static const unsigned int ms_numSpaceships = 3;
+  enum class Control {up, down, left, right, MAX};
+  struct ButtonInLayout
+  {
+    Control control;
+    QPointF pos;
+  };
+
+
+private:
+  static const unsigned int ms_numControl = static_cast<unsigned int>(Control::MAX);
+  static const std::array<std::string, ms_numControl> ms_buttonTexts;
+
+  static const unsigned int ms_numPlayers = 3;
   std::unique_ptr<Environment> m_environment;
   std::vector<BodyItem*> m_bodyItems;
   std::unique_ptr<NewBodyData> m_newBody;

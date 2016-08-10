@@ -112,6 +112,16 @@ QRectF TransformScene::getTableRect() const
   return m_calibration.getTableRect();
 }
 
+QLineF TransformScene::getPlayerPosition(unsigned int player, unsigned int numPlayers)
+{
+  QRectF tableRect = getTableRect();
+  double angle = 2 * M_PI * player / (numPlayers + 1);
+  QPointF origin = tableRect.center() + QPointF(-0.5 * tableRect.width()  * cos(angle),
+                                                 0.5 * tableRect.height() * sin(angle) );
+  QLineF line( origin, tableRect.center() );
+  return line.unitVector();
+}
+
 void TransformScene::showInfoText(const std::string& text)
 {
   if ( !m_infoText )

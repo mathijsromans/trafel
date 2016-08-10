@@ -23,6 +23,7 @@ namespace
   const double stepsize = speedup/fps;
 }
 
+const std::array<std::string, GravityScene::ms_numControl> GravityScene::ms_buttonTexts = {"U", "D", "L", "R"};
 
 GravityScene::GravityScene()
 : TransformScene(),
@@ -70,24 +71,36 @@ GravityScene::init()
   connect(m_timer, SIGNAL(timeout()), this, SLOT(step()));
   m_timer->start(1000/fps);
 
-//  QSignalMapper* signalMapper = new QSignalMapper(this);
-//  std::
+  std::array<ButtonInLayout, 4> buttons;
+  buttons[0] = { Control::up, QPoint(0, 1) };
+  buttons[1] = { Control::left, QPoint(-1, 0) };
+  buttons[2] = { Control::down, QPoint(0, 0) };
+  buttons[3] = { Control::right, QPoint(1, 0) };
 
-//  connect(button, SIGNAL(clicked()), signalMapper, SLOT(map()));
-//        signalMapper->setMapping(button, texts[i]);
-//        gridLayout->addWidget(button, i / 3, i % 3);
-//    }
-
-//    connect(signalMapper, SIGNAL(mapped(QString)),
-//            this, SIGNAL(clicked(QString)));
-
-
-
-
-  Button* button = new Button("Up");
-  button->setPos(getTableRect().bottomLeft());
-  addItem( button );
-  connect( button, SIGNAL(pressed()), this, SLOT(slotButtonPressed()) );
+  QSignalMapper* signalMapper = new QSignalMapper(this);
+  for ( unsigned int i = 0; i != ms_numPlayers; ++i )
+  {
+    QLineF playerLine = getPlayerPosition(i, ms_numPlayers);
+    QPointF origin = playerLine.p1();
+    QPointF xDir = playerLine.p1() - playerLine.normalVector().p2();
+    QPointF yDir = playerLine.p2() - playerLine.p1();
+    for ( unsigned int j = 0; j != buttons.size(); ++j )
+    {
+      unsigned int control = static_cast<unsigned int>(buttons[j].control);
+      Button* button = new Button(ms_buttonTexts[control]);
+      QRectF buttonRect = button->boundingRect();
+      QPointF buttonSize = buttonRect.bottomRight() - buttonRect.topLeft();
+      button->setTransformOriginPoint(0.5 * buttonSize);
+      button->setPos(origin + 1.25 * buttonSize.x() * buttons[j].pos.x() * xDir
+                            + 1.25 * buttonSize.y() * buttons[j].pos.y() * yDir
+                            - 0.5*buttonSize );
+      button->setRotation(90-playerLine.angle());
+      addItem( button );
+      connect(button, SIGNAL(pressed()), signalMapper, SLOT(map()));
+      signalMapper->setMapping(button, i * ms_numControl + control );
+    }
+  }
+  connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(slotButtonPressed(int)));
 }
 
 
@@ -162,9 +175,9 @@ GravityScene::getScaleFactor(const QRectF& tableRect)
   return std::min(tableRect.width(), tableRect.height()) * zoom;
 }
 
-void GravityScene::slotButtonPressed()
+void GravityScene::slotButtonPressed(int b)
 {
-  m_environment->boost(0, Body::Direction::up);
+  m_environment->boost(b/ms_numControl, static_cast<Body::Direction>( b%ms_numControl ));
 
 }
 
@@ -239,15 +252,15 @@ GravityScene::createSpaceShips()
 {
   const double s1X = 100e9;
   const double s1Vy = Environment::calcOrbitalVelocity(s1X, 0, sunMass);
-  std::array<QColor, ms_numSpaceships> colors{QColor(Qt::red), QColor(Qt::green), QColor(Qt::blue)};
-  for ( unsigned int i = 0; i != ms_numSpaceships; ++i )
+  std::array<QColor, 3> colors{QColor(Qt::red), QColor(Qt::green), QColor(Qt::blue)};
+  for ( unsigned int i = 0; i != ms_numPlayers; ++i )
   {
-    double angle = 2 * M_PI * i / ms_numSpaceships;
+    double angle = 2 * M_PI * i / ms_numPlayers;
     double x = sin(angle) * s1X;
     double y = cos(angle) * s1X;
     double vx = cos(angle) * s1Vy;
     double vy = -sin(angle) * s1Vy;
-    Body* s1 = new Body(x, y, vx, vy, 0, colors[i], m_environment.get());
+    Body* s1 = new Body(x, y, vx, vy, 0, colors[i%3], m_environment.get());
     addSpaceship(s1, i);
   }
 }
