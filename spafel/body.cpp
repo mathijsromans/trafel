@@ -234,7 +234,7 @@ Body::IntegrationResult Body::integrateRK45(double stepsize, unsigned int time) 
     if (result.error > integrationTolerance && nSteps < maxSteps)
     {
       result.success = false;
-      result.x = {};
+      result.x.fill(0);
       return result;
     }
   }
