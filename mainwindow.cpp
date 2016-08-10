@@ -18,8 +18,8 @@ MainWindow::MainWindow(QWidget *parent) :
   qRegisterMetaType<PointerEvent>();
 
   v = new QGraphicsView();
-  t = new GravityScene();
-//  t = new TrafficScene();
+//  t = new GravityScene(); // FOR SPAFEL
+  t = new TrafficScene();   // FOR TRAFEL
   v->setScene(t);
   setCentralWidget(v);
 //  showMaximized();

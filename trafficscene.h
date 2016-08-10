@@ -56,6 +56,8 @@ private:
   double travelDist( unsigned int from, unsigned int to ) const;
   std::vector<const Track*> getBestPath(unsigned int from, unsigned int to) const;
   QGraphicsLineItem* addDotLine(int x1, int y1, int x2, int y2 , const QColor& colorC = QColor());
+  double getBorder() const;
+  QRectF getField() const;
   QPointF getDotOrigin() const;
   QPointF getDotDistance() const;
   double getMaxDotDistance() const;

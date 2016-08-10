@@ -60,6 +60,7 @@ void Calibration::calibrate()
     QPen pen(Qt::white);
     pen.setWidth(3);
     m_tableRectItem = m_scene.addRect(m_tableRect, pen);
+    done(); // REMOVE ME TO VERIFY!!!
   }
   else
   {

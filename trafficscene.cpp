@@ -96,17 +96,26 @@ void TrafficScene::init()
     }
   }
 
-  QFont f;
-  f.setPixelSize(getMaxDotDistance()*0.4);
+  QFont font;
+  font.setPixelSize(getBorder()*0.8);
+  QRectF field = getField();
   for ( unsigned int player = 0; player != 2; ++player )
   {
-    QGraphicsTextItem* text = addText("", f);
-    text->setDefaultTextColor(Qt::black);
-    text->setPos(getDotPosition(2+0.5*player, -0.65 + (static_cast<int>(ms_gridSize)+0.3)*(!player)));
+    QGraphicsTextItem* text = addText("00", font);
+    text->setDefaultTextColor(Qt::black);    
+    QRectF brect = text->boundingRect();
+    QPointF offset = brect.center()-brect.topLeft();
+    text->setPos(QPointF( getTableRect().left() + 0.3 * field.width(),
+                          getTableRect().top() + 0.5 * getBorder() + (getTableRect().height()-getBorder())*(!player) )
+                 - offset );
+    text->setTransformOriginPoint(offset);
     m_moneyLabel[player] = text;
     mutateMoney(player, 0);
   }
   m_moneyLabel[1]->setRotation(180);
+
+//  addRect(getField(), QPen(Qt::red));
+
 
 }
 
@@ -414,14 +423,29 @@ QGraphicsLineItem* TrafficScene::addDotLine(int x1, int y1, int x2, int y2, cons
   return line;
 }
 
+double TrafficScene::getBorder() const
+{
+  return 0.05 * getTableRect().height();
+}
+
+QRectF TrafficScene::getField() const
+{
+  QRectF rect = getTableRect();
+  double space = getBorder();
+  rect.setTop(rect.top() + space);
+  rect.setBottom(rect.bottom() - space);
+  return rect;
+}
+
 QPointF TrafficScene::getDotOrigin() const
 {
-  return getTableRect().topLeft() + 0.5 * getDotDistance();
+  return getField().topLeft() + 0.5*getDotDistance();
 }
 
 QPointF TrafficScene::getDotDistance() const
 {
-  return (getTableRect().bottomRight() - getTableRect().topLeft()) / (ms_gridSize+1);
+  QRectF field = getField();
+  return (field.bottomRight() - field.topLeft()) / ms_gridSize;
 }
 
 double TrafficScene::getMaxDotDistance() const
