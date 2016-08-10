@@ -27,6 +27,12 @@ bool has_if( const T1& vec, T2 condition )
 
 template <typename T>
 T sqr(T x) { return x*x; }
+
+template <typename T> int sign(T val)
+{
+  return (T(0) < val) - (val < T(0));
+}
+
 }
 
 TrafficScene::TrafficScene()
@@ -156,6 +162,66 @@ QColor TrafficScene::getPlayerColor(unsigned int player) const
   return Qt::black;
 }
 
+void TrafficScene::addTrack(unsigned int from, unsigned int to)
+{
+  double cost = 10*dist(from, to);
+  if ( from != to && cost <= m_money[m_currentPlayer] )
+  {
+    mutateMoney(m_currentPlayer, -cost);
+    int x1 = m_dots[from].x;
+    int y1 = m_dots[from].y;
+    int x2 = m_dots[to].x;
+    int y2 = m_dots[to].y;
+    std::vector<unsigned int> route;
+    route.push_back(getDot(x1, y1));
+    if ( x1 == x2 ) // vertical
+    {
+      int dy = sign(y2-y1);
+      for ( int y = y1+dy; y != y2; y += dy )
+      {
+        route.push_back(getDot(x1, y));
+      }
+    }
+    else // not vertical
+    {
+      int dx = sign(x2-x1);
+      for ( int x = x1 + dx; x != x2; x += dx )
+      {
+        if ( ((x-x1) * (y2-y1)) % (x2-x1) == 0 )
+        {
+          int y = y1 + (x-x1) * (y2-y1)/(x2-x1);
+          route.push_back(getDot(x, y));
+        }
+      }
+    }
+    route.push_back(getDot(x2, y2));
+    for ( auto it = route.begin(); it != route.end() - 1; ++it)
+    {
+      QGraphicsLineItem* line = addDotLine(m_dots[*it].x, m_dots[*it].y,
+                                           m_dots[*(it+1)].x, m_dots[*(it+1)].y,
+                                           getPlayerColor(m_currentPlayer));
+      m_tracks.push_back(Track{*it, *(it+1), m_currentPlayer, line});
+    }
+    for ( unsigned int d : route )
+    {
+      addItem( new MousePing(getDotPosition(m_dots[d].x,m_dots[d].y), QColor(Qt::black) ) );
+    }
+  }
+}
+
+unsigned int TrafficScene::getDot(unsigned int x, unsigned int y) const
+{
+  for ( unsigned int i = 0; i != m_dots.size(); ++i )
+  {
+    if ( m_dots[i].x == x &&
+         m_dots[i].y == y )
+    {
+      return i;
+    }
+  }
+  throw std::logic_error("dot not found");
+}
+
 void TrafficScene::mouseClick(QPointF p)
 {
   auto its = items(p);
@@ -166,36 +232,28 @@ void TrafficScene::mouseClick(QPointF p)
   }
   if ( m_travelState == TravelState::neutral )
   {
-    unsigned int i = 0;
-    for ( ; i != m_dots.size(); ++i )
+    unsigned int to = 0;
+    for ( ; to != m_dots.size(); ++to )
     {
-      if ( its.contains(  m_dots[i].ellipse ) )
+      if ( its.contains(  m_dots[to].ellipse ) )
       {
         break;
       }
     }
-    if ( i != m_dots.size() )
+    if ( to != m_dots.size() )
     {
       switch( m_clickState )
       {
         case ClickState::neutral:
           m_clickState = ClickState::click1;
-          m_click1 = i;
+          m_click1 = to;
           m_dots[m_click1].ellipse->setBrush(getPlayerColor(m_currentPlayer));
         break;
         case ClickState::click1:
         {
           m_clickState = ClickState::neutral;
           m_dots[m_click1].ellipse->setBrush(m_dots[m_click1].originalBrush);
-          double cost = 10*dist(m_click1, i);
-          if ( m_click1 != i && cost <= m_money[m_currentPlayer] )
-          {
-            mutateMoney(m_currentPlayer, -cost);
-            QGraphicsLineItem* line = addDotLine(m_dots[m_click1].x, m_dots[m_click1].y,
-                                                 m_dots[i].x, m_dots[i].y,
-                                                 getPlayerColor(m_currentPlayer));
-            m_tracks.push_back(Track{m_click1, i, m_currentPlayer, line});
-          }
+          addTrack(m_click1, to);
         }
         break;
       }

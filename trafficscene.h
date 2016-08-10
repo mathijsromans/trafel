@@ -63,6 +63,8 @@ private:
   double getMaxDotDistance() const;
   QPointF getDotPosition(double x, double y) const;
   void createCities();
+  void addTrack(unsigned int from, unsigned int to);
+  unsigned int getDot(unsigned int x, unsigned int y) const;
 
 private:
   enum class TravelState { neutral, select1, select2, startTravel, travelling };
