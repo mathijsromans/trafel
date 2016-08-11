@@ -66,7 +66,7 @@ void TransformScene::doInit()
   quitButton->setPos(getTableRect().topLeft());
   addItem( quitButton );
   connect(quitButton, SIGNAL(pressed()), this, SLOT(slotQuit()));
-//  addRect(getTableRect(), QPen(Qt::white));
+  addRect(getTableRect(), QPen(Qt::white));
 
   init();
 }

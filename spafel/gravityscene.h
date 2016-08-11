@@ -30,9 +30,6 @@ public:
 public:
   explicit GravityScene();
   virtual ~GravityScene();
-
-  virtual void init() override;
-
   static QPointF envToScene(const QPointF& point, const QRectF& tableRect);
   static QPointF sceneToEnv(const QPointF& point, const QRectF& tableRect);
 
@@ -43,6 +40,7 @@ private slots:
   void step();
 
 private:
+  virtual void init() override;
   void addBody(Body* body);
   void addSpaceship(Body* body, unsigned int id);
   void updateTrackItems();

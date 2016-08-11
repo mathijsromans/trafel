@@ -36,7 +36,8 @@ SOURCES += main.cpp\
     spafel/spaceship.cpp \
     button.cpp \
     clickableitem.cpp \
-    spafel/planet.cpp
+    spafel/planet.cpp \
+    poker/pokerscene.cpp
 
 HEADERS  += mainwindow.h \
     trafficscene.h \
@@ -57,6 +58,7 @@ HEADERS  += mainwindow.h \
     spafel/spaceship.h \
     button.h \
     clickableitem.h \
-    spafel/planet.h
+    spafel/planet.h \
+    poker/pokerscene.h
 
 FORMS    +=
