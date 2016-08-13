@@ -34,7 +34,7 @@ public:
   static QPointF sceneToEnv(const QPointF& point, const QRectF& tableRect);
 
 protected:
-  virtual void mouseClick(QPointF point) override;
+  void eventClick(QPointF point, PointerEvent::Color c) override;
 
 private slots:
   void step();
@@ -63,8 +63,6 @@ private:
 private:
   static const unsigned int ms_numControl = static_cast<unsigned int>(Control::MAX);
   static const std::array<std::string, ms_numControl> ms_buttonTexts;
-
-  static const unsigned int ms_numPlayers = 3;
   std::unique_ptr<Environment> m_environment;
   std::vector<BodyItem*> m_bodyItems;
   std::unique_ptr<NewBodyData> m_newBody;

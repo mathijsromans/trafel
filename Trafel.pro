@@ -37,7 +37,12 @@ SOURCES += main.cpp\
     button.cpp \
     clickableitem.cpp \
     spafel/planet.cpp \
-    poker/pokerscene.cpp
+    poker/pokerscene.cpp \
+    flafel/flafelscene.cpp \
+    pixmapitem.cpp \
+    flafel/ball.cpp \
+    flafel/stopper.cpp \
+    flafel/player.cpp
 
 HEADERS  += mainwindow.h \
     trafficscene.h \
@@ -59,6 +64,12 @@ HEADERS  += mainwindow.h \
     button.h \
     clickableitem.h \
     spafel/planet.h \
-    poker/pokerscene.h
+    poker/pokerscene.h \
+    flafel/flafelscene.h \
+    pixmapitem.h \
+    flafel/ball.h \
+    flafel/stopper.h \
+    flafel/player.h \
+    nocopy.h
 
 FORMS    +=

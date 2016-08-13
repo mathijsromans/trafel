@@ -78,9 +78,9 @@ GravityScene::init()
   buttons[3] = { Control::right, QPoint(1, 0) };
 
   QSignalMapper* signalMapper = new QSignalMapper(this);
-  for ( unsigned int i = 0; i != ms_numPlayers; ++i )
+  for ( unsigned int i = 0; i != getNumPlayers(); ++i )
   {
-    QLineF playerLine = getPlayerPosition(i, ms_numPlayers);
+    QLineF playerLine = getPlayerPosition(i);
     QPointF origin = playerLine.p1();
     QPointF xDir = playerLine.p1() - playerLine.normalVector().p2();
     QPointF yDir = playerLine.p2() - playerLine.p1();
@@ -118,7 +118,7 @@ GravityScene::step()
 
 
 void
-GravityScene::mouseClick(QPointF /*point*/)
+GravityScene::eventClick(QPointF /*point*/, PointerEvent::Color /*c*/)
 {
 //  if (m_newBody)
 //  {
@@ -253,9 +253,9 @@ GravityScene::createSpaceShips()
   const double s1X = 100e9;
   const double s1Vy = Environment::calcOrbitalVelocity(s1X, 0, sunMass);
   std::array<QColor, 3> colors{QColor(Qt::red), QColor(Qt::green), QColor(Qt::blue)};
-  for ( unsigned int i = 0; i != ms_numPlayers; ++i )
+  for ( unsigned int i = 0; i != getNumPlayers(); ++i )
   {
-    double angle = 2 * M_PI * i / ms_numPlayers;
+    double angle = 2 * M_PI * i / getNumPlayers();
     double x = sin(angle) * s1X;
     double y = cos(angle) * s1X;
     double vx = cos(angle) * s1Vy;

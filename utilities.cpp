@@ -21,7 +21,7 @@ QRectF squareAt(double x, double y, double size)
 double dist(QPointF p1, QPointF p2)
 {
   QPointF p = p1-p2;
-  return sqrt(sqr(p.x()+sqr(p.y())));
+  return sqrt(sqr(p.x())+sqr(p.y()));
 }
 
 }

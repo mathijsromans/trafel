@@ -14,12 +14,6 @@
 namespace
 {
 template <typename T1, typename T2>
-bool contains( const T1& vec, const T2& elem )
-{
-  return std::find( vec.begin(), vec.end(), elem ) != vec.end();
-}
-
-template <typename T1, typename T2>
 bool has_if( const T1& vec, T2 condition )
 {
   return std::find_if( vec.begin(), vec.end(), condition ) != vec.end();
@@ -27,11 +21,6 @@ bool has_if( const T1& vec, T2 condition )
 
 template <typename T>
 T sqr(T x) { return x*x; }
-
-template <typename T> int sign(T val)
-{
-  return (T(0) < val) - (val < T(0));
-}
 
 }
 
@@ -65,7 +54,7 @@ void TrafficScene::createCities()
       {
         n = range(m_rng);
       }
-      while ( contains( m_cities, n ) );
+      while ( Utilities::contains( m_cities, n ) );
 
       m_cities.push_back(n);
       ++xCities[m_dots[n].x];
@@ -78,7 +67,7 @@ void TrafficScene::createCities()
 
 void TrafficScene::init()
 {
-  std::random_device rd;
+  static std::random_device rd;
   m_rng.seed(rd());
 
   double dotSize = getMaxDotDistance()/6+1;
@@ -176,7 +165,7 @@ void TrafficScene::addTrack(unsigned int from, unsigned int to)
     route.push_back(getDot(x1, y1));
     if ( x1 == x2 ) // vertical
     {
-      int dy = sign(y2-y1);
+      int dy = Utilities::sign(y2-y1);
       for ( int y = y1+dy; y != y2; y += dy )
       {
         route.push_back(getDot(x1, y));
@@ -184,7 +173,7 @@ void TrafficScene::addTrack(unsigned int from, unsigned int to)
     }
     else // not vertical
     {
-      int dx = sign(x2-x1);
+      int dx = Utilities::sign(x2-x1);
       for ( int x = x1 + dx; x != x2; x += dx )
       {
         if ( ((x-x1) * (y2-y1)) % (x2-x1) == 0 )
@@ -222,7 +211,7 @@ unsigned int TrafficScene::getDot(unsigned int x, unsigned int y) const
   throw std::logic_error("dot not found");
 }
 
-void TrafficScene::mouseClick(QPointF p)
+void TrafficScene::eventClick(QPointF p, PointerEvent::Color /*c*/)
 {
   auto its = items(p);
   for ( auto l : m_moneyLabel )

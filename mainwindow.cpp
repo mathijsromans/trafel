@@ -2,6 +2,7 @@
 #include "trafficscene.h"
 #include "transformscene.h"
 #include "userinput.h"
+#include "flafel/flafelscene.h"
 #include "spafel/gravityscene.h"
 #include "poker/pokerscene.h"
 #include <QCoreApplication>
@@ -21,7 +22,8 @@ MainWindow::MainWindow(QWidget *parent) :
   v = new QGraphicsView();
 //  t = new GravityScene(); // FOR SPAFEL
 //  t = new TrafficScene(); // FOR TRAFEL
-  t = new PokerScene(3);   // FOR PAFEL
+//  t = new PokerScene();   // FOR PAFEL
+  t = new FlafelScene();    // FOR FLAFEL
   v->setScene(t);
   setCentralWidget(v);
 //  showMaximized();

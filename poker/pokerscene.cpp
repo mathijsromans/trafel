@@ -8,26 +8,25 @@
 #include <stdlib.h>
 #include <QDebug>
 
-PokerScene::PokerScene(unsigned int numPlayers)
+PokerScene::PokerScene()
  : TransformScene(),
    m_cards{{}},
    m_cardsBack{{}},
-   m_numPlayers(numPlayers),
    m_numberCardsUsed(0),
    m_stage{Stage::start}
 {
-  if ( m_numPlayers > 23 )
-  {
-    throw std::runtime_error("Too many players");
-  }
 }
 
 void PokerScene::init()
 {
+  if ( getNumPlayers() > 23 )
+  {
+    throw std::runtime_error("Too many players");
+  }
   createCards();
 }
 
-void PokerScene::mouseClick(QPointF /*p*/)
+void PokerScene::eventClick(QPointF /*p*/, PointerEvent::Color /*c*/)
 {
   QRectF brect = m_cards.front()->boundingRect();
   QPointF cardOffset = brect.center()-brect.topLeft();
@@ -126,8 +125,8 @@ void PokerScene::createCards()
 
 void PokerScene::shuffleCards()
 {
-  std::random_device rd;
-  std::mt19937 rng(rd());
+  static std::random_device rd;
+  static std::mt19937 rng(rd());
   std::shuffle( m_cards.begin(), m_cards.end(), rng );
 }
 
@@ -135,11 +134,11 @@ void PokerScene::dealCards()
 {
   const unsigned int cardsDealt = 2;
   m_numberCardsUsed = 0;
-  for ( unsigned int i = 0; i < m_numPlayers * cardsDealt; ++i )
+  for ( unsigned int i = 0; i < getNumPlayers() * cardsDealt; ++i )
   {
     QTimer::singleShot(300*i, this, SLOT(dealCard()));
   }
-  QTimer::singleShot(300*m_numPlayers * cardsDealt + 50, this, SLOT(showCards()));
+  QTimer::singleShot(300*getNumPlayers() * cardsDealt + 50, this, SLOT(showCards()));
 }
 
 void PokerScene::playDealCardSound()
@@ -160,11 +159,11 @@ void PokerScene::dealCard()
   double adjacentCardAngleOffset = 0.6 * brect.width();
   QGraphicsItemAnimation *animation = new QGraphicsItemAnimation(this);
   animation->setTimeLine(timer);
-  int dealRound = m_numberCardsUsed / m_numPlayers;
+  int dealRound = m_numberCardsUsed / getNumPlayers();
   double offset = adjacentCardAngleOffset * ( 1 - 2 * dealRound );
 
   unsigned int position = m_numberCardsUsed + dealRound + 1;
-  double angle = 2 * M_PI * position / (m_numPlayers + 1);
+  double angle = 2 * M_PI * position / (getNumPlayers() + 1);
   for (double d = 0; d < 1; d = d + 0.01)
   {
     animation->setPosAt(d, tableRect.center() +

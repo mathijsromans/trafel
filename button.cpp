@@ -14,7 +14,7 @@ Button::Button(const std::string& text)
   setWidget(m_pushButton);
 }
 
-void Button::mouseClick(const PointerEvent::CPoint& /*p*/)
+void Button::eventClick(const PointerEvent::CPoint& /*p*/)
 {
   emit pressed();
 }

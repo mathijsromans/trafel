@@ -6,14 +6,17 @@
 const std::array<QColor, 3> PointerEvent::ms_qcolors = { Qt::red, Qt::green, Qt::blue };
 
 PointerEvent::PointerEvent()
-  : m_points()
+  : m_points(),
+    m_ping()
 {
   m_points.fill(QPointF(0,0));
+  m_ping.fill(false);
 }
 
 PointerEvent::PointerEvent(const std::array<QPointF, 3>& points)
   : m_points(points)
 {
+  m_ping.fill(false);
 }
 
 QPointF PointerEvent::getAny() const
@@ -28,6 +31,11 @@ QPointF PointerEvent::getAny() const
   return QPointF(0,0);
 }
 
+QPointF PointerEvent::getPoint(PointerEvent::Color c) const
+{
+  return m_points[static_cast<unsigned int>(c)];
+}
+
 std::vector<PointerEvent::CPoint> PointerEvent::getPoints() const
 {
   std::vector<CPoint> result;
@@ -35,7 +43,7 @@ std::vector<PointerEvent::CPoint> PointerEvent::getPoints() const
   {
     if ( !m_points[i].isNull() )
     {
-      result.push_back( CPoint{static_cast<Color>(i), ms_qcolors[i], m_points[i]} );
+      result.push_back( CPoint{static_cast<Color>(i), m_points[i], m_ping[i]} );
     }
   }
   return result;
@@ -52,16 +60,27 @@ void PointerEvent::transform(const QTransform& t)
   }
 }
 
-bool PointerEvent::differsFrom(const PointerEvent& other) const
+bool PointerEvent::compareTo(const PointerEvent& other)
 {
+  bool result = false;
   for ( unsigned int i = 0; i != m_points.size(); ++i )
   {
-    if ( m_points[i].isNull() != other.m_points[i].isNull() ||
-          Utilities::dist(m_points[i], other.m_points[i]) > 10 )
+    if ( m_points[i].isNull() != other.m_points[i].isNull() )
     {
-      return true;
+      m_ping[i] = true;
+      result = true;
+    }
+    if ( Utilities::dist(m_points[i], other.m_points[i]) > 10 )
+    {
+      result = true;
     }
   }
-  return false;
+  return result;
+}
+
+QColor PointerEvent::getQColor(PointerEvent::Color color)
+{
+  return ms_qcolors[static_cast<unsigned int>(color)];
+
 }
 

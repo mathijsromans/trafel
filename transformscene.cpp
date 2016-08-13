@@ -14,7 +14,8 @@ TransformScene::TransformScene()
  : m_calibration(*this),
    m_infoText(0),
    m_quitYes(new Button("Yes")),
-   m_quitNo(new Button("No"))
+   m_quitNo(new Button("No")),
+   m_inputPrev{{}}
 {
   setBackgroundBrush(Qt::black);
   addItem(m_quitYes);
@@ -34,13 +35,20 @@ void TransformScene::calibrate()
   m_calibration.calibrate();
 }
 
-void TransformScene::mouseClick(QPointF /*p*/)
+void TransformScene::eventClick(QPointF /*p*/, PointerEvent::Color /*c*/)
+{
+}
+
+void TransformScene::eventUnclick(QPointF /*p*/, PointerEvent::Color /*c*/)
+{
+}
+
+void TransformScene::eventMove(QPointF /*p*/, PointerEvent::Color /*c*/)
 {
 }
 
 void TransformScene::inputEvent(const PointerEvent& e)
 {
-  bool accepted = false;
   for ( PointerEvent::CPoint p : e.getPoints() )
   {
     foreach ( QGraphicsItem* item, items(p.point))
@@ -48,15 +56,31 @@ void TransformScene::inputEvent(const PointerEvent& e)
       ClickableItem* clickItem = dynamic_cast<ClickableItem*>( item );
       if ( clickItem )
       {
-        clickItem->mouseClick(p);
-        accepted = true;
+        clickItem->eventClick(p);
+        return;
       }
     }
   }
 
-  if ( !accepted )
+  for ( unsigned int c = 0; c != 3; ++c )
   {
-   mouseClick(e.getAny());
+    PointerEvent::Color color = PointerEvent::Color(c);
+    QPointF prevPoint = m_inputPrev[c];
+    QPointF newPoint = e.getPoint(color);
+    if ( prevPoint.isNull() && !newPoint.isNull() )
+    {
+      eventClick( newPoint, color );
+    }
+    else if ( !prevPoint.isNull() && newPoint.isNull() )
+    {
+      eventUnclick( newPoint, color );
+    }
+    else if ( !prevPoint.isNull() && !newPoint.isNull() &&
+              Utilities::dist(prevPoint, newPoint) > 10 )
+    {
+      eventMove( newPoint, color );
+    }
+    m_inputPrev[c] = newPoint;
   }
 }
 
@@ -68,12 +92,54 @@ void TransformScene::doInit()
   connect(quitButton, SIGNAL(pressed()), this, SLOT(slotQuit()));
   addRect(getTableRect(), QPen(Qt::white));
 
+  if ( showScore() )
+  {
+    QFont font;
+    font.setPixelSize(0.04 * getTableRect().height());
+    for ( unsigned int player = 0; player != getNumPlayers(); ++player )
+    {
+      QGraphicsTextItem* text = addText("00", font);
+      text->setDefaultTextColor(Qt::black);
+      QRectF brect = text->boundingRect();
+      QPointF offset = brect.center()-brect.topLeft();
+      QLineF playerLine = getPlayerPosition(player);
+      playerLine.setLength(0.5*brect.height());
+      text->setPos(playerLine.p2() - offset );
+      text->setTransformOriginPoint(offset);
+      text->setRotation(playerLine.angle()+90);
+      m_players.push_back( PlayerScore{text} );
+      setScore(player, 0);
+    }
+  }
+
   init();
 }
 
 void TransformScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-  m_calibration.processMouseClick(PointerEvent(std::array<QPointF, 3>{event->scenePos(), QPointF(0,0), QPointF(0,0)}));
+  processMouseEvent(PointerEvent(std::array<QPointF, 3>{event->scenePos(), QPointF(0,0), QPointF(0,0)}));
+}
+
+void TransformScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* /*event*/)
+{
+  processMouseEvent(PointerEvent(std::array<QPointF, 3>{QPointF(0,0), QPointF(0,0), QPointF(0,0)}));
+}
+
+void TransformScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
+{
+  if ( event->buttons() == Qt::LeftButton )
+  {
+    processMouseEvent(PointerEvent(std::array<QPointF, 3>{event->scenePos(), QPointF(0,0), QPointF(0,0)}));
+  }
+}
+
+void TransformScene::processMouseEvent(PointerEvent e)
+{
+  if ( e.compareTo(m_lastMouseEvent) )
+  {
+    m_calibration.processMouseClick(e);
+    m_lastMouseEvent = e;
+  }
 }
 
 void TransformScene::slotLightAt(PointerEvent e)
@@ -107,20 +173,35 @@ void TransformScene::slotQuitNo()
   m_quitNo->hide();
 }
 
+unsigned int TransformScene::getNumPlayers() const
+{
+  return 3;
+}
 
 QRectF TransformScene::getTableRect() const
 {
   return m_calibration.getTableRect();
 }
 
-QLineF TransformScene::getPlayerPosition(unsigned int player, unsigned int numPlayers)
+QLineF TransformScene::getPlayerPosition(unsigned int player)
 {
   QRectF tableRect = getTableRect();
-  double angle = 2 * M_PI * player / (numPlayers + 1);
+  double angle = 2 * M_PI * player / (getNumPlayers() + 1);
   QPointF origin = tableRect.center() + QPointF(-0.5 * tableRect.width()  * cos(angle),
                                                  0.5 * tableRect.height() * sin(angle) );
   QLineF line( origin, tableRect.center() );
   return line.unitVector();
+}
+
+void TransformScene::setScore(unsigned int player, int score)
+{
+  if ( player < m_players.size() )
+  {
+    const std::array<QColor, 3> colors{QColor(Qt::red), QColor(Qt::green), QColor(Qt::blue)};
+    m_players[player].scoreText->setHtml("<div style='background-color: " +
+                                    colors[player%colors.size()].name() +
+                                    ";'>" + QString::number(score) + "</div>");
+  }
 }
 
 void TransformScene::showInfoText(const std::string& text)

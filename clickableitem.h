@@ -7,7 +7,7 @@ class ClickableItem
 {
 public:
   ClickableItem();
-  virtual void mouseClick(const PointerEvent::CPoint& p) = 0;
+  virtual void eventClick(const PointerEvent::CPoint& p) = 0;
 };
 
 #endif // CLICKABLEITEM_H

@@ -11,8 +11,8 @@ T sqr(T x) { return x*x; }
 
 Earth::Earth(double dx, double dy)
 {
-  std::random_device rd;
-  std::mt19937 rng(rd());
+  static std::random_device rd;
+  static std::mt19937 rng(rd());
   const double diag = sqrt(dx*dx+dy*dy);
   for ( unsigned int i = 0; i < 45; ++i )
   {

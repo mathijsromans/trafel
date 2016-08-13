@@ -111,7 +111,10 @@ void Calibration::processMouseClick(PointerEvent e)
     e.transform(m_transform);
     for ( auto p : e.getPoints() )
     {
-      m_scene.addItem( new MousePing(p.point, p.qcolor) );
+      if ( p.ping )
+      {
+        m_scene.addItem( new MousePing(p.point, PointerEvent::getQColor(p.color)) );
+      }
     }
     processTransformedMouseClick(e);
   }

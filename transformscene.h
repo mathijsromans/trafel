@@ -19,9 +19,13 @@ public:
   TransformScene();
   virtual ~TransformScene();
   void calibrate();
-  virtual void inputEvent(const PointerEvent& e);
+  void inputEvent(const PointerEvent& e);
   void doInit();
   void showInfoText(const std::string& text);
+  QRectF getTableRect() const;
+
+  /// returns unit vector with origin at the player's position
+  QLineF getPlayerPosition(unsigned int player);
 
 signals:
   void quit();
@@ -34,20 +38,31 @@ public slots:
 
 protected:
   void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
-  QRectF getTableRect() const;
-
-  /// returns unit vector with origin at the player's position
-  QLineF getPlayerPosition( unsigned int player, unsigned int numPlayers );
-
+  void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
+  void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
+  void processMouseEvent(PointerEvent e);
+  unsigned int getNumPlayers() const;
+  void setScore(unsigned int player, int score);
 private:
   virtual void init() = 0;
-  virtual void mouseClick(QPointF p);
+  virtual void eventClick(QPointF p, PointerEvent::Color c);
+  virtual void eventUnclick(QPointF p, PointerEvent::Color c);
+  virtual void eventMove(QPointF p, PointerEvent::Color c);
+  virtual bool showScore() const { return false; }
 
 private:
+  struct PlayerScore
+  {
+    QGraphicsTextItem* scoreText;
+  };
+
   Calibration m_calibration;
   QGraphicsTextItem* m_infoText;
   Button* m_quitYes;
   Button* m_quitNo;
+  std::vector<PlayerScore> m_players;
+  std::array<QPointF, 3> m_inputPrev;
+  PointerEvent m_lastMouseEvent;
 };
 
 #endif // TRANSFORMSCENE_H

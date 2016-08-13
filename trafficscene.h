@@ -22,7 +22,7 @@ public:
   QColor getPlayerColor(unsigned int player) const;
 
 protected:
-  virtual void mouseClick(QPointF p);
+  void eventClick(QPointF p, PointerEvent::Color c) override;
 
 private slots:
   void slotGo();

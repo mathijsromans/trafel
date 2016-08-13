@@ -7,7 +7,7 @@ class PokerScene : public TransformScene
 {
   Q_OBJECT
 public:
-  explicit PokerScene( unsigned int numPlayers );
+  explicit PokerScene();
   virtual ~PokerScene() {}
 private:
   enum class Stage { start, dealing, dealt, flop, turn, river };
@@ -21,14 +21,13 @@ private slots:
   void showCards();
 private:
   void init() override;
-  void mouseClick(QPointF p) override;
+  void eventClick(QPointF p, PointerEvent::Color c) override;
 private:
   typedef QGraphicsPixmapItem Card;
   static const unsigned int numValue = 13;
   static const unsigned int numSuit = 4;
   std::array<Card*, numValue*numSuit> m_cards;
   std::array<Card*, numValue*numSuit> m_cardsBack;
-  unsigned int m_numPlayers;
   unsigned int m_numberCardsUsed;
   Stage m_stage;
 };

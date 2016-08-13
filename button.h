@@ -12,7 +12,7 @@ class Button : public QGraphicsProxyWidget, public ClickableItem
 
 public:
   explicit Button(const std::string& text);
-  virtual void mouseClick(const PointerEvent::CPoint& p);
+  virtual void eventClick(const PointerEvent::CPoint& p);
 signals:
   void pressed();
 private:

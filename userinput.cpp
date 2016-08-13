@@ -154,7 +154,7 @@ void UserInput::process()
 //  qDebug() << "saved to " << fileName;
 
   PointerEvent event( getEvent() );
-  if ( event.differsFrom( m_lastEvent ) )
+  if ( event.compareTo( m_lastEvent ) )
   {
     if ( !event.getAny().isNull() )
     {
