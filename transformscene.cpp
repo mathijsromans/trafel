@@ -76,7 +76,7 @@ void TransformScene::inputEvent(const PointerEvent& e)
       eventUnclick( newPoint, color );
     }
     else if ( !prevPoint.isNull() && !newPoint.isNull() &&
-              Utilities::dist(prevPoint, newPoint) > 10 )
+              Utilities::dist(prevPoint, newPoint) > 6 )
     {
       eventMove( newPoint, color );
     }

@@ -70,7 +70,7 @@ bool PointerEvent::compareTo(const PointerEvent& other)
       m_ping[i] = true;
       result = true;
     }
-    if ( Utilities::dist(m_points[i], other.m_points[i]) > 10 )
+    if ( Utilities::dist(m_points[i], other.m_points[i]) > 6 )
     {
       result = true;
     }

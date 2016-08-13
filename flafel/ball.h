@@ -15,7 +15,7 @@ class Ball : NoCopy
 public:
   explicit Ball(FlafelScene& scene);
   virtual ~Ball();
-  void advance( double dt, const std::vector<QLineF>& stopLines, const std::vector<QPointF>& stopPoints, QLineF ignoreLine = QLineF(), QPointF ignorePoint = QPointF() );
+  void advance( double dt, const std::vector<QLineF>& stopLines, const std::vector<QPointF>& stopPoints );
   QPointF getPos() const;
   void setPos(QPointF pos);
   bool isInBase() const;

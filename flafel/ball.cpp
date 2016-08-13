@@ -42,77 +42,89 @@ Ball::~Ball()
 
 void Ball::advance( double dt,
                     const std::vector<QLineF>& stopLines,
-                    const std::vector<QPointF>& stopPoints,
-                    QLineF ignoreLine,
-                    QPointF ignorePoint )
+                    const std::vector<QPointF>& stopPoints )
 {
   if ( m_isInBase )
   {
     m_timeInBase += dt;
     return;
   }
-  double vMag = QPointF::dotProduct(m_v, m_v);
-  QLineF path( m_item->pos(), m_item->pos() + dt * m_v );
-  QPointF firstIntersection;
-  QLineF firstStopLine;
-  QPointF firstStopPoint;
-  for ( QLineF line : stopLines )
+  QLineF ignoreLine;
+  QPointF ignorePoint;
+  unsigned int counter = 0;
+  while ( dt != 0 )
   {
-    if ( line == ignoreLine )
+    if ( ++counter == 100 )
     {
-      continue;
+      return;  // too many iterations
     }
-    QLineF lineBefore( line.p1(), path.p1() );
-    QLineF lineAfter(  line.p1(), path.p2() );
-    double crossBefore = line.dx() * lineBefore.dy() -
-                         line.dy() * lineBefore.dx();
-    double crossAfter = line.dx() * lineAfter.dy() -
-                        line.dy() * lineAfter.dx();
-    QPointF intersection;
-    if ( Utilities::sign(crossBefore) != Utilities::sign(crossAfter) &&
-         line.intersect(path, &intersection ) == QLineF::BoundedIntersection &&
-         ( firstIntersection.isNull() ||
-           Utilities::dist(path.p1(), intersection) < Utilities::dist(path.p1(), firstIntersection) ) )
+    double vMag = QPointF::dotProduct(m_v, m_v);
+    QLineF path( m_item->pos(), m_item->pos() + dt * m_v );
+    QPointF firstIntersection;
+    QLineF firstStopLine;
+    QPointF firstStopPoint;
+    for ( QLineF line : stopLines )
     {
-      firstIntersection = intersection;
-      firstStopLine = line;
-      firstStopPoint = QPointF();
+      if ( line == ignoreLine )
+      {
+        continue;
+      }
+      QLineF lineBefore( line.p1(), path.p1() );
+      QLineF lineAfter(  line.p1(), path.p2() );
+      double crossBefore = line.dx() * lineBefore.dy() -
+                           line.dy() * lineBefore.dx();
+      double crossAfter = line.dx() * lineAfter.dy() -
+                          line.dy() * lineAfter.dx();
+      QPointF intersection;
+      if ( crossBefore < 0 &&
+           crossAfter > 0 &&
+           line.intersect(path, &intersection ) == QLineF::BoundedIntersection &&
+           ( firstIntersection.isNull() ||
+             Utilities::dist(path.p1(), intersection) < Utilities::dist(path.p1(), firstIntersection) ) )
+      {
+        firstIntersection = intersection;
+        firstStopLine = line;
+        firstStopPoint = QPointF();
+      }
     }
-  }
-  for ( QPointF point : stopPoints )
-  {
-    if ( point == ignorePoint )
+    for ( QPointF point : stopPoints )
     {
-      continue;
+      if ( point == ignorePoint )
+      {
+        continue;
+      }
+      QPointF intersection = circleLineSegmentIntersection( path, point, 0.5 * ms_diameter );
+      if ( !intersection.isNull() &&
+           ( firstIntersection.isNull() ||
+             Utilities::dist(path.p1(), intersection) < Utilities::dist(path.p1(), firstIntersection) ) )
+      {
+        firstIntersection = intersection;
+        firstStopLine = QLineF();
+        firstStopPoint = point;
+      }
     }
-    QPointF intersection = circleLineSegmentIntersection( path, point, 0.5 * ms_diameter );
-    if ( !intersection.isNull() &&
-         ( firstIntersection.isNull() ||
-           Utilities::dist(path.p1(), intersection) < Utilities::dist(path.p1(), firstIntersection) ) )
+    if ( !firstStopLine.isNull() )
     {
-      firstIntersection = intersection;
-      firstStopLine = QLineF();
-      firstStopPoint = point;
+      QLineF l = firstStopLine.unitVector();
+      l.translate(-l.p1());
+      m_v = 2 * QPointF::dotProduct(m_v, l.p2()) * l.p2() - m_v; // reflect
     }
-  }
-  if ( !firstStopLine.isNull() )
-  {
-    QLineF l = firstStopLine.unitVector();
-    l.translate(-l.p1());
-    m_v = 2 * QPointF::dotProduct(m_v, l.p2()) * l.p2() - m_v; // reflect
-  }
-  else if ( !firstStopPoint.isNull() )
-  {
-    m_v = -m_v; // reflect
-  }
-  if ( !firstIntersection.isNull() )
-  {
-    m_item->setPos( firstIntersection );
-    advance(dt - Utilities::dist(path.p1(), firstIntersection) / vMag, stopLines, stopPoints, firstStopLine, firstStopPoint );
-  }
-  else
-  {
-    m_item->setPos( path.p2() );
+    else if ( !firstStopPoint.isNull() )
+    {
+      m_v = -m_v; // reflect
+    }
+    if ( !firstIntersection.isNull() )
+    {
+      m_item->setPos( firstIntersection );
+      dt = dt - Utilities::dist(path.p1(), firstIntersection) / vMag;
+      ignoreLine = firstStopLine;
+      ignorePoint = firstStopPoint;
+    }
+    else
+    {
+      m_item->setPos( path.p2() );
+      dt = 0;
+    }
   }
 }
 

@@ -5,10 +5,18 @@
 #include "stopper.h"
 #include "utilities.h"
 
+namespace
+{
+  const double totalStopperLength = 0.1;
+  const double minStopperLength = 0.03;
+}
+
+
 std::array<std::unique_ptr<QPixmap>, 3> Player::ms_holes;
 
 Player::Player(FlafelScene& scene, unsigned int player)
- : m_base(0),
+ : m_scene(scene),
+   m_base(0),
    m_score(10),
    m_baseDiameter( 0.2 * scene.getTableRect().width() ),
    m_totalStopperLength(0)
@@ -37,15 +45,45 @@ Player::~Player()
 
 void Player::addStopper(std::unique_ptr<Stopper> stopper)
 {
+  m_totalStopperLength += stopper->length();
   m_stoppers.push_back(std::move(stopper));
+  removeExcessStoppers();
 }
 
 void Player::extendStopper(QPointF newEnd)
 {
+  if ( m_stoppers.empty() )
+  {
+    return;
+  }
   auto& stopper = m_stoppers.back();
-  QLineF line = stopper->item->line();
-  line.setP2(newEnd);
-  stopper->item->setLine(line);
+  m_totalStopperLength -= stopper->length();
+  stopper->setEnd(newEnd);
+  m_totalStopperLength += stopper->length();
+  removeExcessStoppers();
+}
+
+void Player::finishStopper()
+{
+  if ( !m_stoppers.empty() )
+  {
+    Stopper& stopper = *m_stoppers.back();
+    double minLength = minStopperLength * m_scene.getTableRect().width();
+    if ( stopper.length() < minLength )
+    {
+      QLineF line = stopper.item->line();
+      if ( line.length() == 0 )
+      {
+        line.setP2( line.p1() + QPointF(minLength, 0) );
+      }
+      else
+      {
+        line.setLength(minLength);
+      }
+      extendStopper(line.p2());
+    }
+  }
+
 }
 
 void Player::putBallInHole(Ball& ball)
@@ -66,4 +104,16 @@ void Player::putBallInHole(Ball& ball)
 unsigned int Player::getScore()
 {
   return m_score;
+}
+
+void Player::removeExcessStoppers()
+{
+  const double maxLength = totalStopperLength * m_scene.getTableRect().width();
+  while ( m_totalStopperLength > maxLength )
+  {
+    Stopper* stopper = m_stoppers.front().get();
+    m_totalStopperLength -= stopper->length();
+    m_stoppers.pop_front();
+    m_scene.stopperRemoved(stopper);
+  }
 }

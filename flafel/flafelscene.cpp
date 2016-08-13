@@ -5,6 +5,7 @@
 #include "player.h"
 #include "stopper.h"
 #include "utilities.h"
+#include <cassert>
 #include <QDebug>
 #include <QGraphicsEllipseItem>
 #include <QGraphicsPixmapItem>
@@ -61,6 +62,11 @@ void FlafelScene::eventClick(QPointF p, PointerEvent::Color c)
   m_players[static_cast<unsigned int>(c)]->addStopper(createStopper(p, p, PointerEvent::getQColor(c)));
 }
 
+void FlafelScene::eventUnclick(QPointF /*p*/, PointerEvent::Color c)
+{
+  m_players[static_cast<unsigned int>(c)]->finishStopper();
+}
+
 void FlafelScene::eventMove(QPointF p, PointerEvent::Color c)
 {
   m_players[static_cast<unsigned int>(c)]->extendStopper(p);
@@ -86,11 +92,14 @@ void FlafelScene::advanceBalls()
   std::vector<QPointF> points;
   for ( const Stopper* stopper : m_allStoppers )
   {
-    QLineF line = stopper->item->line();
+    const QLineF line = stopper->item->line();
     QLineF transportLine = line.normalVector().unitVector();
     QPointF transport = 0.5 * Ball::getDiameter() * ( transportLine.p2() - transportLine.p1() );
-    lines.push_back( line.translated(+transport) );
-    lines.push_back( line.translated(-transport) );
+    QLineF line1 = line.translated(+transport);
+    QLineF line2 = line.translated(-transport);
+    line2 = QLineF( line2.p2(), line2.p1() );
+    lines.push_back( line1 );
+    lines.push_back( line2 );
     points.push_back(line.p1());
     points.push_back(line.p2());
   }
@@ -126,6 +135,13 @@ void FlafelScene::updateScores()
   {
     setScore(p, m_players[p]->getScore() );
   }
+}
+
+void FlafelScene::stopperRemoved(const Stopper* stopper)
+{
+  auto it = std::find(m_allStoppers.begin(), m_allStoppers.end(), stopper);
+  assert(it != m_allStoppers.end());
+  m_allStoppers.erase(it);
 }
 
 void FlafelScene::step()

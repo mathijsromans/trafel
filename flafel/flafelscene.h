@@ -17,9 +17,11 @@ class FlafelScene : public TransformScene
 public:
   explicit FlafelScene();
   ~FlafelScene() override;
+  void stopperRemoved( const Stopper* stopper );
 private:
   void init() override;
   void eventClick(QPointF p, PointerEvent::Color c) override;
+  void eventUnclick(QPointF p, PointerEvent::Color c) override;
   void eventMove(QPointF p, PointerEvent::Color c) override;
   bool showScore() const override { return true; }
   std::unique_ptr<Stopper> createStopper( QPointF start, QPointF end, QColor c );
