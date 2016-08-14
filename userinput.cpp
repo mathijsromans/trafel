@@ -150,16 +150,13 @@ void UserInput::process()
 
 //  static int counter = 0;
 //  QString fileName = QString("grab_") + QString::number(counter++) + ".png";
-//  m_currentImage.save( fileName );
+//  m_currentImage.toImage().save( fileName );
 //  qDebug() << "saved to " << fileName;
 
   PointerEvent event( getEvent() );
   if ( event.compareTo( m_lastEvent ) )
   {
-    if ( !event.getAny().isNull() )
-    {
-      signalMouseClick(event);
-    }
+    signalMouseClick(event);
     m_lastEvent = event;
   }
 

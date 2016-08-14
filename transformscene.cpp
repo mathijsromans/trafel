@@ -186,7 +186,7 @@ QRectF TransformScene::getTableRect() const
 QLineF TransformScene::getPlayerPosition(unsigned int player)
 {
   QRectF tableRect = getTableRect();
-  double angle = 2 * M_PI * player / (getNumPlayers() + 1);
+  double angle = 2 * M_PI * (player+1) / (getNumPlayers() + 1);
   QPointF origin = tableRect.center() + QPointF(-0.5 * tableRect.width()  * cos(angle),
                                                  0.5 * tableRect.height() * sin(angle) );
   QLineF line( origin, tableRect.center() );
