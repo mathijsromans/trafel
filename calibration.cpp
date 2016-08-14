@@ -25,8 +25,8 @@ bool compareY(QPointF A, QPointF B)
 
 }
 
-Calibration::Calibration(TransformScene& scene)
- : m_scene(scene),
+Calibration::Calibration()
+ : m_scene(0),
    m_status(Status::uninitialised),
    m_calibrationLights(),
    m_cornerPoints(),
@@ -50,16 +50,29 @@ Calibration::Calibration(TransformScene& scene)
   settings.endGroup();
 }
 
+void Calibration::setScene(TransformScene* scene)
+{
+  m_scene = scene;
+  if ( m_status != Status::done )
+  {
+    calibrate();
+  }
+  else
+  {
+    m_scene->doInit(m_tableRect);
+  }
+}
+
 void Calibration::calibrate()
 {
   if ( m_status == Status::testing )
   {
     m_testingLocation = 0.5 * ( m_tableRect.center() + m_tableRect.bottomRight());
-    m_circle = m_scene.addEllipse( Utilities::squareAt(m_testingLocation,10), QPen(Qt::white,3));
-    m_scene.showInfoText("Verify calibration");
+    m_circle = m_scene->addEllipse( Utilities::squareAt(m_testingLocation,10), QPen(Qt::white,3));
+    m_scene->showInfoText("Verify calibration");
     QPen pen(Qt::white);
     pen.setWidth(3);
-    m_tableRectItem = m_scene.addRect(m_tableRect, pen);
+    m_tableRectItem = m_scene->addRect(m_tableRect, pen);
 //    done(); // REMOVE ME TO VERIFY!!!
   }
   else
@@ -67,13 +80,8 @@ void Calibration::calibrate()
     m_calibrationLights.clear();
     m_cornerPoints.clear();
     m_status = Status::uninitialised;
-    m_circle = m_scene.addEllipse(Utilities::squareAt(ms_calibrationCoordinates[m_calibrationLights.size()],20), QPen(Qt::green,3));
+    m_circle = m_scene->addEllipse(Utilities::squareAt(ms_calibrationCoordinates[m_calibrationLights.size()],20), QPen(Qt::green,3));
   }
-}
-
-QRectF Calibration::getTableRect() const
-{
-  return m_tableRect;
 }
 
 void Calibration::processTransformedMouseClick(PointerEvent e)
@@ -96,11 +104,11 @@ void Calibration::processTransformedMouseClick(PointerEvent e)
   }
   else
   {
-    m_scene.inputEvent(e);
+    m_scene->inputEvent(e);
   }
 }
 
-void Calibration::processMouseClick(PointerEvent e)
+void Calibration::processEvent(PointerEvent e)
 {
   if ( m_status == Status::uninitialised )
   {
@@ -113,7 +121,7 @@ void Calibration::processMouseClick(PointerEvent e)
     {
       if ( p.ping )
       {
-        m_scene.addItem( new MousePing(p.point, PointerEvent::getQColor(p.color)) );
+        m_scene->addItem( new MousePing(p.point, PointerEvent::getQColor(p.color)) );
       }
     }
     processTransformedMouseClick(e);
@@ -122,7 +130,7 @@ void Calibration::processMouseClick(PointerEvent e)
   if ( m_status == Status::transformDone )
   {
     std::string text = "Select corner " + std::to_string(m_cornerPoints.size()+1);
-    m_scene.showInfoText(text);
+    m_scene->showInfoText(text);
   }
 }
 
@@ -136,16 +144,16 @@ void Calibration::clear()
   m_tableRect = QRectF();
   m_transform.reset();
   m_testingLocation = QPointF();
-  m_scene.showInfoText("");
+  m_scene->showInfoText("");
 }
 
 void Calibration::done()
 {
   m_status = Status::done;
   m_circle->hide();
-  m_scene.showInfoText("");
+  m_scene->showInfoText("");
   m_tableRectItem->hide();
-  m_scene.doInit();
+  m_scene->doInit(m_tableRect);
 }
 
 void Calibration::newCalibratePoint(QPoint p)
@@ -198,7 +206,7 @@ void Calibration::newCornerPoint(QPointF p)
     qDebug() << "TABLE RECT IS " << m_tableRect;
     QPen pen(Qt::white);
     pen.setWidth(3);
-    m_tableRectItem = m_scene.addRect(m_tableRect, pen);    
+    m_tableRectItem = m_scene->addRect(m_tableRect, pen);
     done();
     QSettings settings("TafelSoft", "Tafel");
     settings.beginGroup("Calibration");

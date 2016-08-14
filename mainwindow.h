@@ -1,8 +1,12 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "calibration.h"
+#include "mainmenuscene.h"
+#include "pointerevent.h"
 #include "userinputthread.h"
 #include <QMainWindow>
+#include <memory>
 class QGraphicsView;
 class TrafficScene;
 class TransformScene;
@@ -20,6 +24,8 @@ protected:
   virtual void resizeEvent(QResizeEvent* event) override;
 
 private slots:
+  void slotStartGame(MainMenuScene::Games game);
+  void slotInputEvent(PointerEvent e);
   void slotQuit();
 
 private:
@@ -28,7 +34,8 @@ private:
 private:
   UserInputThread m_userInputThread;
   QGraphicsView* v;
-  TransformScene* t;
+  std::unique_ptr<TransformScene> m_currentScene;
+  Calibration m_calibration;
 };
 
 #endif // MAINWINDOW_H

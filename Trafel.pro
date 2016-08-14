@@ -42,7 +42,8 @@ SOURCES += main.cpp\
     pixmapitem.cpp \
     flafel/ball.cpp \
     flafel/stopper.cpp \
-    flafel/player.cpp
+    flafel/player.cpp \
+    mainmenuscene.cpp
 
 HEADERS  += mainwindow.h \
     trafficscene.h \
@@ -70,6 +71,7 @@ HEADERS  += mainwindow.h \
     flafel/ball.h \
     flafel/stopper.h \
     flafel/player.h \
-    nocopy.h
+    nocopy.h \
+    mainmenuscene.h
 
 FORMS    +=

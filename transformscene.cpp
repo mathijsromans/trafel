@@ -1,4 +1,5 @@
 #include "button.h"
+#include "calibration.h"
 #include "mouseping.h"
 #include "transformscene.h"
 #include "utilities.h"
@@ -11,8 +12,7 @@
 #include <iostream>
 
 TransformScene::TransformScene()
- : m_calibration(*this),
-   m_infoText(0),
+ : m_infoText(0),
    m_quitYes(new Button("Yes")),
    m_quitNo(new Button("No")),
    m_inputPrev{{}}
@@ -28,11 +28,6 @@ TransformScene::TransformScene()
 
 TransformScene::~TransformScene()
 {
-}
-
-void TransformScene::calibrate()
-{
-  m_calibration.calibrate();
 }
 
 void TransformScene::eventClick(QPointF /*p*/, PointerEvent::Color /*c*/)
@@ -84,8 +79,9 @@ void TransformScene::inputEvent(const PointerEvent& e)
   }
 }
 
-void TransformScene::doInit()
+void TransformScene::doInit(QRectF tableRect)
 {
+  m_tableRect = tableRect;
   Button* quitButton = new Button("Quit");
   quitButton->setPos(getTableRect().topLeft());
   addItem( quitButton );
@@ -95,7 +91,8 @@ void TransformScene::doInit()
   if ( showScore() )
   {
     QFont font;
-    font.setPixelSize(0.04 * getTableRect().height());
+    double size = getTableRect().height();
+    font.setPixelSize(0.04 * size);
     for ( unsigned int player = 0; player != getNumPlayers(); ++player )
     {
       QGraphicsTextItem* text = addText("00", font);
@@ -104,9 +101,9 @@ void TransformScene::doInit()
       QPointF offset = brect.center()-brect.topLeft();
       QLineF playerLine = getPlayerPosition(player);
       playerLine.setLength(0.5*brect.height());
-      text->setPos(playerLine.p2() - offset );
+      text->setPos(playerLine.p2() - 0.1 * size * playerLine.normalVector().unitVector().translated(-playerLine.p1()).p2() - offset );
       text->setTransformOriginPoint(offset);
-      text->setRotation(playerLine.angle()+90);
+      text->setRotation(90-playerLine.angle());
       m_players.push_back( PlayerScore{text} );
       setScore(player, 0);
     }
@@ -137,14 +134,9 @@ void TransformScene::processMouseEvent(PointerEvent e)
 {
   if ( e.compareTo(m_lastMouseEvent) )
   {
-    m_calibration.processMouseClick(e);
+    emit signalMouseEvent(e);
     m_lastMouseEvent = e;
   }
-}
-
-void TransformScene::slotLightAt(PointerEvent e)
-{
-  m_calibration.processMouseClick( e );
 }
 
 void TransformScene::slotQuit()
@@ -163,7 +155,7 @@ void TransformScene::slotQuitYes()
   showInfoText("");
   m_quitYes->hide();
   m_quitNo->hide();
-  quit();
+  emit signalQuit();
 }
 
 void TransformScene::slotQuitNo()
@@ -180,7 +172,7 @@ unsigned int TransformScene::getNumPlayers() const
 
 QRectF TransformScene::getTableRect() const
 {
-  return m_calibration.getTableRect();
+  return m_tableRect;
 }
 
 QLineF TransformScene::getPlayerPosition(unsigned int player)

@@ -18,7 +18,7 @@ public:
   virtual ~UserInput();
   void process();
 signals:
-  void signalMouseClick(PointerEvent point);
+  void signalEvent(PointerEvent point);
 private:
   void getImage();
   PointerEvent getEvent() const;

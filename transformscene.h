@@ -1,10 +1,10 @@
 #ifndef TRANSFORMSCENE_H
 #define TRANSFORMSCENE_H
 
-#include "calibration.h"
 #include "pointerevent.h"
 #include <QGraphicsScene>
 #include <QPoint>
+#include <memory>
 #include <vector>
 
 class Button;
@@ -16,11 +16,11 @@ class TransformScene : public QGraphicsScene
   Q_OBJECT
 
 public:
-  TransformScene();
+  explicit TransformScene();
   virtual ~TransformScene();
   void calibrate();
   void inputEvent(const PointerEvent& e);
-  void doInit();
+  void doInit(QRectF tableRect);
   void showInfoText(const std::string& text);
   QRectF getTableRect() const;
 
@@ -28,10 +28,10 @@ public:
   QLineF getPlayerPosition(unsigned int player);
 
 signals:
-  void quit();
+  void signalMouseEvent(PointerEvent e);
+  void signalQuit();
 
 public slots:
-  void slotLightAt( PointerEvent e );
   void slotQuit();
   void slotQuitYes();
   void slotQuitNo();
@@ -56,7 +56,7 @@ private:
     QGraphicsTextItem* scoreText;
   };
 
-  Calibration m_calibration;
+  QRectF m_tableRect;
   QGraphicsTextItem* m_infoText;
   Button* m_quitYes;
   Button* m_quitNo;

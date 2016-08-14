@@ -15,12 +15,12 @@ class PointerEvent;
 class Calibration
 {
 public:
-  explicit Calibration( TransformScene& scene );
-  void calibrate();
-  QRectF getTableRect() const;
-  void processMouseClick(PointerEvent e);
+  explicit Calibration();
+  void setScene( TransformScene* scene );
+  void processEvent(PointerEvent e);
 
 private:
+  void calibrate();
   void clear();
   void done();
   void newCalibratePoint(QPoint p);
@@ -29,7 +29,7 @@ private:
 
 private:
   enum class Status { uninitialised, transformDone, testing, done };
-  TransformScene& m_scene;
+  TransformScene* m_scene;
   Status m_status;
   std::vector<QPoint> m_calibrationLights;
   std::vector<QPointF> m_cornerPoints;

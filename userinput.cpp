@@ -156,7 +156,7 @@ void UserInput::process()
   PointerEvent event( getEvent() );
   if ( event.compareTo( m_lastEvent ) )
   {
-    signalMouseClick(event);
+    signalEvent(event);
     m_lastEvent = event;
   }
 
