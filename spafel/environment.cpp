@@ -7,6 +7,7 @@
 #include <thread>
 #include <set>
 
+
 namespace
 {
   const double minDistance = 5.0e9;
@@ -178,4 +179,20 @@ void Environment::preventCollisions() const
       }
     }
   }
+}
+
+QPointF Environment::calcCentreOfMass(double time) const
+{
+  QPointF centreOfMass;
+  double sumMass = 0.0;
+  for (const auto& body : mo_bodies)
+  {
+    double mass = body->getMass();
+    centreOfMass.setX(centreOfMass.x() + body->getState(time)[0]*mass);
+    centreOfMass.setY(centreOfMass.y() + body->getState(time)[1]*mass);
+    sumMass += mass;
+  }
+  centreOfMass.setX(centreOfMass.x() / sumMass);
+  centreOfMass.setY(centreOfMass.y() / sumMass);
+  return centreOfMass;
 }

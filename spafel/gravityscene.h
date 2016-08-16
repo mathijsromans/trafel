@@ -30,8 +30,8 @@ public:
 public:
   explicit GravityScene();
   virtual ~GravityScene();
-  static QPointF envToScene(const QPointF& point, const QRectF& tableRect);
-  static QPointF sceneToEnv(const QPointF& point, const QRectF& tableRect);
+  static QPointF envToScene(const QPointF& point, const QRectF& tableRect, const QPointF& centreOfMass);
+  static QPointF sceneToEnv(const QPointF& point, const QRectF& tableRect, const QPointF& centreOfMass);
 
 protected:
   void eventClick(QPointF point, PointerEvent::Color c) override;

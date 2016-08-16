@@ -20,8 +20,8 @@ public:
   std::array<double, 4> getStateDerivative(const std::array<double, 4>& x0, const Body* ignoreBody, unsigned int time) const;
   void boost(unsigned int spaceshipId, Body::Direction d);
   unsigned int getStepsize() const;
-
   unsigned int getCurrentTime() const;
+  QPointF calcCentreOfMass(double time) const;
 
   static double calcOrbitalVelocity(double apogeeX, double eccentricity, double massCentralBody);
 

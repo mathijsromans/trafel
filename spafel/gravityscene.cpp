@@ -25,8 +25,8 @@ namespace
 
 const std::array<std::string, GravityScene::ms_numControl> GravityScene::ms_buttonTexts = {"U", "D", "L", "R"};
 
-GravityScene::GravityScene()
-: TransformScene(),
+GravityScene::GravityScene() :
+  TransformScene(),
   m_environment(new Environment(stepsize)),
   m_bodyItems(),
   m_newBody(),
@@ -108,9 +108,10 @@ void
 GravityScene::step()
 {
   m_environment->oneStep();
+  QPointF centreOfMass = m_environment->calcCentreOfMass(m_environment->getCurrentTime());
   for (BodyItem* bodyItem : m_bodyItems)
   {
-    bodyItem->updateItem(getTableRect());
+    bodyItem->updateItem(getTableRect(), centreOfMass);
   }
 
   updateTrackItems();
@@ -145,26 +146,26 @@ GravityScene::eventClick(QPointF /*point*/, PointerEvent::Color /*c*/)
 }
 
 QPointF
-GravityScene::envToScene(const QPointF& point, const QRectF& tableRect)
+GravityScene::envToScene(const QPointF& point, const QRectF& tableRect, const QPointF& centreOfMass)
 {
   double sceneCentreOffsetX = tableRect.topLeft().x() + tableRect.width() / 2.0;
   double sceneCentreOffsetY = tableRect.topLeft().y() + tableRect.height() / 2.0;
   double scaleFactor = getScaleFactor(tableRect);
-  double x = point.x()/AU * scaleFactor + sceneCentreOffsetX;
-  double y = point.y()/AU * scaleFactor + sceneCentreOffsetY;
+  double x = (point.x() - centreOfMass.x())/AU * scaleFactor + sceneCentreOffsetX;
+  double y = (point.y() - centreOfMass.y())/AU * scaleFactor + sceneCentreOffsetY;
   QPointF pointScene(x, y);
   return pointScene;
 }
 
 
 QPointF
-GravityScene::sceneToEnv(const QPointF& point, const QRectF& tableRect)
+GravityScene::sceneToEnv(const QPointF& point, const QRectF& tableRect, const QPointF& centreOfMass)
 {
   double sceneCentreOffsetX = tableRect.topLeft().x() + tableRect.width() / 2.0;
   double sceneCentreOffsetY = tableRect.topLeft().y() + tableRect.height() / 2.0;
   double scaleFactor = getScaleFactor(tableRect);
-  double x = (point.x() - sceneCentreOffsetX) * AU / scaleFactor;
-  double y = (point.y() - sceneCentreOffsetY) * AU / scaleFactor;
+  double x = (point.x() - centreOfMass.x() - sceneCentreOffsetX) * AU / scaleFactor;
+  double y = (point.y() - centreOfMass.y() - sceneCentreOffsetY) * AU / scaleFactor;
   return QPointF(x, y);
 }
 
@@ -211,7 +212,8 @@ GravityScene::updateTrackItems()
       unsigned int time = t + m_environment->getCurrentTime();
       auto s1 = body->getState(time);
       auto s2 = body->getState(time + 1);
-      QLineF newLine(envToScene(QPointF(s2[0], s2[1]), getTableRect()), envToScene(QPointF(s1[0], s1[1]), getTableRect()));
+      QPointF com = m_environment->calcCentreOfMass(time);
+      QLineF newLine(envToScene(QPointF(s2[0], s2[1]), getTableRect(), com), envToScene(QPointF(s1[0], s1[1]), getTableRect(), com));
       QGraphicsLineItem* line = addLine(newLine, QPen(body->getColor()));
       line->setZValue(-10);
       lines.push_back(line);
