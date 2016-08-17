@@ -84,7 +84,7 @@ void Cargo::updateItem(const QRectF &tableRect, QPointF centreOfMass)
 
 QRectF Cargo::boundingRect() const
 {
-  return Utilities::squareAt(0, 0, 10);
+  return Utilities::squareAt(0, 0, 6);
 }
 
 void Cargo::paint(QPainter *painter,
