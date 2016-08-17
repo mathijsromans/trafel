@@ -11,6 +11,7 @@
 class Environment;
 class Body;
 class BodyItem;
+class Planet;
 class QTimer;
 
 class GravityScene : public TransformScene
@@ -41,11 +42,12 @@ private slots:
 
 private:
   virtual void init() override;
-  void addBody(Body* body);
+  void addPlanet(Body* body);
   void addSpaceship(Body* body, unsigned int id);
   void updateTrackItems();
   void createCelestialBodies();
   void createSpaceShips();
+  void createCargo();
   static double getScaleFactor(const QRectF& tableRect);
 
 private slots:
@@ -65,6 +67,7 @@ private:
   static const std::array<std::string, ms_numControl> ms_buttonTexts;
   std::unique_ptr<Environment> m_environment;
   std::vector<BodyItem*> m_bodyItems;
+  std::vector<Planet*> m_planets;
   std::unique_ptr<NewBodyData> m_newBody;
   std::map<Body*, std::deque<QGraphicsLineItem*>> m_trackItems;
   QGraphicsEllipseItem* m_tempPlanet;

@@ -8,8 +8,9 @@ class BodyItem : public QGraphicsItem
 {
 public:
   BodyItem(Body* body);
-  void updateItem(const QRectF& tableRect, QPointF centreOfMass);
+  virtual void updateItem(const QRectF& tableRect, QPointF centreOfMass);
   Body* getBody() const;
+  void setBody(Body* body);
 
 private:
   Body* m_body;

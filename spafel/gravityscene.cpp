@@ -3,7 +3,8 @@
 #include "button.h"
 #include "spafel/planet.h"
 #include "spafel/environment.h"
-#include "spaceship.h"
+#include "spafel/spaceship.h"
+#include "spafel/cargoitem.h"
 
 #include <QDebug>
 #include <QGraphicsEllipseItem>
@@ -41,11 +42,12 @@ GravityScene::~GravityScene()
 {
 }
 
-
-void GravityScene::addBody(Body* body)
+void
+GravityScene::addPlanet(Body* body)
 {
   m_environment->addBody(body);
   Planet* bodyItem = new Planet(body);
+  m_planets.push_back(bodyItem);
   m_bodyItems.push_back(bodyItem);
   addItem(bodyItem);
 }
@@ -66,6 +68,7 @@ GravityScene::init()
 
   createCelestialBodies();
   createSpaceShips();
+  createCargo();
   m_environment->init();
 
   connect(m_timer, SIGNAL(timeout()), this, SLOT(step()));
@@ -225,28 +228,28 @@ void
 GravityScene::createCelestialBodies()
 {
   Body* sun = new Body(0.0, 0.0, 0.0, 0.0, sunMass, Qt::yellow, m_environment.get());
-  addBody(sun);
+  addPlanet(sun);
 
   double earthEccentricity = 0.0167086;
   const double earthMass = 5.972e24;
   double earthX = 152.10e9;
   double earthVy = Environment::calcOrbitalVelocity(earthX, earthEccentricity, sunMass);
   Body* earth = new Body(earthX, 0.0, 0.0, -earthVy, earthMass, Qt::white, m_environment.get());
-  addBody(earth);
+  addPlanet(earth);
 
   double venusEccentricity = 0.006772;
   const double venusMass = 4.8675e24;
   double venusX = 108.939e9;
   double venusVy = Environment::calcOrbitalVelocity(venusX, venusEccentricity, sunMass);
   Body* venus = new Body(venusX, 0.0, 0.0, -venusVy, venusMass, Qt::white, m_environment.get());
-  addBody(venus);
+  addPlanet(venus);
 
   double mercuryEccentricity = 0.205630;
   const double mercuryMass = 3.3011e23;
   double mercuryX = 69.81690e9;
   double mercuryVy = Environment::calcOrbitalVelocity(mercuryX, mercuryEccentricity, sunMass);
   Body* mercury = new Body(mercuryX, 0.0, 0.0, -mercuryVy, mercuryMass, Qt::white, m_environment.get());
-  addBody(mercury);
+  addPlanet(mercury);
 }
 
 void
@@ -265,4 +268,12 @@ GravityScene::createSpaceShips()
     Body* s1 = new Body(x, y, vx, vy, 0, colors[i%3], m_environment.get());
     addSpaceship(s1, i);
   }
+}
+
+void
+GravityScene::createCargo()
+{
+  CargoItem* cargo = new CargoItem(m_planets[1], m_planets[2]);
+  m_bodyItems.push_back(cargo);
+  addItem(cargo);
 }

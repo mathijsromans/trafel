@@ -31,6 +31,7 @@ SOURCES += main.cpp\
     calibration.cpp \
     spafel/body.cpp \
     spafel/bodyitem.cpp \
+    spafel/cargoitem.cpp \
     spafel/environment.cpp \
     spafel/gravityscene.cpp \
     spafel/spaceship.cpp \
@@ -43,7 +44,7 @@ SOURCES += main.cpp\
     flafel/ball.cpp \
     flafel/stopper.cpp \
     flafel/player.cpp \
-    mainmenuscene.cpp
+    mainmenuscene.cpp \
 
 HEADERS  += mainwindow.h \
     trafficscene.h \
@@ -58,6 +59,7 @@ HEADERS  += mainwindow.h \
     utilities.h \
     calibration.h \
     spafel/body.h \
+    spafel/cargoitem.h \
     spafel/bodyitem.h \
     spafel/environment.h \
     spafel/gravityscene.h \
@@ -72,6 +74,6 @@ HEADERS  += mainwindow.h \
     flafel/stopper.h \
     flafel/player.h \
     nocopy.h \
-    mainmenuscene.h
+    mainmenuscene.h \
 
 FORMS    +=

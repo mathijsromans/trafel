@@ -8,8 +8,8 @@ class Planet : public BodyItem
 public:
   Planet(Body* body);
   static unsigned int calcRadius(double mass);
-  QRectF boundingRect() const;
-  void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+  virtual QRectF boundingRect() const override;
+  virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 private:
   double m_radius;
