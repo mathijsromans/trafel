@@ -19,7 +19,7 @@ namespace
   const double sunMass = 1e27;
   const double zoom = 0.4;
   const double fps = 30;            // number of frames per second
-  const double speedup = 100000000;  // speedup factor, number of seconds per second
+  const double speedup = 50000000;  // speedup factor, number of seconds per second
   const double stepsize = speedup/fps;
 }
 
@@ -33,7 +33,8 @@ GravityScene::GravityScene() :
   m_spaceships(),
   m_cargos(),
   m_trackItems(),
-  m_tempPlanet(0)
+  m_tempPlanet(0),
+  m_scores()
 {
   static std::random_device rd;
   m_randomGenerator.seed(rd());
@@ -60,6 +61,7 @@ GravityScene::addSpaceship(Body* body, unsigned int id)
   Spaceship* ship = new Spaceship(body, id);
   m_spaceships.push_back(ship);
   m_bodyItems.push_back(ship);
+  m_scores[id] = 0;
   addItem(ship);
 }
 
@@ -249,7 +251,6 @@ GravityScene::createCargo(Planet* notOnMe)
   std::uniform_int_distribution<> distribution(1, m_planets.size()-1);
 
   std::size_t indexA = distribution(m_randomGenerator);
-  std::cout << "A: " << indexA << std::endl;
   while (m_planets[indexA] == notOnMe)
   {
     indexA = distribution(m_randomGenerator);
@@ -259,8 +260,6 @@ GravityScene::createCargo(Planet* notOnMe)
   {
     indexB = distribution(m_randomGenerator);
   }
-  std::cout << "A: " << indexA << std::endl;
-  std::cout << "B: " << indexB << std::endl;
   Cargo* cargo = new Cargo(m_planets[indexA], m_planets[indexB]);
   m_bodyItems.push_back(cargo);
   m_cargos.push_back(cargo);
@@ -270,6 +269,7 @@ GravityScene::createCargo(Planet* notOnMe)
 void
 GravityScene::handleCollisions()
 {
+  std::vector<Cargo*> toRemoveCargos;
   for (const auto& spaceship : m_spaceships)
   {
     for (const auto& planet : m_planets)
@@ -279,12 +279,39 @@ GravityScene::handleCollisions()
         for (const auto& cargo : m_cargos)
         {
           Cargo::Action action = cargo->notifyCollision(spaceship, planet);
-          if (action == Cargo::Action::pickup)
+          switch (action)
           {
-            createCargo();
+            case Cargo::Action::pickup :
+            {
+              createCargo(planet);
+              break;
+            }
+            case Cargo::Action::dropoff :
+            {
+              unsigned int playerId = spaceship->getPlayerId();
+              m_scores[playerId] += 10;
+              setScore(playerId, m_scores[playerId]);
+              toRemoveCargos.push_back(cargo);
+              break;
+            }
+            case Cargo::Action::none :
+              break;
           }
         }
       }
     }
   }
+
+  for (auto cargo : toRemoveCargos)
+  {
+    m_cargos.erase( std::remove(m_cargos.begin(), m_cargos.end(), cargo), m_cargos.end() );
+    removeBodyItem(cargo);
+    delete cargo;
+  }
+}
+
+void GravityScene::removeBodyItem(BodyItem* bodyItem)
+{
+  removeItem(bodyItem);
+  m_bodyItems.erase( std::remove(m_bodyItems.begin(), m_bodyItems.end(), bodyItem), m_bodyItems.end() );
 }

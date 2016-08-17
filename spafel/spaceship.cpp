@@ -14,7 +14,8 @@ std::unique_ptr<QPixmap> Spaceship::ms_blueSpaceship;
 
 Spaceship::Spaceship(Body* body, unsigned int id)
   : BodyItem(body),
-    m_pixmap()
+    m_pixmap(),
+    m_playerId(id)
 {
   if ( !ms_blueSpaceship )
   {
@@ -40,6 +41,11 @@ void Spaceship::paint(QPainter* painter,
                       QWidget* /*widget*/)
 {
   painter->drawPixmap(boundingRect().topLeft(), m_pixmap);
+}
+
+unsigned int Spaceship::getPlayerId() const
+{
+  return m_playerId;
 }
 
 void Spaceship::initPixmaps()

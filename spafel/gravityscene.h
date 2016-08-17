@@ -37,8 +37,9 @@ public:
 
 private:
   virtual void init() override;
-  unsigned int getFps() const override;
-  void step() override;
+  virtual unsigned int getFps() const override;
+  virtual bool showScore() const override { return true; }
+  virtual void step() override;
   void handleCollisions();
   void addPlanet(Body* body, const QColor& lineColor);
   void addSpaceship(Body* body, unsigned int id);
@@ -47,6 +48,7 @@ private:
   void createSpaceShips();
   void createCargo(Planet* notOnMe=0);
   static double getScaleFactor(const QRectF& tableRect);
+  void removeBodyItem(BodyItem* bodyItem);
 
 private slots:
   void slotButtonPressed(int b);
@@ -72,6 +74,7 @@ private:
   QGraphicsEllipseItem* m_tempPlanet;
   QTimer* m_timer;
   std::mt19937 m_randomGenerator;
+  std::map<unsigned int, int> m_scores;
 };
 
 #endif // GRAVITYSCENE_H
