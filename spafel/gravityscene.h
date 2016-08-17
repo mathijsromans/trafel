@@ -14,7 +14,6 @@ class BodyItem;
 class Cargo;
 class Planet;
 class Spaceship;
-class QTimer;
 
 class GravityScene : public TransformScene
 {
@@ -36,15 +35,10 @@ public:
   static QPointF envToScene(const QPointF& point, const QRectF& tableRect, const QPointF& centreOfMass);
   static QPointF sceneToEnv(const QPointF& point, const QRectF& tableRect, const QPointF& centreOfMass);
 
-
-protected:
-//  void eventClick(QPointF point, PointerEvent::Color c) override;
-
-private slots:
-  void step();
-
 private:
   virtual void init() override;
+  unsigned int getFps() const override;
+  void step() override;
   void handleCollisions();
   void addPlanet(Body* body, const QColor& lineColor);
   void addSpaceship(Body* body, unsigned int id);
@@ -76,7 +70,6 @@ private:
   std::vector<Cargo*> m_cargos;
   std::map<Body*, std::deque<QGraphicsLineItem*>> m_trackItems;
   QGraphicsEllipseItem* m_tempPlanet;
-  QTimer* m_timer;
 };
 
 #endif // GRAVITYSCENE_H

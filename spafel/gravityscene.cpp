@@ -10,7 +10,6 @@
 #include <QGraphicsEllipseItem>
 #include <QGraphicsSceneMouseEvent>
 #include <QSignalMapper>
-#include <QTimer>
 
 #include <cmath>
 
@@ -34,8 +33,7 @@ GravityScene::GravityScene() :
   m_spaceships(),
   m_cargos(),
   m_trackItems(),
-  m_tempPlanet(0),
-  m_timer(new QTimer(this))
+  m_tempPlanet(0)
 {
 }
 
@@ -73,9 +71,6 @@ GravityScene::init()
   createCargo();
   m_environment->init();
 
-  connect(m_timer, SIGNAL(timeout()), this, SLOT(step()));
-  m_timer->start(1000/fps);
-
   std::array<ButtonInLayout, 4> buttons;
   buttons[0] = { Control::up, QPoint(0, 1) };
   buttons[1] = { Control::left, QPoint(-1, 0) };
@@ -106,6 +101,11 @@ GravityScene::init()
     }
   }
   connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(slotButtonPressed(int)));
+}
+
+unsigned int GravityScene::getFps() const
+{
+  return fps;
 }
 
 void
