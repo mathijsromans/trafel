@@ -45,6 +45,7 @@ SOURCES += main.cpp\
     flafel/stopper.cpp \
     flafel/player.cpp \
     mainmenuscene.cpp \
+    rafel/rafelscene.cpp
 
 HEADERS  += mainwindow.h \
     trafficscene.h \
@@ -75,5 +76,6 @@ HEADERS  += mainwindow.h \
     flafel/player.h \
     nocopy.h \
     mainmenuscene.h \
+    rafel/rafelscene.h
 
 FORMS    +=

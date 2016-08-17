@@ -10,7 +10,7 @@ class MainMenuScene : public TransformScene
   Q_OBJECT
 
 public:
-  enum class Games { mainMenu, poker, trafel, spafel, flafel, MAX };
+  enum class Games { mainMenu, poker, trafel, spafel, flafel, rafel, MAX };
   const std::array<std::string, static_cast<unsigned int>(Games::MAX)> m_gameNames;
   MainMenuScene();
 signals:

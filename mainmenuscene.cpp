@@ -5,7 +5,7 @@
 
 MainMenuScene::MainMenuScene()
    : TransformScene(),
-     m_gameNames({"MAIN MENU", "POKER", "TRAFEL", "SPAFEL", "FLAFEL"})
+     m_gameNames({"MAIN MENU", "POKER", "TRAFEL", "SPAFEL", "FLAFEL", "RAFEL"})
 {
 }
 

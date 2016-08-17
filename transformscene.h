@@ -45,10 +45,15 @@ protected:
   void setScore(unsigned int player, int score);
 private:
   virtual void init() = 0;
-  virtual void eventClick(QPointF p, PointerEvent::Color c);
-  virtual void eventUnclick(QPointF p, PointerEvent::Color c);
-  virtual void eventMove(QPointF p, PointerEvent::Color c);
+  virtual void step() {}
+  virtual void eventClick(QPointF /*p*/, PointerEvent::Color /*c*/) {}
+  virtual void eventUnclick(QPointF /*p*/, PointerEvent::Color /*c*/) {}
+  virtual void eventMove(QPointF /*p*/, PointerEvent::Color /*c*/) {}
   virtual bool showScore() const { return false; }
+  virtual unsigned int getFps() const { return 0; }
+
+private slots:
+  void doStep();
 
 private:
   struct PlayerScore
@@ -63,6 +68,7 @@ private:
   std::vector<PlayerScore> m_players;
   std::array<QPointF, 3> m_inputPrev;
   PointerEvent m_lastMouseEvent;
+  QTimer* m_timer;
 };
 
 #endif // TRANSFORMSCENE_H

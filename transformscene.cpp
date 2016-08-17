@@ -8,6 +8,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QPixmap>
 #include <QPainter>
+#include <QTimer>
 
 #include <iostream>
 
@@ -15,7 +16,8 @@ TransformScene::TransformScene()
  : m_infoText(0),
    m_quitYes(new Button("Yes")),
    m_quitNo(new Button("No")),
-   m_inputPrev{{}}
+   m_inputPrev{{}},
+   m_timer(0)
 {
   setBackgroundBrush(Qt::black);
   addItem(m_quitYes);
@@ -27,18 +29,6 @@ TransformScene::TransformScene()
 }
 
 TransformScene::~TransformScene()
-{
-}
-
-void TransformScene::eventClick(QPointF /*p*/, PointerEvent::Color /*c*/)
-{
-}
-
-void TransformScene::eventUnclick(QPointF /*p*/, PointerEvent::Color /*c*/)
-{
-}
-
-void TransformScene::eventMove(QPointF /*p*/, PointerEvent::Color /*c*/)
 {
 }
 
@@ -110,6 +100,14 @@ void TransformScene::doInit(QRectF tableRect)
   }
 
   init();
+
+  double fps = getFps();
+  if ( fps != 0 )
+  {
+    m_timer = new QTimer(this);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(doStep()));
+    m_timer->start(1000/fps);
+  }
 }
 
 void TransformScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
@@ -193,6 +191,11 @@ void TransformScene::setScore(unsigned int player, int score)
                                     colors[player%colors.size()].name() +
                                     ";'>" + QString::number(score) + "</div>");
   }
+}
+
+void TransformScene::doStep()
+{
+  step();
 }
 
 void TransformScene::showInfoText(const std::string& text)

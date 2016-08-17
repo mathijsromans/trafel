@@ -4,6 +4,7 @@
 #include "userinput.h"
 #include "mainmenuscene.h"
 #include "flafel/flafelscene.h"
+#include "rafel/rafelscene.h"
 #include "spafel/gravityscene.h"
 #include "poker/pokerscene.h"
 #include <QCoreApplication>
@@ -90,10 +91,11 @@ void MainWindow::slotStartGame(MainMenuScene::Games game)
       m_currentScene = std::move(mainMenuScene);
     }
     break;
-    case Games::poker:    m_currentScene = std::make_unique<PokerScene>(); break;
-    case Games::trafel:   m_currentScene = std::make_unique<TrafficScene>(); break;
-    case Games::spafel:   m_currentScene = std::make_unique<GravityScene>(); break;
-    case Games::flafel:   m_currentScene = std::make_unique<FlafelScene>(); break;
+    case Games::poker:  m_currentScene = std::make_unique<PokerScene>(); break;
+    case Games::trafel: m_currentScene = std::make_unique<TrafficScene>(); break;
+    case Games::spafel: m_currentScene = std::make_unique<GravityScene>(); break;
+    case Games::flafel: m_currentScene = std::make_unique<FlafelScene>(); break;
+    case Games::rafel:  m_currentScene = std::make_unique<RafelScene>(); break;
     case Games::MAX: assert(false);
   }
   m_calibration.setScene(m_currentScene.get());

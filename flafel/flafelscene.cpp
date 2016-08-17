@@ -9,24 +9,16 @@
 #include <QDebug>
 #include <QGraphicsEllipseItem>
 #include <QGraphicsPixmapItem>
-#include <QTimer>
 #include <random>
 
 namespace
 {
   // game parameters
   double n_timeForNewBall = 1;
-
-  // techical parameters
-  double n_fps = 20;
-
-  // derived parameters
-  double n_dt = 1 / n_fps;
 }
 
 FlafelScene::FlafelScene()
  : TransformScene(),
-   m_timer(new QTimer(this)),
    m_timeSinceLastNewBall(0)
 {
 }
@@ -52,9 +44,6 @@ void FlafelScene::init()
   m_borderStoppers[1] = createStopper( rect.topRight(), rect.bottomRight(), Qt::white );
   m_borderStoppers[2] = createStopper( rect.bottomRight(), rect.bottomLeft(), Qt::white );
   m_borderStoppers[3] = createStopper( rect.bottomLeft(), rect.topLeft(), Qt::white );
-
-  connect(m_timer, SIGNAL(timeout()), this, SLOT(step()));
-  m_timer->start(1000/n_fps);
 }
 
 void FlafelScene::eventClick(QPointF p, PointerEvent::Color c)
@@ -105,7 +94,7 @@ void FlafelScene::advanceBalls()
   }
   for ( auto&& b : m_balls )
   {
-    b->advance(n_dt, lines, points);
+    b->advance(ms_dt, lines, points);
   }
 }
 
@@ -155,7 +144,7 @@ void FlafelScene::step()
 
 void FlafelScene::addBalls()
 {
-  m_timeSinceLastNewBall += n_dt;
+  m_timeSinceLastNewBall += ms_dt;
   if ( m_timeSinceLastNewBall < n_timeForNewBall )
   {
     return;
