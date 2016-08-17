@@ -16,6 +16,9 @@ template <typename T> int sign(T val)
   return (T(0) < val) - (val < T(0));
 }
 
+template <typename T>
+T sqr(T x) { return x*x; }
+
 template <typename T1, typename T2>
 bool contains( const T1& vec, const T2& elem )
 {

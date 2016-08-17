@@ -20,12 +20,12 @@ public:
   void stopperRemoved( const Stopper* stopper );
 private:
   void init() override;
-  void step() override;
+  void step(unsigned int turn) override;
   void eventClick(QPointF p, PointerEvent::Color c) override;
   void eventUnclick(QPointF p, PointerEvent::Color c) override;
   void eventMove(QPointF p, PointerEvent::Color c) override;
   bool showScore() const override { return true; }
-  virtual unsigned int getFps() const { return ms_fps; }
+  virtual double getFps() const { return ms_fps; }
   std::unique_ptr<Stopper> createStopper( QPointF start, QPointF end, QColor c );
   void addBalls();
   void advanceBalls();
@@ -38,7 +38,7 @@ private:
   std::array<std::unique_ptr<Stopper>, 4> m_borderStoppers;
   std::vector<const Stopper*> m_allStoppers;
   double m_timeSinceLastNewBall;
-  const unsigned int ms_fps = 20;
+  const double ms_fps = 20;
   const double ms_dt = 1.0 / ms_fps;
 };
 

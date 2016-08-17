@@ -107,13 +107,13 @@ GravityScene::init()
   connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(slotButtonPressed(int)));
 }
 
-unsigned int GravityScene::getFps() const
+double GravityScene::getFps() const
 {
   return fps;
 }
 
 void
-GravityScene::step()
+GravityScene::step(unsigned int /*turn*/)
 {
   m_environment->oneStep();
   QPointF centreOfMass = m_environment->calcCentreOfMass(m_environment->getCurrentTime());

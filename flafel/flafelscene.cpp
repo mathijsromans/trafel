@@ -133,7 +133,7 @@ void FlafelScene::stopperRemoved(const Stopper* stopper)
   m_allStoppers.erase(it);
 }
 
-void FlafelScene::step()
+void FlafelScene::step(unsigned int /*turn*/)
 {
   addBalls();
   advanceBalls();

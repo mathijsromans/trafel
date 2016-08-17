@@ -5,9 +5,6 @@
 namespace Utilities
 {
 
-template <typename T>
-T sqr(T x) { return x*x; }
-
 QRectF squareAt(QPointF p, double size)
 {
   return QRectF(p.x()-0.5*size, p.y()-0.5*size, size, size);

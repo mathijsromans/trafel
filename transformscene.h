@@ -45,12 +45,12 @@ protected:
   void setScore(unsigned int player, int score);
 private:
   virtual void init() = 0;
-  virtual void step() {}
+  virtual void step(unsigned int /*turn*/) {}
   virtual void eventClick(QPointF /*p*/, PointerEvent::Color /*c*/) {}
   virtual void eventUnclick(QPointF /*p*/, PointerEvent::Color /*c*/) {}
   virtual void eventMove(QPointF /*p*/, PointerEvent::Color /*c*/) {}
   virtual bool showScore() const { return false; }
-  virtual unsigned int getFps() const { return 0; }
+  virtual double getFps() const { return 0; }
 
 private slots:
   void doStep();
@@ -68,6 +68,7 @@ private:
   std::vector<PlayerScore> m_players;
   std::array<QPointF, 3> m_inputPrev;
   PointerEvent m_lastMouseEvent;
+  unsigned int m_turn = 0;
   QTimer* m_timer;
 };
 

@@ -17,6 +17,7 @@ TransformScene::TransformScene()
    m_quitYes(new Button("Yes")),
    m_quitNo(new Button("No")),
    m_inputPrev{{}},
+   m_turn(0),
    m_timer(0)
 {
   setBackgroundBrush(Qt::black);
@@ -107,6 +108,7 @@ void TransformScene::doInit(QRectF tableRect)
     m_timer = new QTimer(this);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(doStep()));
     m_timer->start(1000/fps);
+    step(0);
   }
 }
 
@@ -195,7 +197,7 @@ void TransformScene::setScore(unsigned int player, int score)
 
 void TransformScene::doStep()
 {
-  step();
+  step(m_turn++);
 }
 
 void TransformScene::showInfoText(const std::string& text)

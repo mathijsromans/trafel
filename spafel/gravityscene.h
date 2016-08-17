@@ -37,9 +37,9 @@ public:
 
 private:
   virtual void init() override;
-  virtual unsigned int getFps() const override;
+  virtual double getFps() const override;
   virtual bool showScore() const override { return true; }
-  virtual void step() override;
+  virtual void step(unsigned int turn) override;
   void handleCollisions();
   void addPlanet(Body* body, const QColor& lineColor);
   void addSpaceship(Body* body, unsigned int id);
