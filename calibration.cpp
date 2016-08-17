@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QGraphicsEllipseItem>
 #include <QSettings>
+#include <QGraphicsPixmapItem>
 
 const std::array<QPoint,4> Calibration::ms_calibrationCoordinates = {QPoint{200,200},QPoint{600,200},QPoint{600,600},QPoint{200,600}};
 
@@ -32,7 +33,8 @@ Calibration::Calibration()
    m_cornerPoints(),
    m_tableRect(QPoint(200, 200), QPoint(600, 600)),
    m_circle(0),
-   m_tableRectItem(0)
+   m_tableRectItem(0),
+   m_imageItem(new QGraphicsPixmapItem() )
 {
   QSettings settings("TafelSoft", "Tafel");
   settings.beginGroup("Calibration");
@@ -79,13 +81,15 @@ void Calibration::calibrate()
   {
     m_calibrationLights.clear();
     m_cornerPoints.clear();
+    m_scene->showInfoText("Verify camera position");
+    m_imageItem->setPixmap(QPixmap::fromImage(QImage("grab_0.png")));
+    m_scene->addItem(m_imageItem);
     m_status = Status::uninitialised;
-    m_circle = m_scene->addEllipse(Utilities::squareAt(ms_calibrationCoordinates[m_calibrationLights.size()],20), QPen(Qt::green,3));
   }
 }
 
 void Calibration::processTransformedMouseClick(PointerEvent e)
-{  
+{
   if ( m_status == Status::transformDone )
   {
     newCornerPoint(e.getAny());
@@ -117,6 +121,12 @@ void Calibration::processEvent(PointerEvent e)
   }
   if ( m_status == Status::uninitialised )
   {
+    m_circle = m_scene->addEllipse(Utilities::squareAt(ms_calibrationCoordinates[m_calibrationLights.size()],20), QPen(Qt::green,3));
+    m_scene->showInfoText("Click the points");
+    m_status = Status::cameraPositioned;
+  }
+  else if ( m_status == Status::cameraPositioned )
+  {
     newCalibratePoint(e.getAny().toPoint());
   }
   else
@@ -137,6 +147,11 @@ void Calibration::processEvent(PointerEvent e)
     std::string text = "Select corner " + std::to_string(m_cornerPoints.size()+1);
     m_scene->showInfoText(text);
   }
+}
+
+bool Calibration::isDone() const
+{
+  return m_status == Status::done;
 }
 
 void Calibration::clear()

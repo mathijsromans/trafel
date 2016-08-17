@@ -10,6 +10,7 @@
 class TransformScene;
 class QGraphicsRectItem;
 class QGraphicsEllipseItem;
+class QGraphicsPixmapItem;
 class PointerEvent;
 
 class Calibration
@@ -18,6 +19,7 @@ public:
   explicit Calibration();
   void setScene( TransformScene* scene );
   void processEvent(PointerEvent e);
+  bool isDone() const;
 
 private:
   void calibrate();
@@ -28,7 +30,7 @@ private:
   void processTransformedMouseClick(PointerEvent e);
 
 private:
-  enum class Status { uninitialised, transformDone, testing, done };
+  enum class Status { uninitialised, cameraPositioned, transformDone, testing, done };
   TransformScene* m_scene;
   Status m_status;
   std::vector<QPoint> m_calibrationLights;
@@ -36,6 +38,7 @@ private:
   QRectF m_tableRect;
   QGraphicsEllipseItem* m_circle;  
   QGraphicsRectItem* m_tableRectItem;
+  QGraphicsPixmapItem* m_imageItem;
   QTransform m_transform;
   QPointF m_testingLocation;
   static const unsigned int ms_version = 1;

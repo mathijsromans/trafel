@@ -146,10 +146,13 @@ void UserInput::process()
 
   getImage();
 
-//  static int counter = 0;
-//  QString fileName = QString("grab_") + QString::number(counter++) + ".png";
-//  m_currentImage.toImage().save( fileName );
-//  qDebug() << "saved to " << fileName;
+  static int counter = 0;
+  if (counter == 0)
+  {
+    QString fileName = QString("grab_") + QString::number(counter++) + ".png";
+    m_currentImage.toImage().save( fileName );
+    qDebug() << "saved to " << fileName;
+  }
 
   PointerEvent event( getEvent() );
   if ( event.compareTo( m_lastEvent ) )
