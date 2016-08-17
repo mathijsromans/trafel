@@ -17,7 +17,7 @@ namespace
 {
   const double AU = 149.6e9;
   const double sunMass = 1e27;
-  const double zoom = 0.4;
+  const double zoom = 0.3;
   const double fps = 30;            // number of frames per second
   const double speedup = 50000000;  // speedup factor, number of seconds per second
   const double stepsize = speedup/fps;
@@ -208,10 +208,10 @@ GravityScene::createCelestialBodies()
 
   double earthEccentricity = 0.0167086;
   const double earthMass = 5.972e24;
-  double earthX = 152.10e9;
+  double earthX = 152.10e9 * 1.2;  // * 1.4 to create larger distance
   double earthVy = Environment::calcOrbitalVelocity(earthX, earthEccentricity, sunMass);
   Body* earth = new Body(earthX, 0.0, 0.0, -earthVy, earthMass, Qt::white, m_environment.get());
-  addPlanet(earth, Qt::red);
+  addPlanet(earth, Qt::green);
 
   double venusEccentricity = 0.006772;
   const double venusMass = 4.8675e24;
@@ -225,7 +225,14 @@ GravityScene::createCelestialBodies()
   double mercuryX = 69.81690e9;
   double mercuryVy = Environment::calcOrbitalVelocity(mercuryX, mercuryEccentricity, sunMass);
   Body* mercury = new Body(mercuryX, 0.0, 0.0, -mercuryVy, mercuryMass, Qt::white, m_environment.get());
-  addPlanet(mercury, Qt::green);
+  addPlanet(mercury, Qt::red);
+
+//  double marsEccentricity = 0.0934;
+//  const double massMars = 6.4171e23;
+//  double marsX = 227.9e9;
+//  double marsY = Environment::calcOrbitalVelocity(marsX, marsEccentricity, sunMass);
+//  Body* mars = new Body(marsX, 0.0, 0.0, -marsY, massMars, Qt::white, m_environment.get());
+//  addPlanet(mars, Qt::red);
 }
 
 void
