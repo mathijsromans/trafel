@@ -17,7 +17,7 @@ public:
   };
 public:
   Cargo(Planet* origin, Planet* destination);
-  void setSpaceship(Spaceship* spaceship);
+  void notifyCollision(Spaceship* spaceship, Planet* planet);
   virtual void updateItem(const QRectF& tableRect, QPointF centreOfMass) override;
   virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
   virtual QRectF boundingRect() const override;

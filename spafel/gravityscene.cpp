@@ -112,23 +112,13 @@ void
 GravityScene::step()
 {
   m_environment->oneStep();
+  handleCollisions();
+
   QPointF centreOfMass = m_environment->calcCentreOfMass(m_environment->getCurrentTime());
   for (BodyItem* bodyItem : m_bodyItems)
   {
     bodyItem->updateItem(getTableRect(), centreOfMass);
   }
-
-  for (const auto& item : m_spaceships)
-  {
-    for (const auto& planet : m_planets)
-    {
-      if (item->collidesWithItem(planet))
-      {
-
-      }
-    }
-  }
-
   updateTrackItems();
 }
 
@@ -257,5 +247,24 @@ GravityScene::createCargo()
 {
   Cargo* cargo = new Cargo(m_planets[1], m_planets[2]);
   m_bodyItems.push_back(cargo);
+  m_cargos.push_back(cargo);
   addItem(cargo);
+}
+
+void
+GravityScene::handleCollisions()
+{
+  for (const auto& spaceship : m_spaceships)
+  {
+    for (const auto& planet : m_planets)
+    {
+      if (spaceship->collidesWithItem(planet))
+      {
+        for (const auto& cargo : m_cargos)
+        {
+          cargo->notifyCollision(spaceship, planet);
+        }
+      }
+    }
+  }
 }

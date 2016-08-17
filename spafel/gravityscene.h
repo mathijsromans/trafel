@@ -36,6 +36,7 @@ public:
   static QPointF envToScene(const QPointF& point, const QRectF& tableRect, const QPointF& centreOfMass);
   static QPointF sceneToEnv(const QPointF& point, const QRectF& tableRect, const QPointF& centreOfMass);
 
+
 protected:
 //  void eventClick(QPointF point, PointerEvent::Color c) override;
 
@@ -44,6 +45,7 @@ private slots:
 
 private:
   virtual void init() override;
+  void handleCollisions();
   void addPlanet(Body* body, const QColor& lineColor);
   void addSpaceship(Body* body, unsigned int id);
   void updateTrackItems();

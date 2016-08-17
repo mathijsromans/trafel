@@ -23,11 +23,17 @@ Cargo::Cargo(Planet* origin, Planet* destination) :
   assert(destination);
 }
 
-void Cargo::setSpaceship(Spaceship* spaceship)
+void Cargo::notifyCollision(Spaceship* spaceship, Planet* planet)
 {
-  assert(m_status == Status::origin);
-  m_status = Status::spaceship;
-  m_spaceship = spaceship;
+  if (m_status == Status::origin && m_origin == planet)
+  {
+    m_status = Status::spaceship;
+    m_spaceship = spaceship;
+  }
+  else if (m_status == Status::spaceship && m_spaceship == spaceship && m_destination == planet)
+  {
+    m_status = Status::destination;
+  }
 }
 
 Body* Cargo::getCurrentBody() const
