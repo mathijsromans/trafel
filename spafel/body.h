@@ -19,9 +19,10 @@ class Body
 public:
   struct IntegrationResult
   {
-    IntegrationResult() : success(false) {}
+    IntegrationResult() : success(false), error(-1.0), nSteps(0) {}
     bool success;
     double error;
+    unsigned int nSteps;
     std::array<double, 4> x;
   };
 
