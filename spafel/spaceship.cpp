@@ -68,12 +68,6 @@ void Spaceship::setShowRocketOn()
   m_rocketOn += 10;
 }
 
-void Spaceship::setSize(int size)
-{
-  m_pixmap = m_pixmap.scaledToWidth(size);
-  m_pixmapRocketOff = m_pixmapRocketOff.scaledToWidth(size);
-}
-
 void Spaceship::setHasCargo(bool hasCargo)
 {
   m_hasCargo = hasCargo;

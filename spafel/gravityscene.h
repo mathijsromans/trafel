@@ -49,7 +49,6 @@ private:
   void createCargo(Planet* notOnMe=0);
   static double getScaleFactor(const QRectF& tableRect);
   void removeBodyItem(BodyItem* bodyItem);
-  void checkScores();
 
 private slots:
   void slotButtonPressed(int b);
@@ -75,7 +74,7 @@ private:
   QGraphicsEllipseItem* m_tempPlanet;
   QTimer* m_timer;
   std::mt19937 m_randomGenerator;
-  std::map<unsigned int, unsigned int> m_scores;
+  std::map<unsigned int, int> m_scores;
 };
 
 #endif // GRAVITYSCENE_H

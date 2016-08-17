@@ -16,7 +16,6 @@ public:
                      QWidget* widget);
   unsigned int getPlayerId() const;
   void setShowRocketOn();
-  void setSize(int size);
   void setHasCargo(bool hasCargo);
   bool hasCargo() const;
 private:

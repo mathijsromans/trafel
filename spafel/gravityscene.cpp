@@ -21,7 +21,6 @@ namespace
   const double fps = 30;            // number of frames per second
   const double speedup = 50000000;  // speedup factor, number of seconds per second
   const double stepsize = speedup/fps;
-  const unsigned int winningScore = 50;
 }
 
 const std::array<std::string, GravityScene::ms_numControl> GravityScene::ms_buttonTexts = {"U", "D", "L", "R"};
@@ -124,7 +123,6 @@ GravityScene::step(unsigned int /*turn*/)
   }
   updateTrackItems();
   handleCollisions();
-  checkScores();
 }
 
 QPointF
@@ -326,20 +324,4 @@ void GravityScene::removeBodyItem(BodyItem* bodyItem)
 {
   removeItem(bodyItem);
   m_bodyItems.erase( std::remove(m_bodyItems.begin(), m_bodyItems.end(), bodyItem), m_bodyItems.end() );
-}
-
-void GravityScene::checkScores()
-{
-  for (const auto& score : m_scores)
-  {
-    if (score.second >= winningScore)
-    {
-      QFont font;
-      int spaceshipWidth = getTableRect().width() * 0.3;
-      int textSize = getTableRect().width() * 0.1;
-      font.setPixelSize(textSize);
-      addText("WINNER", font);
-      m_spaceships[score.first]->setSize(spaceshipWidth);
-    }
-  }
 }
