@@ -13,7 +13,7 @@
 
 namespace
 {
-  const QColor lineColor = Qt::black;
+  const unsigned int lineWidth = 2;
 }
 
 Cargo::Cargo(Planet* origin, Planet* destination) :
@@ -58,6 +58,21 @@ Body* Cargo::getCurrentBody() const
   return 0;
 }
 
+QColor Cargo::getLineColor() const
+{
+  switch (m_status)
+  {
+    case Location::origin :
+      return m_destination->getColor();
+    case Location::destination :
+      return Qt::white;
+    case Location::spaceship :
+      return Qt::white;
+  }
+  assert(false);
+  return {};
+}
+
 void Cargo::updateItem(const QRectF &tableRect, QPointF centreOfMass)
 {
   Body* body = getCurrentBody();
@@ -76,8 +91,9 @@ void Cargo::paint(QPainter *painter,
                       const QStyleOptionGraphicsItem */*option*/,
                       QWidget */*widget*/)
 {
-  QPen pen(lineColor);
-  QBrush brush(m_destination->getLineColor());
+  QPen pen(getLineColor());
+  pen.setWidth(lineWidth);
+  QBrush brush(m_destination->getColor());
   painter->setPen(pen);
   painter->setBrush(brush);
   painter->drawRect(boundingRect());

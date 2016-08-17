@@ -30,6 +30,7 @@ public:
   virtual QRectF boundingRect() const override;
 private:
   Body* getCurrentBody() const;
+  QColor getLineColor() const;
 private:
   Planet* m_origin;
   Planet* m_destination;

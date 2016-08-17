@@ -8,14 +8,13 @@
 namespace
 {
   const double earthMass = 5.972e24;
-  const unsigned int lineWidth = 4;
   const double minRadius = 10.0;
 }
 
-Planet::Planet(Body* body, const QColor& lineColor)
+Planet::Planet(Body* body, const QColor& color)
 : BodyItem(body),
   m_radius(calcRadius(getBody()->getMass())),
-  m_lineColor(lineColor)
+  m_color(color)
 {
 }
 
@@ -27,10 +26,8 @@ QRectF Planet::boundingRect() const
 void Planet::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/,
                    QWidget */*widget*/)
 {
-  QColor color = getBody()->getColor();
-  QPen pen(m_lineColor);
-  pen.setWidth(lineWidth);
-  QBrush brush(color);
+  QPen pen(m_color);
+  QBrush brush(m_color);
   painter->setPen(pen);
   painter->setBrush(brush);
   painter->drawEllipse(boundingRect());
@@ -42,7 +39,7 @@ Planet::calcRadius(double mass)
   return static_cast<unsigned int>(std::max(std::pow(mass, 1/6.0) / std::pow(earthMass, 1/6.0) * 30.0, minRadius));
 }
 
-QColor Planet::getLineColor()
+QColor Planet::getColor() const
 {
-  return m_lineColor;
+  return m_color;
 }
