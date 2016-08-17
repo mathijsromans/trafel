@@ -5,8 +5,8 @@
 
 namespace
 {
-  const double integrationTolerance = 0.4;
-  const unsigned int maxSteps = 500;
+  const double integrationTolerance = 3.0;
+  const unsigned int maxSteps = 200;
 }
 
 
@@ -237,11 +237,13 @@ Body::IntegrationResult Body::integrateRK45(double stepsize, unsigned int time) 
     {
       result.success = false;
       result.x.fill(0);
+      result.nSteps = nSteps;
       return result;
     }
   }
 
   result.success = true;
   result.x = x;
+  result.nSteps = nSteps;
   return result;
 }
