@@ -112,14 +112,13 @@ void
 GravityScene::step()
 {
   m_environment->oneStep();
-  handleCollisions();
-
   QPointF centreOfMass = m_environment->calcCentreOfMass(m_environment->getCurrentTime());
   for (BodyItem* bodyItem : m_bodyItems)
   {
     bodyItem->updateItem(getTableRect(), centreOfMass);
   }
   updateTrackItems();
+  handleCollisions();
 }
 
 QPointF
