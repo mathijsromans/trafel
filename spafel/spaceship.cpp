@@ -67,6 +67,12 @@ void Spaceship::setShowRocketOn()
   m_rocketOn += 10;
 }
 
+void Spaceship::setSize(int size)
+{
+  m_pixmap = m_pixmap.scaledToWidth(size);
+  m_pixmapRocketOff = m_pixmapRocketOff.scaledToWidth(size);
+}
+
 void Spaceship::initPixmaps()
 {
   ms_redSpaceship = std::make_unique<QPixmap>("../trafel/resources/rocket_red.png");

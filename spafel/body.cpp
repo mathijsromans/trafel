@@ -5,7 +5,7 @@
 
 namespace
 {
-  const double integrationTolerance = 3.0;
+  const double integrationTolerance = 10.0;
   const unsigned int maxSteps = 200;
 }
 

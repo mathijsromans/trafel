@@ -16,6 +16,7 @@ public:
                      QWidget* widget);
   unsigned int getPlayerId() const;
   void setShowRocketOn();
+  void setSize(int size);
 private:
   void initPixmaps();
 private:

@@ -21,6 +21,7 @@ namespace
   const double fps = 30;            // number of frames per second
   const double speedup = 50000000;  // speedup factor, number of seconds per second
   const double stepsize = speedup/fps;
+  const unsigned int winningScore = 50;
 }
 
 const std::array<std::string, GravityScene::ms_numControl> GravityScene::ms_buttonTexts = {"U", "D", "L", "R"};
@@ -123,6 +124,7 @@ GravityScene::step(unsigned int /*turn*/)
   }
   updateTrackItems();
   handleCollisions();
+  checkScores();
 }
 
 QPointF
@@ -283,29 +285,30 @@ GravityScene::handleCollisions()
     auto spaceship = spaceshipId.second;
     for (const auto& planet : m_planets)
     {
-      if (spaceship->collidesWithItem(planet))
+      if (!spaceship->collidesWithItem(planet))
       {
-        for (const auto& cargo : m_cargos)
+        continue;
+      }
+      for (const auto& cargo : m_cargos)
+      {
+        Cargo::Action action = cargo->notifyCollision(spaceship, planet);
+        switch (action)
         {
-          Cargo::Action action = cargo->notifyCollision(spaceship, planet);
-          switch (action)
+          case Cargo::Action::pickup :
           {
-            case Cargo::Action::pickup :
-            {
-              createCargo(planet);
-              break;
-            }
-            case Cargo::Action::dropoff :
-            {
-              unsigned int playerId = spaceship->getPlayerId();
-              m_scores[playerId] += 10;
-              setScore(playerId, m_scores[playerId]);
-              toRemoveCargos.push_back(cargo);
-              break;
-            }
-            case Cargo::Action::none :
-              break;
+            createCargo(planet);
+            break;
           }
+          case Cargo::Action::dropoff :
+          {
+            unsigned int playerId = spaceship->getPlayerId();
+            m_scores[playerId] += 10;
+            setScore(playerId, m_scores[playerId]);
+            toRemoveCargos.push_back(cargo);
+            break;
+          }
+          case Cargo::Action::none :
+            break;
         }
       }
     }
@@ -323,4 +326,20 @@ void GravityScene::removeBodyItem(BodyItem* bodyItem)
 {
   removeItem(bodyItem);
   m_bodyItems.erase( std::remove(m_bodyItems.begin(), m_bodyItems.end(), bodyItem), m_bodyItems.end() );
+}
+
+void GravityScene::checkScores()
+{
+  for (const auto& score : m_scores)
+  {
+    if (score.second >= winningScore)
+    {
+      QFont font;
+      int spaceshipWidth = getTableRect().width() * 0.3;
+      int textSize = getTableRect().width() * 0.1;
+      font.setPixelSize(textSize);
+      addText("WINNER", font);
+      m_spaceships[score.first]->setSize(spaceshipWidth);
+    }
+  }
 }
