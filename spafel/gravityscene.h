@@ -42,7 +42,7 @@ private slots:
 
 private:
   virtual void init() override;
-  void addPlanet(Body* body);
+  void addPlanet(Body* body, const QColor& lineColor);
   void addSpaceship(Body* body, unsigned int id);
   void updateTrackItems();
   void createCelestialBodies();

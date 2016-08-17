@@ -22,7 +22,6 @@ public:
   virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
   virtual QRectF boundingRect() const override;
 private:
-  QColor getColor() const;
   Body* getCurrentBody() const;
 private:
   Planet* m_origin;

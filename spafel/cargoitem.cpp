@@ -45,21 +45,6 @@ Body* CargoItem::getCurrentBody() const
   return 0;
 }
 
-QColor CargoItem::getColor() const
-{
-  switch (m_status)
-  {
-  case Status::origin :
-    return Qt::red;
-  case Status::destination :
-    return Qt::green;
-  case Status::spaceship :
-    return m_spaceship->getBody()->getColor();
-  }
-  assert(false);
-  return {};
-}
-
 void CargoItem::updateItem(const QRectF &tableRect, QPointF centreOfMass)
 {
   Body* body = getCurrentBody();
@@ -78,11 +63,9 @@ void CargoItem::paint(QPainter *painter,
                       const QStyleOptionGraphicsItem */*option*/,
                       QWidget */*widget*/)
 {
-  QColor color = getColor();
   QPen pen(Qt::white);
-  QBrush brush(color);
+  QBrush brush(m_destination->getLineColor());
   painter->setPen(pen);
   painter->setBrush(brush);
-  QRectF(0.0, 0.0, 10, 10);
   painter->drawRect(boundingRect());
 }

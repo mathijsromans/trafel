@@ -43,10 +43,10 @@ GravityScene::~GravityScene()
 }
 
 void
-GravityScene::addPlanet(Body* body)
+GravityScene::addPlanet(Body* body, const QColor& lineColor)
 {
   m_environment->addBody(body);
-  Planet* bodyItem = new Planet(body);
+  Planet* bodyItem = new Planet(body, lineColor);
   m_planets.push_back(bodyItem);
   m_bodyItems.push_back(bodyItem);
   addItem(bodyItem);
@@ -228,28 +228,28 @@ void
 GravityScene::createCelestialBodies()
 {
   Body* sun = new Body(0.0, 0.0, 0.0, 0.0, sunMass, Qt::yellow, m_environment.get());
-  addPlanet(sun);
+  addPlanet(sun, Qt::yellow);
 
   double earthEccentricity = 0.0167086;
   const double earthMass = 5.972e24;
   double earthX = 152.10e9;
   double earthVy = Environment::calcOrbitalVelocity(earthX, earthEccentricity, sunMass);
   Body* earth = new Body(earthX, 0.0, 0.0, -earthVy, earthMass, Qt::white, m_environment.get());
-  addPlanet(earth);
+  addPlanet(earth, Qt::red);
 
   double venusEccentricity = 0.006772;
   const double venusMass = 4.8675e24;
   double venusX = 108.939e9;
   double venusVy = Environment::calcOrbitalVelocity(venusX, venusEccentricity, sunMass);
   Body* venus = new Body(venusX, 0.0, 0.0, -venusVy, venusMass, Qt::white, m_environment.get());
-  addPlanet(venus);
+  addPlanet(venus, Qt::blue);
 
   double mercuryEccentricity = 0.205630;
   const double mercuryMass = 3.3011e23;
   double mercuryX = 69.81690e9;
   double mercuryVy = Environment::calcOrbitalVelocity(mercuryX, mercuryEccentricity, sunMass);
   Body* mercury = new Body(mercuryX, 0.0, 0.0, -mercuryVy, mercuryMass, Qt::white, m_environment.get());
-  addPlanet(mercury);
+  addPlanet(mercury, Qt::green);
 }
 
 void
