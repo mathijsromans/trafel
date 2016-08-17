@@ -35,6 +35,8 @@ GravityScene::GravityScene() :
   m_trackItems(),
   m_tempPlanet(0)
 {
+  static std::random_device rd;
+  m_randomGenerator.seed(rd());
 }
 
 GravityScene::~GravityScene()
@@ -242,9 +244,24 @@ GravityScene::createSpaceShips()
 }
 
 void
-GravityScene::createCargo()
+GravityScene::createCargo(Planet* notOnMe)
 {
-  Cargo* cargo = new Cargo(m_planets[1], m_planets[2]);
+  std::uniform_int_distribution<> distribution(1, m_planets.size()-1);
+
+  std::size_t indexA = distribution(m_randomGenerator);
+  std::cout << "A: " << indexA << std::endl;
+  while (m_planets[indexA] == notOnMe)
+  {
+    indexA = distribution(m_randomGenerator);
+  }
+  std::size_t indexB = distribution(m_randomGenerator);
+  while (indexA == indexB)
+  {
+    indexB = distribution(m_randomGenerator);
+  }
+  std::cout << "A: " << indexA << std::endl;
+  std::cout << "B: " << indexB << std::endl;
+  Cargo* cargo = new Cargo(m_planets[indexA], m_planets[indexB]);
   m_bodyItems.push_back(cargo);
   m_cargos.push_back(cargo);
   addItem(cargo);
@@ -261,7 +278,11 @@ GravityScene::handleCollisions()
       {
         for (const auto& cargo : m_cargos)
         {
-          cargo->notifyCollision(spaceship, planet);
+          Cargo::Action action = cargo->notifyCollision(spaceship, planet);
+          if (action == Cargo::Action::pickup)
+          {
+            createCargo();
+          }
         }
       }
     }

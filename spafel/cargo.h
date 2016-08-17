@@ -10,14 +10,21 @@ class Spaceship;
 class Cargo : public BodyItem
 {
 public:
-  enum class Status {
+  enum class Location {
     origin,
     spaceship,
     destination,
   };
+
+  enum class Action {
+    dropoff,
+    pickup,
+    none
+  };
+
 public:
   Cargo(Planet* origin, Planet* destination);
-  void notifyCollision(Spaceship* spaceship, Planet* planet);
+  Cargo::Action notifyCollision(Spaceship* spaceship, Planet* planet);
   virtual void updateItem(const QRectF& tableRect, QPointF centreOfMass) override;
   virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
   virtual QRectF boundingRect() const override;
@@ -27,7 +34,7 @@ private:
   Planet* m_origin;
   Planet* m_destination;
   Spaceship* m_spaceship;
-  Status m_status;
+  Location m_status;
 };
 
 #endif // CARGO_H

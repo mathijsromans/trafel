@@ -45,7 +45,7 @@ private:
   void updateTrackItems();
   void createCelestialBodies();
   void createSpaceShips();
-  void createCargo();
+  void createCargo(Planet* notOnMe=0);
   static double getScaleFactor(const QRectF& tableRect);
 
 private slots:
@@ -70,6 +70,8 @@ private:
   std::vector<Cargo*> m_cargos;
   std::map<Body*, std::deque<QGraphicsLineItem*>> m_trackItems;
   QGraphicsEllipseItem* m_tempPlanet;
+  QTimer* m_timer;
+  std::mt19937 m_randomGenerator;
 };
 
 #endif // GRAVITYSCENE_H

@@ -11,40 +11,47 @@
 
 #include <cassert>
 
+namespace
+{
+  const QColor lineColor = Qt::black;
+}
 
 Cargo::Cargo(Planet* origin, Planet* destination) :
   BodyItem(origin->getBody()),
   m_origin(origin),
   m_destination(destination),
   m_spaceship(0),
-  m_status(Status::origin)
+  m_status(Location::origin)
 {
   assert(origin);
   assert(destination);
 }
 
-void Cargo::notifyCollision(Spaceship* spaceship, Planet* planet)
+Cargo::Action Cargo::notifyCollision(Spaceship* spaceship, Planet* planet)
 {
-  if (m_status == Status::origin && m_origin == planet)
+  if (m_status == Location::origin && m_origin == planet)
   {
-    m_status = Status::spaceship;
+    m_status = Location::spaceship;
     m_spaceship = spaceship;
+    return Action::pickup;
   }
-  else if (m_status == Status::spaceship && m_spaceship == spaceship && m_destination == planet)
+  else if (m_status == Location::spaceship && m_spaceship == spaceship && m_destination == planet)
   {
-    m_status = Status::destination;
+    m_status = Location::destination;
+    return Action::dropoff;
   }
+  return Action::none;
 }
 
 Body* Cargo::getCurrentBody() const
 {
   switch (m_status)
   {
-    case Status::origin :
+    case Location::origin :
       return m_origin->getBody();
-    case Status::destination :
+    case Location::destination :
       return m_destination->getBody();
-    case Status::spaceship :
+    case Location::spaceship :
       return m_spaceship->getBody();
   }
   assert(false);
@@ -69,7 +76,7 @@ void Cargo::paint(QPainter *painter,
                       const QStyleOptionGraphicsItem */*option*/,
                       QWidget */*widget*/)
 {
-  QPen pen(Qt::white);
+  QPen pen(lineColor);
   QBrush brush(m_destination->getLineColor());
   painter->setPen(pen);
   painter->setBrush(brush);

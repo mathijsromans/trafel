@@ -47,6 +47,5 @@ void Spaceship::initPixmaps()
   ms_redSpaceship = std::make_unique<QPixmap>("../trafel/resources/rocket_red.png");
   ms_greenSpaceship = std::make_unique<QPixmap>("../trafel/resources/rocket_green.png");
   ms_blueSpaceship = std::make_unique<QPixmap>("../trafel/resources/rocket_blue.png");
-
 }
 
