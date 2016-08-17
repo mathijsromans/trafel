@@ -34,7 +34,7 @@ Calibration::Calibration()
    m_tableRect(QPoint(200, 200), QPoint(600, 600)),
    m_circle(0),
    m_tableRectItem(0),
-   m_imageItem(new QGraphicsPixmapItem() )
+   m_imageItem(0)
 {
   QSettings settings("TafelSoft", "Tafel");
   settings.beginGroup("Calibration");
@@ -81,8 +81,11 @@ void Calibration::calibrate()
   {
     m_calibrationLights.clear();
     m_cornerPoints.clear();
+    m_imageItem = new QGraphicsPixmapItem();
+    m_imageItem->setPixmap(QPixmap::fromImage(QImage("grab_0.png")).scaledToWidth(500));
+    m_imageItem->setPos(250, 250);
+    m_imageItem->setZValue(-10);
     m_scene->showInfoText("Verify camera position");
-    m_imageItem->setPixmap(QPixmap::fromImage(QImage("grab_0.png")));
     m_scene->addItem(m_imageItem);
     m_status = Status::uninitialised;
   }
@@ -123,6 +126,7 @@ void Calibration::processEvent(PointerEvent e)
   {
     m_circle = m_scene->addEllipse(Utilities::squareAt(ms_calibrationCoordinates[m_calibrationLights.size()],20), QPen(Qt::green,3));
     m_scene->showInfoText("Click the points");
+    delete m_imageItem;
     m_status = Status::cameraPositioned;
   }
   else if ( m_status == Status::cameraPositioned )

@@ -148,9 +148,11 @@ void UserInput::process()
   if (counter == 0)
   {
     getImage(800);
+#if USE_CAMERA
     QString fileName = QString("grab_") + QString::number(counter++) + ".png";
     m_currentImage.toImage().save( fileName );
     qDebug() << "saved to " << fileName;
+#endif
   }
   else
   {
