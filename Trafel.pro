@@ -11,7 +11,11 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = Trafel
 TEMPLATE = app
 
-#LIBS += -lraspicam
+exists( USE_CAMERA ) {
+  message( "INFO: Configuring for use with camera!" )
+  LIBS += -lraspicam
+  DEFINES += USE_CAMERA
+}
 
 QMAKE_CXXFLAGS += -std=c++1y -Wall -g
 CONFIG += console

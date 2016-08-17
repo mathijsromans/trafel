@@ -8,9 +8,7 @@
 #include <unistd.h> // for usleep
 #include <unordered_set>
 
-#define USE_CAMERA 0
-
-#if USE_CAMERA
+#ifdef USE_CAMERA
 #include <raspicam/raspicam.h>
 
 namespace
