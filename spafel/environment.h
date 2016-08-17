@@ -30,7 +30,7 @@ private:
 
 private:
   static constexpr double gravitationalConstant=6.67408e-11;
-  static const unsigned int timeAhead = 200;
+  static const unsigned int timeAhead = 150;
   const unsigned int m_stepsize;
   unsigned int m_currentTime;
   std::vector<Body*> mo_bodies;
