@@ -141,7 +141,6 @@ void TransformScene::processMouseEvent(PointerEvent e)
 
 void TransformScene::slotQuit()
 {
-  qDebug() << "QUIT";
   showInfoText("Do you want to quit?");
   QRectF rect = getTableRect();
   m_quitYes->setPos( rect.center() + QPointF(0.25 * rect.width(), 0));

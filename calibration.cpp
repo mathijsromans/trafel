@@ -110,6 +110,11 @@ void Calibration::processTransformedMouseClick(PointerEvent e)
 
 void Calibration::processEvent(PointerEvent e)
 {
+  if ( m_status != Status::done &&
+       e.getAny().isNull() )
+  {
+    return; // ignore mouse release events when calibration is not done
+  }
   if ( m_status == Status::uninitialised )
   {
     newCalibratePoint(e.getAny().toPoint());
