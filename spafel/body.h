@@ -27,7 +27,7 @@ public:
   };
 
 public:
-  explicit Body(double x, double y, double vx, double vy, double mass, QColor color, Environment* environment);
+  explicit Body(double x, double y, double vx, double vy, double mass, QColor trackColor, Environment* environment);
   ~Body();
 
   void oneStep();
@@ -42,8 +42,8 @@ public:
   void boost(Direction d);
   bool trackChanged();
 
-  static const unsigned int timeAhead = 200;
-  QColor getColor() const;
+  static const unsigned int timeAhead = 150;
+  QColor getTrackColor() const;
 
 private:
   IntegrationResult integrateRK45(double stepsize, unsigned int time) const;
@@ -53,7 +53,7 @@ private:
   bool m_trackChanged;
   unsigned int m_currentTime;
   double m_mass;
-  QColor m_color;
+  QColor m_trackColor;
 
   Environment* m_environment;
 };

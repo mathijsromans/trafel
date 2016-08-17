@@ -15,14 +15,20 @@ public:
                      const QStyleOptionGraphicsItem* option,
                      QWidget* widget);
   unsigned int getPlayerId() const;
+  void setShowRocketOn();
 private:
   void initPixmaps();
 private:
   QPixmap m_pixmap;
+  QPixmap m_pixmapRocketOff;
   unsigned int m_playerId;
+  int m_rocketOn;
   static std::unique_ptr<QPixmap> ms_redSpaceship;
   static std::unique_ptr<QPixmap> ms_greenSpaceship;
   static std::unique_ptr<QPixmap> ms_blueSpaceship;
+  static std::unique_ptr<QPixmap> ms_redSpaceshipRocketOff;
+  static std::unique_ptr<QPixmap> ms_greenSpaceshipRocketOff;
+  static std::unique_ptr<QPixmap> ms_blueSpaceshipRocketOff;
 };
 
 #endif // SPACESHIP_H

@@ -59,7 +59,7 @@ GravityScene::addSpaceship(Body* body, unsigned int id)
 {
   m_environment->addSpaceship(body);
   Spaceship* ship = new Spaceship(body, id);
-  m_spaceships.push_back(ship);
+  m_spaceships[id] = ship;
   m_bodyItems.push_back(ship);
   m_scores[id] = 0;
   addItem(ship);
@@ -156,8 +156,9 @@ GravityScene::getScaleFactor(const QRectF& tableRect)
 
 void GravityScene::slotButtonPressed(int b)
 {
-  m_environment->boost(b/ms_numControl, static_cast<Body::Direction>( b%ms_numControl ));
-
+  unsigned int spaceshipId = b/ms_numControl;
+  m_environment->boost(spaceshipId, static_cast<Body::Direction>( b%ms_numControl ));
+  m_spaceships[spaceshipId]->setShowRocketOn();
 }
 
 void
@@ -192,7 +193,7 @@ GravityScene::updateTrackItems()
       auto s2 = body->getState(time + 1);
       QPointF com = m_environment->calcCentreOfMass(time);
       QLineF newLine(envToScene(QPointF(s2[0], s2[1]), getTableRect(), com), envToScene(QPointF(s1[0], s1[1]), getTableRect(), com));
-      QGraphicsLineItem* line = addLine(newLine, QPen(body->getColor()));
+      QGraphicsLineItem* line = addLine(newLine, QPen(body->getTrackColor()));
       line->setZValue(-10);
       lines.push_back(line);
     }
@@ -270,8 +271,9 @@ void
 GravityScene::handleCollisions()
 {
   std::vector<Cargo*> toRemoveCargos;
-  for (const auto& spaceship : m_spaceships)
+  for (const auto& spaceshipId : m_spaceships)
   {
+    auto spaceship = spaceshipId.second;
     for (const auto& planet : m_planets)
     {
       if (spaceship->collidesWithItem(planet))

@@ -10,12 +10,12 @@ namespace
 }
 
 
-Body::Body(double x, double y, double vx, double vy, double mass, QColor color, Environment* environment)
+Body::Body(double x, double y, double vx, double vy, double mass, QColor trackColor, Environment* environment)
 : m_x(),
   m_trackChanged(true),
   m_currentTime(0),
   m_mass(mass),
-  m_color(color),
+  m_trackColor(trackColor),
   m_environment(environment)
 {
   m_x[0][0] = x;
@@ -119,9 +119,9 @@ bool Body::trackChanged()
   return result;
 }
 
-QColor Body::getColor() const
+QColor Body::getTrackColor() const
 {
-  return m_color;
+  return m_trackColor;
 }
 
 Body::IntegrationResult Body::integrateRK45(double stepsize, unsigned int time) const

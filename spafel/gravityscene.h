@@ -68,7 +68,7 @@ private:
   std::unique_ptr<Environment> m_environment;
   std::vector<BodyItem*> m_bodyItems;
   std::vector<Planet*> m_planets;
-  std::vector<Spaceship*> m_spaceships;
+  std::map<unsigned int, Spaceship*> m_spaceships;
   std::vector<Cargo*> m_cargos;
   std::map<Body*, std::deque<QGraphicsLineItem*>> m_trackItems;
   QGraphicsEllipseItem* m_tempPlanet;
