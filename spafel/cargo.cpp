@@ -29,15 +29,17 @@ Cargo::Cargo(Planet* origin, Planet* destination) :
 
 Cargo::Action Cargo::notifyCollision(Spaceship* spaceship, Planet* planet)
 {
-  if (m_status == Location::origin && m_origin == planet)
+  if (m_status == Location::origin && m_origin == planet && !spaceship->hasCargo())
   {
     m_status = Location::spaceship;
     m_spaceship = spaceship;
+    spaceship->setHasCargo(true);
     return Action::pickup;
   }
   else if (m_status == Location::spaceship && m_spaceship == spaceship && m_destination == planet)
   {
     m_status = Location::destination;
+    spaceship->setHasCargo(false);
     return Action::dropoff;
   }
   return Action::none;

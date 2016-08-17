@@ -17,9 +17,12 @@ public:
   unsigned int getPlayerId() const;
   void setShowRocketOn();
   void setSize(int size);
+  void setHasCargo(bool hasCargo);
+  bool hasCargo() const;
 private:
   void initPixmaps();
 private:
+  bool m_hasCargo;
   QPixmap m_pixmap;
   QPixmap m_pixmapRocketOff;
   unsigned int m_playerId;

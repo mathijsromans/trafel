@@ -17,6 +17,7 @@ std::unique_ptr<QPixmap> Spaceship::ms_blueSpaceshipRocketOff;
 
 Spaceship::Spaceship(Body* body, unsigned int id)
   : BodyItem(body),
+    m_hasCargo(false),
     m_pixmap(),
     m_pixmapRocketOff(),
     m_playerId(id),
@@ -71,6 +72,16 @@ void Spaceship::setSize(int size)
 {
   m_pixmap = m_pixmap.scaledToWidth(size);
   m_pixmapRocketOff = m_pixmapRocketOff.scaledToWidth(size);
+}
+
+void Spaceship::setHasCargo(bool hasCargo)
+{
+  m_hasCargo = hasCargo;
+}
+
+bool Spaceship::hasCargo() const
+{
+  return m_hasCargo;
 }
 
 void Spaceship::initPixmaps()
