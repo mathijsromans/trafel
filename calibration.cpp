@@ -74,6 +74,7 @@ void Calibration::calibrate()
     m_scene->showInfoText("Verify calibration");
     QPen pen(Qt::white);
     pen.setWidth(3);
+    delete m_tableRectItem;
     m_tableRectItem = m_scene->addRect(m_tableRect, pen);
 //    done(); // REMOVE ME TO VERIFY!!!
   }
@@ -85,6 +86,7 @@ void Calibration::calibrate()
     m_imageItem->setPixmap(QPixmap::fromImage(QImage("grab_0.png")).scaledToWidth(500));
     m_imageItem->setPos(250, 250);
     m_imageItem->setZValue(-10);
+    m_tableRectItem = m_scene->addRect(m_imageItem->boundingRect().translated(m_imageItem->pos()), QPen(Qt::white));
     m_scene->showInfoText("Verify camera position");
     m_scene->addItem(m_imageItem);
     m_status = Status::uninitialised;
@@ -176,7 +178,7 @@ void Calibration::done()
   m_status = Status::done;
   m_circle->hide();
   m_scene->showInfoText("");
-  m_tableRectItem->hide();
+  delete m_tableRectItem;
   m_scene->doInit(m_tableRect);
 }
 
@@ -230,6 +232,7 @@ void Calibration::newCornerPoint(QPointF p)
     qDebug() << "TABLE RECT IS " << m_tableRect;
     QPen pen(Qt::white);
     pen.setWidth(3);
+    delete m_tableRectItem;
     m_tableRectItem = m_scene->addRect(m_tableRect, pen);
     done();
     QSettings settings("TafelSoft", "Tafel");

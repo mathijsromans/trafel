@@ -35,6 +35,8 @@ raspicam::RaspiCam& getCam(unsigned int cameraISO)
     usleep(3000000);
   }
 
+  camera.setISO(cameraISO); // note: 100 to 800
+
   //capture
   return camera;
 }
