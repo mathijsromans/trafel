@@ -20,7 +20,7 @@ public:
 signals:
   void signalEvent(PointerEvent point);
 private:
-  void getImage();
+  void getImage(unsigned int cameraISO);
   PointerEvent getEvent() const;
   bool searchLine(int y, std::array<QPoint, 3>& result, std::array<int, 3>& bestScore) const;
 private:  

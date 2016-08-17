@@ -14,7 +14,7 @@
 namespace
 {
 
-raspicam::RaspiCam& getCam()
+raspicam::RaspiCam& getCam(unsigned int cameraISO)
 {
   static raspicam::RaspiCam camera;
   static bool initialised = false;
@@ -28,7 +28,7 @@ raspicam::RaspiCam& getCam()
     }
 
     camera.setExposure(raspicam::RASPICAM_EXPOSURE_AUTO);
-    camera.setISO(100); // note: 100 to 800
+    camera.setISO(cameraISO); // note: 100 to 800
     camera.setShutterSpeed(5000);
 
     //wait a while until camera stabilizes
@@ -53,17 +53,15 @@ UserInput::~UserInput()
 {
 }
 
-void UserInput::getImage()
+void UserInput::getImage(unsigned int cameraISO)
 {
-//  QTime time;
-//  time.start();
-
 #if USE_CAMERA
-  raspicam::RaspiCam& camera = getCam();
+  raspicam::RaspiCam& camera = getCam(cameraISO);
   camera.grab();
   m_currentImage.setSize( camera.getWidth(), camera.getHeight(), camera.getImageTypeSize( raspicam::RASPICAM_FORMAT_RGB ) );
   camera.retrieve( m_currentImage.getData(), raspicam::RASPICAM_FORMAT_RGB );
 #else
+  (void)cameraISO;
   m_currentImage = m_testImage;
 #endif
 
@@ -144,14 +142,19 @@ void UserInput::process()
 //  QTime time;
 //  time.start();
 
-  getImage();
+
 
   static int counter = 0;
   if (counter == 0)
   {
+    getImage(800);
     QString fileName = QString("grab_") + QString::number(counter++) + ".png";
     m_currentImage.toImage().save( fileName );
     qDebug() << "saved to " << fileName;
+  }
+  else
+  {
+    getImage(100);
   }
 
   PointerEvent event( getEvent() );
