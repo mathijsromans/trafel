@@ -31,7 +31,7 @@ SOURCES += main.cpp\
     calibration.cpp \
     spafel/body.cpp \
     spafel/bodyitem.cpp \
-    spafel/cargoitem.cpp \
+    spafel/cargo.cpp \
     spafel/environment.cpp \
     spafel/gravityscene.cpp \
     spafel/spaceship.cpp \
@@ -59,7 +59,7 @@ HEADERS  += mainwindow.h \
     utilities.h \
     calibration.h \
     spafel/body.h \
-    spafel/cargoitem.h \
+    spafel/cargo.h \
     spafel/bodyitem.h \
     spafel/environment.h \
     spafel/gravityscene.h \

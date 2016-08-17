@@ -4,7 +4,7 @@
 #include "spafel/planet.h"
 #include "spafel/environment.h"
 #include "spafel/spaceship.h"
-#include "spafel/cargoitem.h"
+#include "spafel/cargo.h"
 
 #include <QDebug>
 #include <QGraphicsEllipseItem>
@@ -30,13 +30,14 @@ GravityScene::GravityScene() :
   TransformScene(),
   m_environment(new Environment(stepsize)),
   m_bodyItems(),
-  m_newBody(),
+  m_planets(),
+  m_spaceships(),
+  m_cargos(),
   m_trackItems(),
   m_tempPlanet(0),
   m_timer(new QTimer(this))
 {
 }
-
 
 GravityScene::~GravityScene()
 {
@@ -57,6 +58,7 @@ GravityScene::addSpaceship(Body* body, unsigned int id)
 {
   m_environment->addSpaceship(body);
   Spaceship* ship = new Spaceship(body, id);
+  m_spaceships.push_back(ship);
   m_bodyItems.push_back(ship);
   addItem(ship);
 }
@@ -106,7 +108,6 @@ GravityScene::init()
   connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(slotButtonPressed(int)));
 }
 
-
 void
 GravityScene::step()
 {
@@ -117,35 +118,18 @@ GravityScene::step()
     bodyItem->updateItem(getTableRect(), centreOfMass);
   }
 
+  for (const auto& item : m_spaceships)
+  {
+    for (const auto& planet : m_planets)
+    {
+      if (item->collidesWithItem(planet))
+      {
+
+      }
+    }
+  }
+
   updateTrackItems();
-}
-
-
-void
-GravityScene::eventClick(QPointF /*point*/, PointerEvent::Color /*c*/)
-{
-//  if (m_newBody)
-//  {
-//    Body* body = new Body(m_environment.get());
-//    body->setMass(m_newBody->m_mass);
-//    QPointF envPos = GravityScene::sceneToEnv(m_newBody->scenePos, getTableRect());
-//    QPointF velVect = point - m_newBody->scenePos;
-//    velVect = velVect * 2.0e2;
-//    body->setPosition(envPos.x(), envPos.y());
-//    body->setVelocity(velVect.x(), velVect.y());
-//    addBody(body, Qt::green);
-//    removeItem(m_tempPlanet);
-//    delete m_tempPlanet;
-//    m_tempPlanet = 0;
-//    m_newBody.release();
-//  }
-//  else
-//  {
-//    double mass = 5.0e28;
-//    double radius = Planet::calcRadius(mass);
-//    m_tempPlanet = addEllipse(point.x()-radius, point.y()-radius, 2*radius, 2*radius, QPen(Qt::darkGreen), QBrush(Qt::darkGreen));
-//    m_newBody.reset(new NewBodyData(mass, point));
-//  }
 }
 
 QPointF
@@ -160,7 +144,6 @@ GravityScene::envToScene(const QPointF& point, const QRectF& tableRect, const QP
   return pointScene;
 }
 
-
 QPointF
 GravityScene::sceneToEnv(const QPointF& point, const QRectF& tableRect, const QPointF& centreOfMass)
 {
@@ -171,7 +154,6 @@ GravityScene::sceneToEnv(const QPointF& point, const QRectF& tableRect, const QP
   double y = (point.y() - centreOfMass.y() - sceneCentreOffsetY) * AU / scaleFactor;
   return QPointF(x, y);
 }
-
 
 double
 GravityScene::getScaleFactor(const QRectF& tableRect)
@@ -273,7 +255,7 @@ GravityScene::createSpaceShips()
 void
 GravityScene::createCargo()
 {
-  CargoItem* cargo = new CargoItem(m_planets[1], m_planets[2]);
+  Cargo* cargo = new Cargo(m_planets[1], m_planets[2]);
   m_bodyItems.push_back(cargo);
   addItem(cargo);
 }

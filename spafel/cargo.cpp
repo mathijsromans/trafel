@@ -1,4 +1,4 @@
-#include "cargoitem.h"
+#include "cargo.h"
 
 #include "body.h"
 #include "gravityscene.h"
@@ -12,7 +12,7 @@
 #include <cassert>
 
 
-CargoItem::CargoItem(Planet* origin, Planet* destination) :
+Cargo::Cargo(Planet* origin, Planet* destination) :
   BodyItem(origin->getBody()),
   m_origin(origin),
   m_destination(destination),
@@ -23,14 +23,14 @@ CargoItem::CargoItem(Planet* origin, Planet* destination) :
   assert(destination);
 }
 
-void CargoItem::setSpaceship(Spaceship* spaceship)
+void Cargo::setSpaceship(Spaceship* spaceship)
 {
   assert(m_status == Status::origin);
   m_status = Status::spaceship;
   m_spaceship = spaceship;
 }
 
-Body* CargoItem::getCurrentBody() const
+Body* Cargo::getCurrentBody() const
 {
   switch (m_status)
   {
@@ -45,7 +45,7 @@ Body* CargoItem::getCurrentBody() const
   return 0;
 }
 
-void CargoItem::updateItem(const QRectF &tableRect, QPointF centreOfMass)
+void Cargo::updateItem(const QRectF &tableRect, QPointF centreOfMass)
 {
   Body* body = getCurrentBody();
   assert(body);
@@ -54,12 +54,12 @@ void CargoItem::updateItem(const QRectF &tableRect, QPointF centreOfMass)
   setPos(scenePos.x(), scenePos.y());
 }
 
-QRectF CargoItem::boundingRect() const
+QRectF Cargo::boundingRect() const
 {
   return Utilities::squareAt(0, 0, 10);
 }
 
-void CargoItem::paint(QPainter *painter,
+void Cargo::paint(QPainter *painter,
                       const QStyleOptionGraphicsItem */*option*/,
                       QWidget */*widget*/)
 {

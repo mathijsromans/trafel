@@ -1,5 +1,5 @@
-#ifndef CARGOITEM_H
-#define CARGOITEM_H
+#ifndef CARGO_H
+#define CARGO_H
 
 #include "bodyitem.h"
 
@@ -7,7 +7,7 @@ class Body;
 class Planet;
 class Spaceship;
 
-class CargoItem : public BodyItem
+class Cargo : public BodyItem
 {
 public:
   enum class Status {
@@ -16,7 +16,7 @@ public:
     destination,
   };
 public:
-  CargoItem(Planet* origin, Planet* destination);
+  Cargo(Planet* origin, Planet* destination);
   void setSpaceship(Spaceship* spaceship);
   virtual void updateItem(const QRectF& tableRect, QPointF centreOfMass) override;
   virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -30,4 +30,4 @@ private:
   Status m_status;
 };
 
-#endif // CARGOITEM_H
+#endif // CARGO_H
