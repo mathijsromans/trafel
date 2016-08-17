@@ -8,6 +8,8 @@
 namespace
 {
   const double earthMass = 5.972e24;
+  const unsigned int lineWidth = 4;
+  const double minRadius = 5.0;
 }
 
 Planet::Planet(Body* body, const QColor& lineColor)
@@ -27,7 +29,7 @@ void Planet::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/
 {
   QColor color = getBody()->getColor();
   QPen pen(m_lineColor);
-  pen.setWidth(4);
+  pen.setWidth(lineWidth);
   QBrush brush(color);
   painter->setPen(pen);
   painter->setBrush(brush);
@@ -37,7 +39,7 @@ void Planet::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/
 unsigned int
 Planet::calcRadius(double mass)
 {
-  return std::pow(mass, 1/6.0) / std::pow(earthMass, 1/6.0) * 20.0;
+  return static_cast<unsigned int>(std::max(std::pow(mass, 1/6.0) / std::pow(earthMass, 1/6.0) * 20.0, minRadius));
 }
 
 QColor Planet::getLineColor()
