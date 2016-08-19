@@ -18,6 +18,7 @@ public:
   explicit FlafelScene();
   ~FlafelScene() override;
   void stopperRemoved( const Stopper* stopper );
+  virtual double getFps() const { return ms_fps; }
 private:
   void init() override;
   void step(unsigned int turn) override;
@@ -25,7 +26,6 @@ private:
   void eventUnclick(QPointF p, PointerEvent::Color c) override;
   void eventMove(QPointF p, PointerEvent::Color c) override;
   bool showScore() const override { return true; }
-  virtual double getFps() const { return ms_fps; }
   std::unique_ptr<Stopper> createStopper( QPointF start, QPointF end, QColor c );
   void addBalls();
   void advanceBalls();

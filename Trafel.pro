@@ -49,7 +49,10 @@ SOURCES += main.cpp\
     flafel/stopper.cpp \
     flafel/player.cpp \
     mainmenuscene.cpp \
-    rafel/rafelscene.cpp
+    rafel/rafelscene.cpp \
+    rafel/rafelitem.cpp \
+    rafel/train.cpp \
+    rafel/demandtrack.cpp
 
 HEADERS  += mainwindow.h \
     trafficscene.h \
@@ -80,6 +83,9 @@ HEADERS  += mainwindow.h \
     flafel/player.h \
     nocopy.h \
     mainmenuscene.h \
-    rafel/rafelscene.h
+    rafel/rafelscene.h \
+    rafel/rafelitem.h \
+    rafel/train.h \
+    rafel/demandtrack.h
 
 FORMS    +=

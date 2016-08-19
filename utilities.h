@@ -10,6 +10,7 @@ namespace Utilities
 QRectF squareAt( QPointF p, double size );
 QRectF squareAt( double x, double y, double size );
 double dist(QPointF p1, QPointF p2);
+double dist2(QPointF p1, QPointF p2);
 
 template <typename T> int sign(T val)
 {
@@ -24,6 +25,8 @@ bool contains( const T1& vec, const T2& elem )
 {
   return std::find( vec.begin(), vec.end(), elem ) != vec.end();
 }
+
+unsigned int getRnd( unsigned int min, unsigned int max );
 
 }
 

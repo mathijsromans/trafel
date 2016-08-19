@@ -34,7 +34,7 @@ MainWindow::MainWindow(QWidget *parent) :
   m_userInputThread.setUI(ui);
   m_userInputThread.start();
 
-  slotStartGame( MainMenuScene::Games::mainMenu );
+  slotStartGame( MainMenuScene::Games::rafel );
 }
 
 MainWindow::~MainWindow()

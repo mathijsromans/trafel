@@ -34,10 +34,10 @@ public:
   virtual ~GravityScene();
   static QPointF envToScene(const QPointF& point, const QRectF& tableRect, const QPointF& centreOfMass);
   static QPointF sceneToEnv(const QPointF& point, const QRectF& tableRect, const QPointF& centreOfMass);
+  virtual double getFps() const override;
 
 private:
   virtual void init() override;
-  virtual double getFps() const override;
   virtual bool showScore() const override { return true; }
   virtual void step(unsigned int turn) override;
   void handleCollisions();

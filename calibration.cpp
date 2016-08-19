@@ -76,7 +76,7 @@ void Calibration::calibrate()
     pen.setWidth(3);
     delete m_tableRectItem;
     m_tableRectItem = m_scene->addRect(m_tableRect, pen);
-//    done(); // REMOVE ME TO VERIFY!!!
+    done(); // REMOVE ME TO VERIFY!!!
   }
   else
   {

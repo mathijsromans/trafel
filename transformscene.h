@@ -26,6 +26,7 @@ public:
 
   /// returns unit vector with origin at the player's position
   QLineF getPlayerPosition(unsigned int player);
+  unsigned int getNumPlayers() const;
 
 signals:
   void signalMouseEvent(PointerEvent e);
@@ -41,8 +42,8 @@ protected:
   void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
   void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
   void processMouseEvent(PointerEvent e);
-  unsigned int getNumPlayers() const;
   void setScore(unsigned int player, int score);
+  virtual double getFps() const { return 0; }
 private:
   virtual void init() = 0;
   virtual void step(unsigned int /*turn*/) {}
@@ -50,7 +51,6 @@ private:
   virtual void eventUnclick(QPointF /*p*/, PointerEvent::Color /*c*/) {}
   virtual void eventMove(QPointF /*p*/, PointerEvent::Color /*c*/) {}
   virtual bool showScore() const { return false; }
-  virtual double getFps() const { return 0; }
 
 private slots:
   void doStep();
