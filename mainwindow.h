@@ -25,6 +25,7 @@ protected:
 
 private slots:
   void slotStartGame(MainMenuScene::Games game);
+  void slotSetNumPlayers(int numPlayers);
   void slotInputEvent(PointerEvent e);
   void slotQuit();
 
@@ -36,6 +37,7 @@ private:
   QGraphicsView* v;
   std::unique_ptr<TransformScene> m_currentScene;
   Calibration m_calibration;
+  unsigned int m_numPlayers = 3;
 };
 
 #endif // MAINWINDOW_H

@@ -27,6 +27,7 @@ public:
   /// returns unit vector with origin at the player's position
   QLineF getPlayerPosition(unsigned int player);
   unsigned int getNumPlayers() const;
+  void setNumPlayers( int num );
 
 signals:
   void signalMouseEvent(PointerEvent e);
@@ -70,6 +71,7 @@ private:
   PointerEvent m_lastMouseEvent;
   unsigned int m_turn = 0;
   QTimer* m_timer;
+  unsigned int m_numPlayers;
 };
 
 #endif // TRANSFORMSCENE_H

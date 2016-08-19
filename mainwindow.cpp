@@ -34,7 +34,7 @@ MainWindow::MainWindow(QWidget *parent) :
   m_userInputThread.setUI(ui);
   m_userInputThread.start();
 
-  slotStartGame( MainMenuScene::Games::rafel );
+  slotStartGame( MainMenuScene::Games::mainMenu );
 }
 
 MainWindow::~MainWindow()
@@ -88,6 +88,7 @@ void MainWindow::slotStartGame(MainMenuScene::Games game)
     {
       auto mainMenuScene = std::make_unique<MainMenuScene>();
       connect(mainMenuScene.get(), SIGNAL(signalStartGame(MainMenuScene::Games)), this, SLOT(slotStartGame(MainMenuScene::Games)));
+      connect(mainMenuScene.get(), SIGNAL(signalChangeNumPlayers(int)), this, SLOT(slotSetNumPlayers(int)));
       m_currentScene = std::move(mainMenuScene);
     }
     break;
@@ -98,8 +99,15 @@ void MainWindow::slotStartGame(MainMenuScene::Games game)
     case Games::rafel:  m_currentScene = std::make_unique<RafelScene>(); break;
     case Games::MAX: assert(false);
   }
+  m_currentScene->setNumPlayers(m_numPlayers);
   m_calibration.setScene(m_currentScene.get());
   v->setScene(m_currentScene.get());
   connect(m_currentScene.get(), SIGNAL(signalMouseEvent(PointerEvent)), this, SLOT(slotInputEvent(PointerEvent)));
   connect(m_currentScene.get(), SIGNAL(signalQuit()), this, SLOT(slotQuit()));
+}
+
+void MainWindow::slotSetNumPlayers(int numPlayers)
+{
+  m_numPlayers = numPlayers;
+  m_currentScene->setNumPlayers(m_numPlayers);
 }

@@ -76,7 +76,7 @@ void Calibration::calibrate()
     pen.setWidth(3);
     delete m_tableRectItem;
     m_tableRectItem = m_scene->addRect(m_tableRect, pen);
-    done(); // REMOVE ME TO VERIFY!!!
+//    done(); // REMOVE ME TO VERIFY!!!
   }
   else
   {
@@ -222,12 +222,18 @@ void Calibration::newCornerPoint(QPointF p)
     std::sort(m_cornerPoints.begin(), m_cornerPoints.end(), compareX);
     std::sort(m_cornerPoints.begin(), std::next(m_cornerPoints.begin(), 2), compareY);
     std::sort(std::next(m_cornerPoints.begin(), 2), m_cornerPoints.end(), compareY);
-    QPointF topLeft = m_cornerPoints[0];
-    QPointF bottomLeft = m_cornerPoints[1];
-    QPointF topRight = m_cornerPoints[2];
-    QPointF bottomRight = m_cornerPoints[3];
-    QPointF tableRectTopLeft(std::max(topLeft.x(), bottomLeft.x()), std::max(topLeft.y(), topRight.y()));
-    QPointF tableRectBottomRight(std::min(bottomRight.x(), topRight.x()), std::min(bottomLeft.y(), bottomRight.y()));
+//    QPointF topLeft = m_cornerPoints[0];
+//    QPointF bottomLeft = m_cornerPoints[1];
+//    QPointF topRight = m_cornerPoints[2];
+//    QPointF bottomRight = m_cornerPoints[3];
+//    QPointF tableRectTopLeft(std::max(topLeft.x(), bottomLeft.x()), std::max(topLeft.y(), topRight.y()));
+//    QPointF tableRectBottomRight(std::min(bottomRight.x(), topRight.x()), std::min(bottomLeft.y(), bottomRight.y()));
+    QPointF top = 0.5 * ( m_cornerPoints[0] + m_cornerPoints[2] );
+    QPointF bottom = 0.5 * ( m_cornerPoints[1] + m_cornerPoints[3] );
+    QPointF left = 0.5 * ( m_cornerPoints[0] + m_cornerPoints[1] );
+    QPointF right = 0.5 * ( m_cornerPoints[2] + m_cornerPoints[3] );
+    QPointF tableRectTopLeft( left.x(), top.y() );
+    QPointF tableRectBottomRight( right.x(), bottom.y() );
     m_tableRect = QRectF(tableRectTopLeft, tableRectBottomRight);
     qDebug() << "TABLE RECT IS " << m_tableRect;
     QPen pen(Qt::white);

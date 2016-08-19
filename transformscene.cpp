@@ -77,7 +77,9 @@ void TransformScene::doInit(QRectF tableRect)
   quitButton->setPos(getTableRect().topLeft());
   addItem( quitButton );
   connect(quitButton, SIGNAL(pressed()), this, SLOT(slotQuit()));
-  addRect(getTableRect(), QPen(Qt::white));
+//  addRect(getTableRect(), QPen(Qt::white));
+
+  init();
 
   if ( showScore() )
   {
@@ -100,7 +102,6 @@ void TransformScene::doInit(QRectF tableRect)
     }
   }
 
-  init();
 
   double fps = getFps();
   if ( fps != 0 )
@@ -166,7 +167,7 @@ void TransformScene::slotQuitNo()
 
 unsigned int TransformScene::getNumPlayers() const
 {
-  return 3;
+  return m_numPlayers;
 }
 
 QRectF TransformScene::getTableRect() const
@@ -194,6 +195,11 @@ void TransformScene::setScore(unsigned int player, int score)
                                     colors[player%colors.size()].name() +
                                     ";'>" + QString::number(score) + "</div>");
   }
+}
+
+void TransformScene::setNumPlayers(int num)
+{
+  m_numPlayers = num;
 }
 
 void TransformScene::doStep()

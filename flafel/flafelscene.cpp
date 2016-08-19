@@ -31,7 +31,7 @@ void FlafelScene::init()
 {
   if ( getNumPlayers() > static_cast<unsigned int>(PointerEvent::Color::MAX) )
   {
-    throw std::logic_error("too many players: " + std::to_string(getNumPlayers()));
+    setNumPlayers(static_cast<unsigned int>(PointerEvent::Color::MAX));
   }
   for ( unsigned int p = 0; p != getNumPlayers(); ++p )
   {

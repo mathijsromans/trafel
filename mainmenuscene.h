@@ -15,10 +15,17 @@ public:
   MainMenuScene();
 signals:
   void signalStartGame(MainMenuScene::Games game);
+  void signalChangeNumPlayers(int numPlayers);
 private slots:
-  void slotButtonPressed(int button);
+  void slotGameButtonPressed(int button);
+  void slotChangeNumPlayers(int numPlayers);
 private:
   void init() override;
+  void createGameButtons();
+  void createNumPlayerButtons();
+  void updateText();
+private:
+  QGraphicsTextItem* m_numPlayerText;
 };
 
 #endif // MAINMENUSCENE_H
