@@ -28,7 +28,7 @@ TrafficScene::TrafficScene()
   : m_earth(ms_gridSize, ms_gridSize),
     m_travelState(TravelState::neutral),
     m_clickState(ClickState::neutral),
-    m_money{ 35, 45 },
+    m_money{ 35, 40 },
     m_moneyLabel{ 0, 0 }
 {  
 }

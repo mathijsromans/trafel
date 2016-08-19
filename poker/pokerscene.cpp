@@ -96,7 +96,7 @@ void PokerScene::hideCards()
 void PokerScene::createCards()
 {
   const double cardRatio = 1.2/0.8;
-  double cardWidth = 0.08 * getTableRect().width();
+  double cardWidth = 0.1 * getTableRect().width();
   QRectF cardSize( 0, 0, cardWidth, cardRatio * cardWidth );
   QPixmap cardsFrontPixMap = QPixmap("../trafel/resources/cardsfront.png");
   QPixmap cardsBackPixMap = QPixmap("../trafel/resources/cardback.png").scaled(cardWidth, cardRatio * cardWidth);
@@ -138,12 +138,12 @@ void PokerScene::dealCards()
   {
     QTimer::singleShot(300*i, this, SLOT(dealCard()));
   }
-  QTimer::singleShot(300*getNumPlayers() * cardsDealt + 50, this, SLOT(showCards()));
+  QTimer::singleShot(300*getNumPlayers() * cardsDealt + 250, this, SLOT(showCards()));
 }
 
 void PokerScene::playDealCardSound()
 {
-  system("omxplayer -o local ../poker/sound/dealcard.wav&");
+  system("omxplayer -o local ../trafel/resources/dealcard.wav&");
 }
 
 void PokerScene::dealCard()

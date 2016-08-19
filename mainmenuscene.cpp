@@ -89,9 +89,8 @@ void MainMenuScene::init()
   font.setPixelSize(40);
   m_numPlayerText->setFont(font);
   m_numPlayerText->setDefaultTextColor(Qt::white);
-  m_numPlayerText->setPos(0.25 * tableRect.center() +
-                     0.375 * tableRect.bottomLeft() +
-                     0.375 * tableRect.bottomRight());
+  m_numPlayerText->setPos(0.3 * tableRect.center() +
+                     0.7 * tableRect.bottomLeft() );
   m_numPlayerText->show();
 
   createGameButtons();
