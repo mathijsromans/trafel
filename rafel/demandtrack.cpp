@@ -23,7 +23,7 @@ void DemandTrack::fillQueue()
   {
     std::vector<RafelItem*> items;
     unsigned int amount = Utilities::getRnd(1, 4);
-    RafelItem::Type type = static_cast<RafelItem::Type>( Utilities::getRnd(0, static_cast<unsigned int>(RafelItem::Type::MAX) ) );
+    RafelItem::Type type = static_cast<RafelItem::Type>( Utilities::getRnd(0, static_cast<unsigned int>(RafelItem::Type::MAX)-1 ) );
     for ( unsigned int j = 0; j != amount; ++j )
     {
       auto item = new RafelItem(sz, type);
@@ -45,5 +45,16 @@ void DemandTrack::positionItems()
       m_queue[i][j]->setPos(m_pos + QPointF(i*sz1 , j*sz2));
     }
   }
+}
+
+std::array<int, static_cast<unsigned int>(RafelItem::Type::MAX)> DemandTrack::getDemand() const
+{
+  std::array<int, static_cast<unsigned int>(RafelItem::Type::MAX)> result;
+  result.fill(0);
+  for ( RafelItem* item : m_queue.front() )
+  {
+    ++result[static_cast<unsigned int>(item->getType())];
+  }
+  return result;
 }
 

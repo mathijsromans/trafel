@@ -22,7 +22,9 @@ void RafelScene::init()
 {
   m_train = std::make_unique<Train>(*this);
   m_train->addItem(new RafelItem(0.2*itemSize(), RafelItem::Type::Blue), 0);
+  m_train->addItem(new RafelItem(0.2*itemSize(), RafelItem::Type::Blue), 0);
   m_train->addItem(new RafelItem(0.2*itemSize(), RafelItem::Type::Blue), 1);
+  m_train->addItem(new RafelItem(0.2*itemSize(), RafelItem::Type::Red), 1);
   m_train->addItem(new RafelItem(0.2*itemSize(), RafelItem::Type::Red), 2);
   m_train->addItem(new RafelItem(0.2*itemSize(), RafelItem::Type::Green), 2);
   m_atStation = 0;
@@ -56,7 +58,15 @@ void RafelScene::step(unsigned int /*turn*/)
     if ( diff < 3 * angleStep() ||
          fabs(2 *M_PI-diff) < 3 * angleStep() )
     {
-      m_status = Status::stopped;
+      if ( m_atStation %2 == 1 )
+      {
+        m_train->exchangeWith(*m_demands[m_atStation%2]);
+        m_atStation = (m_atStation+1)%(getNumPlayers()*2);
+      }
+      else
+      {
+        m_status = Status::stopped;
+      }
     }
   }
 }

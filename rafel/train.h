@@ -3,6 +3,7 @@
 
 class PixmapItem;
 class RafelItem;
+class DemandTrack;
 class RafelScene;
 #include <vector>
 
@@ -14,6 +15,7 @@ public:
   void setAngle(double angle);
   void addItem(RafelItem* item, unsigned int wagon);
   double angle() const;
+  void exchangeWith(DemandTrack& track);
 
 private:
   struct Wagon

@@ -1,5 +1,6 @@
 #include "train.h"
 
+#include "demandtrack.h"
 #include "pixmapitem.h"
 #include "rafelitem.h"
 #include "rafelscene.h"
@@ -70,6 +71,47 @@ void Train::addItem(RafelItem* item, unsigned int wagon)
 
 double Train::angle() const
 {
-    return m_angle;
+  return m_angle;
+}
+
+void Train::exchangeWith(DemandTrack& track)
+{
+  std::array<int, static_cast<unsigned int>(RafelItem::Type::MAX)> load;
+  load.fill(0);
+  for ( Wagon& wagon : m_wagons )
+  {
+    for ( RafelItem* item : wagon.items )
+    {
+      ++load[static_cast<unsigned int>(item->getType())];
+    }
+  }
+  std::array<int, static_cast<unsigned int>(RafelItem::Type::MAX)> demand = track.getDemand();
+  for ( unsigned int i = 0; i != static_cast<unsigned int>(RafelItem::Type::MAX); ++i )
+  {
+    if ( load[i] < demand[i] )
+    {
+      return;
+    }
+  }
+
+  // ok
+  for ( Wagon& wagon : m_wagons )
+  {
+    for ( auto it = wagon.items.begin(); it != wagon.items.end(); )
+    {
+      unsigned int iType = static_cast<unsigned int>( (*it)->getType() );
+      if ( demand[iType] )
+      {
+        delete *it;
+        it = wagon.items.erase(it);
+        --demand[iType];
+      }
+      else
+      {
+        ++it;
+      }
+    }
+  }
+
 }
 
